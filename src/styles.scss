@@ -1,15 +1,56 @@
-@import "~primeng/resources/primeng.min.css";
-@import "~primeng/resources/themes/mdc-dark-deeppurple/theme.css";
-@import "~primeicons/primeicons.css";
+@import '~primeng/resources/primeng.min.css';
+@import '~primeicons/primeicons.css';
+@import '../node_modules/primeflex/primeflex.css';
+@import '~primeng/resources/themes/arya-green/theme.css';
+@import '../src/variables.scss';
 
 body,
 body .p-component {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Open sans', sans-serif;
+}
+
+:root[data-theme='theme-light'] {
+  --primary-color: #0072a3;
+  --text-color: #333333;
+  --bg-color: #fafafa;
+  --component-bg-color: #ffffff;
+}
+:root[data-theme='theme-dark'] {
+  --primary-color: #49afd9;
+  --text-color: #e3f5fc;
+  --bg-color: #1b2a32;
+  --component-bg-color: #22343c;
 }
 
 html,
 body,
-my-app {
+app-main {
+  margin: 0;
+  font-size: 12px;
   width: 100%;
+  height: 100vh;
+  background-color: var(--editor-bg);
+}
+
+.as-split-gutter {
+  background-color: transparent !important;
+  .as-split-gutter-icon {
+    background-image: none !important;
+  }
+}
+
+body .topbar {
+  background: var(--top-bar-bg);
+}
+
+body .p-tree,
+.side-menu-split {
+  border: none;
+  background: var(--side-menu-bg);
+}
+
+body .default-view {
   height: 100%;
+  width: 100%;
+  background: var(--editor-bg);
 }

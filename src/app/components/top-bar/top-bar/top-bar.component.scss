@@ -1,1 +1,29 @@
-@import "../../../../variables.scss";
+@import '../../../../variables.scss';
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid $dark-1-accent;
+}
+
+.autocomplete {
+  height: 3rem;
+  width: 60%;
+}
+
+.pi-cog {
+  font-size: 1.5rem;
+  color: $dark-1-opposite-color;
+}
+
+.topbar-end {
+  display: flex;
+  align-items: center;
+}
+
+.text {
+  margin-left: 0.5rem;
+  color: $dark-1-opposite-color;
+}

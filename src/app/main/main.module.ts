@@ -1,17 +1,17 @@
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
 
-import { MainRoutingModule } from "./main-routing.module";
+import { MainRoutingModule } from './main-routing.module'
 
-import { SharedModule } from "../shared/shared.module";
-import { MainComponent } from "./main.component";
-import { SideMenuModule } from "../components/side-menu/side-menu.module";
-import { TopBarModule } from "../components/top-bar/top-bar/top-bar.module";
-import { DefaultViewModule } from "../components/default-view/default-view.module";
-import { SplitterModule } from "primeng/splitter";
-import { PanelModule } from "primeng/panel";
-import { BrowserModule } from "@angular/platform-browser";
-import { ScrollPanelModule } from "primeng/scrollpanel";
+import { SharedModule } from '../shared/shared.module'
+import { MainComponent } from './main.component'
+import { SideMenuModule } from '../components/side-menu/side-menu.module'
+import { TopBarModule } from '../components/top-bar/top-bar/top-bar.module'
+import { DefaultViewModule } from '../components/default-view/default-view.module'
+import { AngularSplitModule } from 'angular-split'
+import { PanelModule } from 'primeng/panel'
+import { BrowserModule } from '@angular/platform-browser'
+import { ScrollPanelModule } from 'primeng/scrollpanel'
 
 @NgModule({
   declarations: [MainComponent],
@@ -22,7 +22,7 @@ import { ScrollPanelModule } from "primeng/scrollpanel";
     SideMenuModule,
     TopBarModule,
     DefaultViewModule,
-    SplitterModule,
+    AngularSplitModule,
     ScrollPanelModule,
     PanelModule,
     BrowserModule,

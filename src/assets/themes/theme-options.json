@@ -1,0 +1,20 @@
+[
+  {
+    "--editor-bg": "#282728",
+    "--side-menu-bg": "#1f1e1f",
+    "--top-bar-bg": "#141113",
+    "--accent": "#fc0042",
+    "--gutter-bg": "#100e0e",
+    "--contrast": "#fafafa",
+    "value": "default"
+  },
+  {
+    "--editor-bg": "#1b2025",
+    "--side-menu-bg": "#131418",
+    "--top-bar-bg": "#181e22",
+    "--accent": "#fc0042",
+    "--gutter-bg": "#100e0e",
+    "--contrast": "#fafafa",
+    "value": "grey"
+  }
+]

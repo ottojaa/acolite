@@ -1,28 +1,52 @@
-import { Component } from '@angular/core';
-import { ElectronService } from './core/services';
-import { TranslateService } from '@ngx-translate/core';
-import { APP_CONFIG } from '../environments/environment';
+import { Component, OnInit } from '@angular/core'
+import { ElectronService } from './core/services'
+import { TranslateService } from '@ngx-translate/core'
+import { APP_CONFIG } from '../environments/environment'
+import { HttpClient } from '@angular/common/http'
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  themeOptions = []
+
   constructor(
     private electronService: ElectronService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private http: HttpClient
   ) {
-    this.translate.setDefaultLang('en');
-    console.log('APP_CONFIG', APP_CONFIG);
+    this.translate.setDefaultLang('en')
+    console.log('APP_CONFIG', APP_CONFIG)
 
     if (electronService.isElectron) {
-      console.log(process.env);
-      console.log('Run in electron');
-      console.log('Electron ipcRenderer', this.electronService.ipcRenderer);
-      console.log('NodeJS childProcess', this.electronService.childProcess);
+      console.log(process.env)
+      console.log('Run in electron')
+      console.log('Electron ipcRenderer', this.electronService.ipcRenderer)
+      console.log('NodeJS childProcess', this.electronService.childProcess)
     } else {
-      console.log('Run in browser');
+      console.log('Run in browser')
+    }
+  }
+
+  ngOnInit(): void {
+    this.http
+      .get<any>('../assets/themes/theme-options.json')
+      .subscribe((data) => {
+        this.themeOptions = data
+        this.changeTheme('grey')
+      })
+  }
+
+  changeTheme(theme: string): void {
+    const selectedTheme = this.themeOptions.find(
+      (option) => option.value === theme
+    )
+    if (selectedTheme) {
+      Object.keys(selectedTheme).forEach((key) => {
+        document.documentElement.style.setProperty(key, selectedTheme[key])
+      })
     }
   }
 }

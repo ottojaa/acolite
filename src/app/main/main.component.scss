@@ -1,3 +1,9 @@
-:host {
-  
+@import '../../assets/themes/theme.scss';
+@import '../../variables.scss';
+.app-container {
+  height: 100%;
+}
+
+.scroll-panel-container {
+  min-width: 200px;
 }
