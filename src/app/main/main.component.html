@@ -1,0 +1,16 @@
+<div class="container">
+  <app-top-bar></app-top-bar>
+  <p-splitter [style]="{ height: '100vh' }" [panelSizes]="[10, 90]">
+    <ng-template pTemplate>
+      <p-scrollPanel [style]="{ width: '100%' }">
+        <app-side-menu></app-side-menu>
+      </p-scrollPanel>
+    </ng-template>
+    <ng-template pTemplate>
+      {{ textii }}
+      <app-default-view></app-default-view>
+    </ng-template>
+  </p-splitter>
+
+  <!--   <a routerLink="/">{{ 'PAGES.DETAIL.BACK_TO_HOME' | translate }}</a> -->
+</div>

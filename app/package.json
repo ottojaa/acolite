@@ -1,0 +1,11 @@
+{
+  "name": "acolite",
+  "version": "0.0.1",
+  "main": "main.js",
+  "private": true,
+  "dependencies": {
+    "@electron/remote": "1.2.0",
+    "primeicons": "4.1.0",
+    "primeng": "*"
+  }
+}

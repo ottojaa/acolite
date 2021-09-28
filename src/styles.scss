@@ -1,0 +1,15 @@
+@import "~primeng/resources/primeng.min.css";
+@import "~primeng/resources/themes/mdc-dark-deeppurple/theme.css";
+@import "~primeicons/primeicons.css";
+
+body,
+body .p-component {
+  font-family: "Roboto", sans-serif;
+}
+
+html,
+body,
+my-app {
+  width: 100%;
+  height: 100%;
+}
