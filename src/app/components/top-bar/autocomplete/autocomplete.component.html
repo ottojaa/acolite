@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="auto-complete">
+    <!-- Search Input -->
+
+    <input
+      class="input-search"
+      type="text"
+      placeholder="Search for files"
+      (input)="onSearchFiles($event.target.value)"
+      (click)="onOpenDrop(true)"
+      (clickOutside)="onOpenDrop(false)"
+      [exclude]="'.input-search'"
+    />
+
+    <!-- Dropdown Menu -->
+    <div *ngIf="openDrop" class="drop-down">
+      <span *ngFor="let file of filterFiles">
+        <p-button styleClass="template-button" class="template-button">
+          <ng-template pTemplate="content">
+            <div class="dropdown-item">
+              <div class="top-row">
+                <div class="extension-container">
+                  <img
+                    *ngIf="file.iconName"
+                    #image
+                    src="../../../../assets/icons/file-extension-icons/{{
+                      file.iconName
+                    }}.svg"
+                    width="20"
+                    height="20"
+                  />
+                </div>
+                <p>{{ file.name }}</p>
+              </div>
+
+              <div
+                class="bottom-row"
+                *ngIf="file.highlightContentText as highlight"
+              >
+                <div class="filler"></div>
+                <p [innerHtml]="highlight"></p>
+              </div>
+            </div>
+          </ng-template>
+        </p-button>
+      </span>
+    </div>
+  </div>
+</div>

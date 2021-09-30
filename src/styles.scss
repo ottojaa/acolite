@@ -2,6 +2,7 @@
 @import '~primeicons/primeicons.css';
 @import '../node_modules/primeflex/primeflex.css';
 @import '~primeng/resources/themes/arya-green/theme.css';
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '../src/variables.scss';
 
 body,
@@ -9,27 +10,20 @@ body .p-component {
   font-family: 'Open sans', sans-serif;
 }
 
-:root[data-theme='theme-light'] {
-  --primary-color: #0072a3;
-  --text-color: #333333;
-  --bg-color: #fafafa;
-  --component-bg-color: #ffffff;
-}
-:root[data-theme='theme-dark'] {
-  --primary-color: #49afd9;
-  --text-color: #e3f5fc;
-  --bg-color: #1b2a32;
-  --component-bg-color: #22343c;
+.mat-menu-content {
+  background: var(--dropdownmenuBg);
+  color: var(--contrast);
 }
 
 html,
 body,
 app-main {
   margin: 0;
-  font-size: 12px;
+  font-size: $base-font-size;
   width: 100%;
   height: 100vh;
-  background-color: var(--editor-bg);
+  background-color: var(--editorBg);
+  transition: background-color $transition-duration linear;
 }
 
 .as-split-gutter {
@@ -40,17 +34,36 @@ app-main {
 }
 
 body .topbar {
-  background: var(--top-bar-bg);
+  background: var(--topbarBg);
+  transition: background-color $transition-duration linear;
+}
+
+body .p-button.p-button-icon-only.p-button-rounded {
+  background-color: none;
+  background: none;
+  color: var(--contrast);
+  border: none;
+}
+
+body .p-inputtext {
+  opacity: 1;
+  color: black;
+}
+
+body .p-tree span {
+  color: var(--contrast);
 }
 
 body .p-tree,
 .side-menu-split {
   border: none;
-  background: var(--side-menu-bg);
+  background: var(--sidemenuBg);
+  transition: background-color $transition-duration linear;
 }
 
 body .default-view {
   height: 100%;
   width: 100%;
-  background: var(--editor-bg);
+  background: var(--editorBg);
+  transition: background-color $transition-duration linear;
 }

@@ -1,0 +1,8 @@
+.icon {
+  font-size: 1.5rem !important;
+  color: var(--contrast);
+}
+
+:host ::ng-deep span {
+  display: none;
+}

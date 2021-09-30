@@ -4,9 +4,8 @@
     height="50"
     class="p-mr-2"
   />
-  <input class="autocomplete" type="text" pInputText placeholder="Search" />
+  <app-autocomplete></app-autocomplete>
   <div class="topbar-end">
-    <i class="pi pi-cog"> </i>
-    <p class="text">Settings</p>
+    <app-theme-switcher [options]="themeOptions"></app-theme-switcher>
   </div>
 </div>

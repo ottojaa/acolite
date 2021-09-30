@@ -1,20 +1,54 @@
 [
   {
-    "--editor-bg": "#282728",
-    "--side-menu-bg": "#1f1e1f",
-    "--top-bar-bg": "#141113",
-    "--accent": "#fc0042",
-    "--gutter-bg": "#100e0e",
-    "--contrast": "#fafafa",
-    "value": "default"
+    "name": "Red and grey",
+    "styles": {
+      "editorBg": "#282728",
+      "sidemenuBg": "#1f1e1f",
+      "topbarBg": "#fc0242",
+      "dropdownmenuBg": "#28313a",
+      "buttonColor": "#b90f3b",
+      "accent": "#00000021",
+      "gutterBg": "#100e0e",
+      "contrast": "#fafafa"
+    }
   },
   {
-    "--editor-bg": "#1b2025",
-    "--side-menu-bg": "#131418",
-    "--top-bar-bg": "#181e22",
-    "--accent": "#fc0042",
-    "--gutter-bg": "#100e0e",
-    "--contrast": "#fafafa",
-    "value": "grey"
+    "name": "Light grey",
+    "styles": {
+      "editorBg": "#37393E",
+      "sidemenuBg": "#2F3136",
+      "topbarBg": "#37393E",
+      "dropdownmenuBg": "#28313a",
+      "buttonColor": "#5765F2",
+      "accent": "#00000021",
+      "gutterBg": "#100e0e",
+      "contrast": "#fafafa"
+    }
+  },
+  {
+    "name": "Dark",
+    "styles": {
+      "editorBg": "#191D21",
+      "sidemenuBg": "#19171C",
+      "topbarBg": "#121016",
+      "dropdownmenuBg": "#28313a",
+      "buttonColor": "#1164A3",
+      "accent": "#00000021",
+      "gutterBg": "#100e0e",
+      "contrast": "#fafafa"
+    }
+  },
+  {
+    "name": "Light Blue",
+    "styles": {
+      "editorBg": "#F3F3F3",
+      "sidemenuBg": "#FFFFFF",
+      "topbarBg": "#0070B5",
+      "dropdownmenuBg": "#FFFFFF",
+      "buttonColor": "#0070B5",
+      "accent": "#00000021",
+      "gutterBg": "#100e0e",
+      "contrast": "#000000"
+    }
   }
 ]

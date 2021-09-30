@@ -1,23 +1,45 @@
 @import '../../../../variables.scss';
 
+:host ::ng-deep .p-inputtext {
+  background: var(--editorBg);
+  opacity: 1;
+  color: var(--contrast) !important;
+}
+
+p-autocomplete {
+  width: 100%;
+  height: 100%;
+}
+
+:host ::ng-deep .ui-inputfield {
+  color: black;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid $dark-1-accent;
+  border-bottom: 1px solid var(--accent);
+}
+
+.input {
+  width: '100%';
+  color: black;
+  background: var(--editorBg);
 }
 
 .autocomplete {
+  border-radius: 0.5rem;
   height: 3rem;
   width: 60%;
+  background-color: var(--editorBg);
+  color: var(--contrast);
 }
 
-.pi-cog {
-  font-size: 1.5rem;
-  color: $dark-1-opposite-color;
+.p-button-label {
+  display: none;
 }
-
 .topbar-end {
   display: flex;
   align-items: center;

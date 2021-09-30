@@ -1,0 +1,14 @@
+:host ::ng-deep .mat-icon-button,
+mat-icon {
+  background: none;
+  color: white !important;
+}
+
+span {
+  margin-left: 0.5rem;
+  color: var(--contrast);
+}
+
+svg {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}

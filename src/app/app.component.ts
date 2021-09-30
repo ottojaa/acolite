@@ -3,7 +3,6 @@ import { ElectronService } from './core/services'
 import { TranslateService } from '@ngx-translate/core'
 import { APP_CONFIG } from '../environments/environment'
 import { HttpClient } from '@angular/common/http'
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -35,17 +34,18 @@ export class AppComponent implements OnInit {
       .get<any>('../assets/themes/theme-options.json')
       .subscribe((data) => {
         this.themeOptions = data
-        this.changeTheme('grey')
+        this.changeTheme('dark')
       })
   }
 
   changeTheme(theme: string): void {
     const selectedTheme = this.themeOptions.find(
-      (option) => option.value === theme
+      (option) => option.name === theme
     )
     if (selectedTheme) {
-      Object.keys(selectedTheme).forEach((key) => {
-        document.documentElement.style.setProperty(key, selectedTheme[key])
+      const { styles } = selectedTheme
+      Object.keys(styles).forEach((key) => {
+        document.documentElement.style.setProperty(key, styles[key])
       })
     }
   }
