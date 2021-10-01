@@ -12,7 +12,7 @@ export class ThemeSwitcherComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.changeTheme('Red and grey')
+    this.changeTheme('Light grey')
   }
 
   changeTheme(theme: string): void {

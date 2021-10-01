@@ -13,8 +13,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private electronService: ElectronService,
-    private translate: TranslateService,
-    private http: HttpClient
+    private translate: TranslateService
   ) {
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
@@ -29,24 +28,5 @@ export class AppComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.http
-      .get<any>('../assets/themes/theme-options.json')
-      .subscribe((data) => {
-        this.themeOptions = data
-        this.changeTheme('dark')
-      })
-  }
-
-  changeTheme(theme: string): void {
-    const selectedTheme = this.themeOptions.find(
-      (option) => option.name === theme
-    )
-    if (selectedTheme) {
-      const { styles } = selectedTheme
-      Object.keys(styles).forEach((key) => {
-        document.documentElement.style.setProperty(key, styles[key])
-      })
-    }
-  }
+  ngOnInit(): void {}
 }

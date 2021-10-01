@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import * as faker from 'faker'
-import { fileExtensionIcons } from '../../../constants'
+import { fileExtensionIcons } from '../../../entities/file/constants'
 
 class File {
   name: string
@@ -8,6 +8,8 @@ class File {
   content: string
   filePath: string
   iconName: string | undefined
+  createdDate: string
+  modifiedDate: string
   highlightContentText?: string | undefined
 }
 
@@ -28,7 +30,7 @@ export class AutocompleteComponent implements OnInit {
       const file = new File()
       file.name = faker.system.commonFileName()
       file.filePath = faker.system.directoryPath()
-      file.content = faker.lorem.lines(2)
+      file.content = faker.lorem.lines(15)
       file.extension = file.name.split('.')[1]
       file.iconName = this.getFileExtensionIconName(file.extension)
 
@@ -50,8 +52,8 @@ export class AutocompleteComponent implements OnInit {
     return icon ? icon.name : null
   }
 
-  onSelectItem(File: File) {
-    this.selectedItem = File
+  onSelectItem(file: File) {
+    this.selectedItem = file
   }
 
   onSearchFiles(value: string) {
@@ -109,7 +111,7 @@ export class AutocompleteComponent implements OnInit {
     }
 
     const highlightStartIndex = highlightText.indexOf('<span ')
-    const highlightEndIndex = highlightText.lastIndexOf('</span>') + 7 // length of '</span>'
+    const highlightEndIndex = highlightText.indexOf('</span>') + 7 // length of '</span>'
     const highlightString = highlightText.substring(
       highlightStartIndex,
       highlightEndIndex
@@ -120,13 +122,13 @@ export class AutocompleteComponent implements OnInit {
       highlightText.length
     )
 
-    const shouldTruncateString = (string: string) => string.length > 60
+    const shouldTruncateString = (string: string) => string.length > 90
 
     if (shouldTruncateString(prefix)) {
-      prefix = '...' + shorten(prefix, 60)
+      prefix = '...' + shorten(prefix, 90)
     }
     if (shouldTruncateString(suffix)) {
-      suffix = shorten(suffix, 60) + '...'
+      suffix = shorten(suffix, 90) + '...'
     }
     return prefix + ' ' + highlightString + ' ' + suffix
   }

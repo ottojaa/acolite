@@ -18,27 +18,33 @@
         <p-button styleClass="template-button" class="template-button">
           <ng-template pTemplate="content">
             <div class="dropdown-item">
-              <div class="top-row">
-                <div class="extension-container">
-                  <img
-                    *ngIf="file.iconName"
-                    #image
-                    src="../../../../assets/icons/file-extension-icons/{{
-                      file.iconName
-                    }}.svg"
-                    width="20"
-                    height="20"
-                  />
-                </div>
-                <p>{{ file.name }}</p>
-              </div>
+              <div class="file-information">
+                <div class="top-row">
+                  <ng-container *ngIf="file.iconName; else filler">
+                    <img
+                      *ngIf="file.iconName"
+                      class="icon-width"
+                      #image
+                      src="../../../../assets/icons/file-extension-icons/{{
+                        file.iconName
+                      }}.svg"
+                      width="15"
+                      height="15"
+                    />
+                  </ng-container>
+                  <ng-template #filler>
+                    <div class="icon-width"></div>
+                  </ng-template>
 
-              <div
-                class="bottom-row"
-                *ngIf="file.highlightContentText as highlight"
-              >
-                <div class="filler"></div>
-                <p [innerHtml]="highlight"></p>
+                  <p class="text-highlight">{{ file.name }}</p>
+                </div>
+                <div
+                  class="bottom-row"
+                  *ngIf="file.highlightContentText as highlight"
+                >
+                  <div class="filler"></div>
+                  <p style="margin-left: 20px" [innerHtml]="highlight"></p>
+                </div>
               </div>
             </div>
           </ng-template>
