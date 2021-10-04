@@ -32,6 +32,8 @@ export class AutocompleteComponent implements OnInit {
       file.filePath = faker.system.directoryPath()
       file.content = faker.lorem.lines(15)
       file.extension = file.name.split('.')[1]
+      file.createdDate = '2020/12/12'
+      file.modifiedDate = '2020/01/01'
       file.iconName = this.getFileExtensionIconName(file.extension)
 
       this.files.push(file)

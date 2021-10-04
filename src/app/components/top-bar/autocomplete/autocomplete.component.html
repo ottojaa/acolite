@@ -13,43 +13,39 @@
     />
 
     <!-- Dropdown Menu -->
-    <div *ngIf="openDrop" class="drop-down">
-      <span *ngFor="let file of filterFiles">
-        <p-button styleClass="template-button" class="template-button">
-          <ng-template pTemplate="content">
-            <div class="dropdown-item">
-              <div class="file-information">
-                <div class="top-row">
-                  <ng-container *ngIf="file.iconName; else filler">
-                    <img
-                      *ngIf="file.iconName"
-                      class="icon-width"
-                      #image
-                      src="../../../../assets/icons/file-extension-icons/{{
-                        file.iconName
-                      }}.svg"
-                      width="15"
-                      height="15"
-                    />
-                  </ng-container>
-                  <ng-template #filler>
-                    <div class="icon-width"></div>
-                  </ng-template>
-
-                  <p class="text-highlight">{{ file.name }}</p>
-                </div>
-                <div
-                  class="bottom-row"
-                  *ngIf="file.highlightContentText as highlight"
-                >
-                  <div class="filler"></div>
-                  <p style="margin-left: 20px" [innerHtml]="highlight"></p>
-                </div>
-              </div>
+    <ul
+      *ngIf="openDrop && filterFiles.length"
+      class="drop-down"
+      keyboardNavigationList
+    >
+      <div class="list-item" *ngFor="let file of filterFiles; let i = index">
+        <li role="option" keyboardNavigationItem>
+          <div class="list-item-information">
+            <div class="top-row">
+              <p class="text-highlight">{{ file.name }}</p>
             </div>
-          </ng-template>
-        </p-button>
-      </span>
-    </div>
+            <div
+              class="bottom-row"
+              *ngIf="file.highlightContentText as highlight"
+            >
+              <div class="filler"></div>
+              <p [innerHtml]="highlight"></p>
+            </div>
+          </div>
+          <!--  <ng-container *ngIf="file.iconName; else filler">
+            <img
+              *ngIf="file.iconName"
+              class="icon-width"
+              src="../../../../assets/icons/file-extension-icons/{{
+                file.iconName
+              }}.svg"
+            />
+          </ng-container>
+          <ng-template #filler>
+            <div class="icon-width"></div>
+          </ng-template> -->
+        </li>
+      </div>
+    </ul>
   </div>
 </div>

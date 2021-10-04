@@ -4,21 +4,59 @@
   width: 60%;
 }
 
-:host ::ng-deep .p-button {
-  width: 100%;
-  border-radius: 0;
-  background-color: var(--editorBg);
-  border: none;
-  padding: 0;
-
+.list-item {
+  position: relative;
+  background-color: var(--sidemenuBg);
+  transition: background-color 100ms linear;
   :hover {
+    background-color: var(--buttonColor) !important;
+  }
+  :focus {
     background-color: var(--buttonColor) !important;
   }
 }
 
-:host ::ng-deep .template-button:hover {
-  background-color: none;
-  background: none;
+.keyboard-navigation-item {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1px;
+  outline: none;
+  background: var(--editorBg);
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+
+  .list-item-information {
+    flex-direction: column;
+    > p {
+      margin: 0;
+    }
+  }
+
+  .top-row {
+    height: 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    p {
+      font-size: 15px;
+      font-weight: bolder;
+      color: var(--textHighlight);
+    }
+  }
+  .bottom-row {
+    display: flex;
+    flex-direction: row;
+  }
+  p {
+    margin: 0;
+    color: var(--contrast);
+  }
+  :focus {
+    padding: 100px;
+    background-color: white;
+  }
 }
 
 .container {
@@ -51,7 +89,7 @@
   width: 100%;
   max-height: 40rem;
   top: 3rem;
-  padding: 0.5rem;
+  padding: 0;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -60,50 +98,11 @@
   box-shadow: $box-shadow;
 }
 
-.dropdown-item {
-  width: 100%;
-  border-radius: 0.5rem;
-  margin-top: 0.5rem;
-  padding: 1rem;
-  background: var(--sidemenuBg);
-  height: auto;
-  display: flex;
-  justify-content: flex-start;
-
-  .extension-container {
-    width: 10%;
-  }
-  .file-information {
-    display: flex;
-    flex-direction: column;
-  }
-  .top-row {
-    height: 2rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    & p {
-      font-size: 15px;
-      font-weight: bolder;
-      color: var(--textHighlight);
-      margin-left: 0.5rem;
-    }
-  }
-  .bottom-row {
-    display: flex;
-    flex-direction: row;
-    p {
-      text-align: start;
-    }
-  }
-  p {
-    margin: 0;
-    color: var(--contrast);
-  }
-}
-
 .icon-width {
-  width: 3%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4%;
 }
 
 :host ::ng-deep.highlightText {
@@ -115,4 +114,5 @@
   background: var(--editorBg);
   border: none;
   border-spacing: 0;
+  margin: 0;
 }

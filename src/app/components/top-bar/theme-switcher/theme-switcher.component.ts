@@ -12,10 +12,10 @@ export class ThemeSwitcherComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.changeTheme('Light grey')
+    this.setTheme('Light grey')
   }
 
-  changeTheme(theme: string): void {
+  setTheme(theme: string): void {
     const selectedTheme = this.options.find((option) => option.name === theme)
     if (selectedTheme) {
       const { styles } = selectedTheme
