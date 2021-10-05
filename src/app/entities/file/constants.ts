@@ -14,3 +14,18 @@ export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'js', acceptedExtensions: ['js'] },
   { name: 'folder', acceptedExtensions: ['folder'] },
 ]
+
+export enum EntityTypes {
+  File = 'file',
+  Folder = 'folder',
+}
+
+export enum FileActions {
+  Rename = 'rename-file',
+  Delete = 'delete',
+  Paste = 'paste-file',
+  Copy = 'copy-file',
+  Cut = 'cut-file',
+  OpenInFolder = 'open-file-in-folder',
+  ModifyTags = 'modify-tags',
+}

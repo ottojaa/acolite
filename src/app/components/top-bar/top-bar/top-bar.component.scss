@@ -6,19 +6,20 @@
   color: var(--contrast) !important;
 }
 
+:host ::ng-deep .ui-inputfield {
+  color: black;
+}
+
 p-autocomplete {
   width: 100%;
   height: 100%;
-}
-
-:host ::ng-deep .ui-inputfield {
-  color: black;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 10%;
   padding: 1rem;
   border-bottom: 1px solid var(--accent);
 }

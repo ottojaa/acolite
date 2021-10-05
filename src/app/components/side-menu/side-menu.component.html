@@ -2,6 +2,12 @@
   [value]="files"
   draggableNodes="true"
   droppableNodes="true"
-  [style]="{ height: '100%' }"
+  selectionMode="multiple"
   [styleClass]="'tree'"
+  (clickOutside)="onClickOutside()"
+  [contextMenu]="cm"
+  [(selection)]="selectedFiles"
+  (onNodeSelect)="onSelectFile($event)"
 ></p-tree>
+
+<p-contextMenu #cm [model]="contextMenuItems" (unselectFile)="onUnselectFile()"></p-contextMenu>

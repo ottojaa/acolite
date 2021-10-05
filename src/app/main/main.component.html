@@ -3,13 +3,9 @@
   <app-top-bar></app-top-bar>
 
   <!-- Sidemenu and editor view -->
-  <as-split direction="horizontal">
+  <as-split direction="horizontal" style="height: 90%">
     <as-split-area class="side-menu-split" [size]="20">
-      <div class="scroll-panel-container">
-        <p-scrollPanel [style]="{ width: '100%' }">
-          <app-side-menu></app-side-menu>
-        </p-scrollPanel>
-      </div>
+      <app-side-menu></app-side-menu>
     </as-split-area>
     <as-split-area [size]="80">
       <app-default-view></app-default-view>

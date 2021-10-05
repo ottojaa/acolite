@@ -26,7 +26,18 @@ export class AppComponent implements OnInit {
     } else {
       console.log('Run in browser')
     }
+    this.electronService.on('pong', (event: Electron.IpcMessageEvent) => {
+      console.log('pong')
+    })
+
+    this.electronService.send('ping')
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    /* window.addEventListener('contextmenu', (e) => {
+      e.preventDefault()
+      console.log(e.target)
+      this.electronService.send('show-context-menu')
+    }) */
+  }
 }
