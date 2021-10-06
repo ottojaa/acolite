@@ -11,7 +11,7 @@ import { DefaultViewModule } from '../components/default-view/default-view.modul
 import { AngularSplitModule } from 'angular-split'
 import { PanelModule } from 'primeng/panel'
 import { BrowserModule } from '@angular/platform-browser'
-import { ScrollPanelModule } from 'primeng/scrollpanel'
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
 
 @NgModule({
   declarations: [MainComponent],
@@ -23,9 +23,9 @@ import { ScrollPanelModule } from 'primeng/scrollpanel'
     TopBarModule,
     DefaultViewModule,
     AngularSplitModule,
-    ScrollPanelModule,
     PanelModule,
     BrowserModule,
+    ProgressSpinnerModule,
   ],
 })
 export class DetailModule {}

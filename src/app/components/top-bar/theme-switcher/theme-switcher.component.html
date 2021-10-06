@@ -1,18 +1,10 @@
 <span>
-  <button
-    mat-icon-button
-    [matMenuTriggerFor]="menu"
-    aria-label="Change Theme Menu"
-  >
+  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Change Theme Menu">
     <mat-icon>palette</mat-icon>
   </button>
 
   <mat-menu #menu="matMenu">
-    <button
-      *ngFor="let option of options"
-      mat-menu-item
-      (click)="setTheme(option.name)"
-    >
+    <button *ngFor="let option of options" mat-menu-item (click)="setTheme(option.name)">
       <mat-icon role="img" svgicon="theme-example" aria-hidden="true">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +27,7 @@
             ></path>
             <path d="M0 0h80v17.24H0V0z" id="c"></path>
           </defs>
-          <use xlink:href="#a" [attr.fill]="option.styles.editorBg"></use>
+          <use xlink:href="#a" [attr.fill]="option.styles.primary"></use>
           <use xlink:href="#b" [attr.fill]="option.styles.buttonColor"></use>
           <use xlink:href="#c" [attr.fill]="option.styles.topbarBg"></use>
         </svg>

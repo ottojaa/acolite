@@ -1,0 +1,18 @@
+<p-card [style]="{ minWidth: '250px', minHeight: '175px' }" styleClass="p-card-shadow">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <h2 class="contrast-text">{{ file.name }}</h2>
+    </div>
+  </ng-template>
+  <p class="card-text padding-horizontal contrast-text">{{ file.content }}</p>
+  <ng-template pTemplate="footer">
+    <p class="padding-horizontal last-modified-text">Last updated 3 days ago</p>
+    <div class="chips-container padding">
+      <mat-chip-list aria-label="File tags">
+        <div *ngFor="let tag of file.tags">
+          <mat-chip [style.background-color]="tag.bg" [style.color]="tag.color">{{ tag.name }}</mat-chip>
+        </div>
+      </mat-chip-list>
+    </div>
+  </ng-template>
+</p-card>

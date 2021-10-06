@@ -6,7 +6,7 @@
 
 .list-item {
   position: relative;
-  background-color: var(--sidemenuBg);
+  background-color: var(--secondary);
   transition: background-color 100ms linear;
   :hover {
     background-color: var(--buttonColor) !important;
@@ -21,7 +21,7 @@
   padding: 1rem;
   margin-top: 1px;
   outline: none;
-  background: var(--editorBg);
+  background: var(--primary);
   height: auto;
   display: flex;
   flex-direction: row;
@@ -61,7 +61,6 @@
 
 .container {
   height: 3rem;
-  position: relative;
 }
 
 .container .auto-complete {
@@ -78,7 +77,7 @@
   height: 100%;
   border-radius: 0.2rem;
   border: none;
-  background: var(--sidemenuBg);
+  background: var(--secondary);
   color: var(--contrast);
   padding: 0 1rem;
   outline: none;
@@ -86,9 +85,9 @@
 }
 
 .auto-complete .drop-down {
-  width: 100%;
+  width: 59%;
   max-height: 40rem;
-  top: 3rem;
+  top: 4.5rem;
   padding: 0;
   position: absolute;
   display: flex;
@@ -111,7 +110,7 @@
 
 .drop-down {
   width: 100%;
-  background: var(--editorBg);
+  background: var(--primary);
   border: none;
   border-spacing: 0;
   margin: 0;

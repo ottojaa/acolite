@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core'
 import { ElectronService } from './core/services'
 import { TranslateService } from '@ngx-translate/core'
 import { APP_CONFIG } from '../environments/environment'
-import { HttpClient } from '@angular/common/http'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,10 +10,7 @@ import { HttpClient } from '@angular/common/http'
 export class AppComponent implements OnInit {
   themeOptions = []
 
-  constructor(
-    private electronService: ElectronService,
-    private translate: TranslateService
-  ) {
+  constructor(private electronService: ElectronService, private translate: TranslateService) {
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
 

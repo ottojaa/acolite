@@ -1,16 +1,26 @@
-<div class="app-container">
+<div class="app-container" @componentLoaded *ngIf="!this.loadingApp; else loading">
   <!-- Topbar -->
-  <app-top-bar></app-top-bar>
-
-  <!-- Sidemenu and editor view -->
-  <as-split direction="horizontal" style="height: 90%">
-    <as-split-area class="side-menu-split" [size]="20">
-      <app-side-menu></app-side-menu>
+  <as-split direction="vertical">
+    <as-split-area class="top-bar-split" [size]="8">
+      <app-top-bar></app-top-bar>
     </as-split-area>
-    <as-split-area [size]="80">
-      <app-default-view></app-default-view>
+
+    <as-split-area [size]="92">
+      <!-- Sidemenu and editor view -->
+      <as-split direction="horizontal" style="height: 100%">
+        <as-split-area class="side-menu-split" [size]="20">
+          <app-side-menu></app-side-menu>
+        </as-split-area>
+        <as-split-area [size]="80">
+          <app-default-view></app-default-view>
+        </as-split-area>
+      </as-split>
     </as-split-area>
   </as-split>
 
   <!--   <a routerLink="/">{{ 'PAGES.DETAIL.BACK_TO_HOME' | translate }}</a> -->
 </div>
+
+<ng-template #loading>
+  <div class="loading-container"><p-progressSpinner></p-progressSpinner></div>
+</ng-template>

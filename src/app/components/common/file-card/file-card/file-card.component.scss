@@ -1,0 +1,64 @@
+@import '../../../../../variables.scss';
+
+:host ::ng-deep .p-card {
+  background-color: var(--secondary);
+  .p-card-body {
+    padding: 0;
+  }
+  .p-card-footer,
+  .p-card-content {
+    padding-top: 0;
+  }
+}
+
+.last-modified-text {
+  margin: 0;
+  color: var(--contrast);
+  opacity: 0.5;
+}
+
+.contrast-text {
+  color: var(--contrast);
+}
+
+:host ::ng-deep .mat-chip-list-wrapper {
+  flex-wrap: nowrap;
+}
+
+.padding {
+  padding: 1rem;
+}
+
+.padding-horizontal {
+  padding: 0 1rem;
+}
+
+.chips-container {
+  overflow-x: auto;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.mat-standard-chip {
+  font-size: $base-font-size;
+  min-height: 22px;
+  white-space: nowrap;
+}
+
+.card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.card-header {
+  padding: 0.5rem 1rem 0 1rem;
+  & p {
+    margin: 0;
+  }
+}

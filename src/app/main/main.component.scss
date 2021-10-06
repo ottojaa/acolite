@@ -8,6 +8,19 @@
   min-width: 200px;
 }
 
+.top-bar-split {
+  background: var(--topbarBg);
+  border-bottom: 2px solid var(--accent);
+}
+
 .side-menu-split {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.loading-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

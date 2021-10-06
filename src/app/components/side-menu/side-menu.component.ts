@@ -26,7 +26,6 @@ export class SideMenuComponent implements OnInit {
   }
 
   onSelectFile(event: { node: TreeNode; originalEvent: MouseEvent }): void {
-    console.log(event.node)
     this.contextMenuItems = this.getMenuItems()
   }
 
@@ -38,6 +37,30 @@ export class SideMenuComponent implements OnInit {
     this.selectedFiles = []
   }
 
+  expandAll() {
+    this.files.forEach((node) => {
+      this.expandRecursive(node, true)
+    })
+  }
+
+  collapseAll() {
+    this.files.forEach((node) => {
+      this.expandRecursive(node, false)
+    })
+  }
+
+  private expandRecursive(node: TreeNode, isExpand: boolean) {
+    node.expanded = isExpand
+    if (node.children) {
+      node.children.forEach((childNode) => {
+        this.expandRecursive(childNode, isExpand)
+      })
+    }
+  }
+
+  /**
+   * Menuitems declared here instead of a separate class / component as otherwise we need to pass a component reference to it
+   */
   getMenuItems(): MenuItem[] {
     return [
       {

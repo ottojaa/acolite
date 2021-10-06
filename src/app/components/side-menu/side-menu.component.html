@@ -1,8 +1,15 @@
+<div class="button-container">
+  <app-rounded-icon-button [icon]="'folder-open'" (onClick)="expandAll()"></app-rounded-icon-button>
+  <app-rounded-icon-button [icon]="'folder'" (onClick)="collapseAll()"></app-rounded-icon-button>
+</div>
+
 <p-tree
   [value]="files"
   draggableNodes="true"
   droppableNodes="true"
+  expanded="true"
   selectionMode="multiple"
+  [filter]="true"
   [styleClass]="'tree'"
   (clickOutside)="onClickOutside()"
   [contextMenu]="cm"

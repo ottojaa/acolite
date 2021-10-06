@@ -1,4 +1,40 @@
+@import 'src/variables.scss';
+
 :host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
   background-color: var(--buttonColor);
   box-shadow: none;
+}
+:host ::ng-deep .p-tree-wrapper {
+  min-width: 40rem;
+}
+:host ::ng-deep .p-inputtext:enabled:focus {
+  border-color: var(--contrast);
+}
+
+.button-container {
+  padding: 0.3rem 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--secondary);
+  box-shadow: $box-shadow;
+}
+
+:host ::ng-deep .p-contextmenu {
+  background-color: var(--secondary);
+  .p-menuitem > .p-menuitem-link {
+    .p-submenu-icon,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+      color: var(--contrast);
+    }
+  }
+  .p-menuitem-link .p-menuitem-icon {
+    color: var(--contrast);
+  }
+  .p-menuitem.p-menuitem-active > .p-menuitem-link {
+    background: var(--textHighlightBg);
+    color: var(--contrast);
+  }
+  .p-submenu-list {
+    background-color: var(--secondary);
+  }
 }

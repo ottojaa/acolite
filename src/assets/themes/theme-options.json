@@ -2,8 +2,8 @@
   {
     "name": "Red and grey",
     "styles": {
-      "editorBg": "#282728",
-      "sidemenuBg": "#1f1e1f",
+      "primary": "#282728",
+      "secondary": "#1f1e1f",
       "topbarBg": "#fc0242",
       "dropdownmenuBg": "#28313a",
       "textHighlight": "#ff3939",
@@ -17,8 +17,8 @@
   {
     "name": "Light grey",
     "styles": {
-      "editorBg": "#37393E",
-      "sidemenuBg": "#2F3136",
+      "primary": "#37393E",
+      "secondary": "#2F3136",
       "topbarBg": "#37393E",
       "dropdownmenuBg": "#28313a",
       "textHighlight": "#56DB80",
@@ -32,8 +32,8 @@
   {
     "name": "Dark",
     "styles": {
-      "editorBg": "#191D21",
-      "sidemenuBg": "#19171C",
+      "primary": "#191D21",
+      "secondary": "#19171C",
       "topbarBg": "#121016",
       "dropdownmenuBg": "#28313a",
       "textHighlight": "#ffffff",
@@ -47,8 +47,8 @@
   {
     "name": "Light Blue",
     "styles": {
-      "editorBg": "#F3F3F3",
-      "sidemenuBg": "#FFFFFF",
+      "primary": "#F3F3F3",
+      "secondary": "#FFFFFF",
       "topbarBg": "#0070B5",
       "dropdownmenuBg": "#FFFFFF",
       "textHighlight": "#005386",

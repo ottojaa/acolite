@@ -7,11 +7,11 @@
 
 body,
 body .p-component {
-  font-family: Segoe UI, Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .mat-menu-content {
-  background: var(--dropdownmenuBg);
+  background: var(--secondary);
   color: var(--contrast);
 }
 
@@ -22,20 +22,17 @@ app-main {
   font-size: $base-font-size;
   width: 100%;
   height: 100%;
-  background-color: var(--editorBg);
-  transition: background-color $transition-duration linear;
+  background-color: var(--primary);
 }
 
-.as-split-gutter {
-  background-color: transparent !important;
-  .as-split-gutter-icon {
-    background-image: none !important;
-  }
+body .as-split-gutter-icon {
+  background-color: var(--topbarBg) !important;
+  background: var(--topbarBg) !important;
+  background-image: none;
 }
 
 body .topbar {
   background: var(--topbarBg);
-  transition: background-color $transition-duration linear;
 }
 
 body .p-button.p-button-icon-only.p-button-rounded {
@@ -47,7 +44,8 @@ body .p-button.p-button-icon-only.p-button-rounded {
 
 body .p-inputtext {
   opacity: 1;
-  color: black;
+  color: var(--contrast);
+  background: var(--primary);
 }
 
 body .p-tree span {
@@ -56,14 +54,13 @@ body .p-tree span {
 
 body .p-tree,
 .side-menu-split {
+  padding-top: 0;
   border: none;
-  background: var(--sidemenuBg);
-  transition: background-color $transition-duration linear;
+  background: var(--secondary);
 }
 
 body .default-view {
   height: 100%;
   width: 100%;
-  background: var(--editorBg);
-  transition: background-color $transition-duration linear;
+  background: var(--primary);
 }
