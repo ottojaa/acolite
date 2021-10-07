@@ -10,7 +10,11 @@
 
 .top-bar-split {
   background: var(--topbarBg);
-  border-bottom: 2px solid var(--accent);
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .side-menu-split {
@@ -23,4 +27,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--secondary) !important;
 }

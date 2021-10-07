@@ -25,21 +25,22 @@ app-main {
   background-color: var(--primary);
 }
 
-body .as-split-gutter-icon {
+body .as-vertical > .as-split-gutter > .as-split-gutter-icon {
   background-color: var(--topbarBg) !important;
   background: var(--topbarBg) !important;
   background-image: none;
+  border-bottom: 2px solid var(--accent);
+}
+
+body .as-horizontal > .as-split-gutter {
+  background-color: transparent !important;
+  .as-split-gutter-icon {
+    background-image: none !important;
+  }
 }
 
 body .topbar {
   background: var(--topbarBg);
-}
-
-body .p-button.p-button-icon-only.p-button-rounded {
-  background-color: none;
-  background: none;
-  color: var(--contrast);
-  border: none;
 }
 
 body .p-inputtext {
@@ -59,7 +60,7 @@ body .p-tree,
   background: var(--secondary);
 }
 
-body .default-view {
+body .editor-view {
   height: 100%;
   width: 100%;
   background: var(--primary);

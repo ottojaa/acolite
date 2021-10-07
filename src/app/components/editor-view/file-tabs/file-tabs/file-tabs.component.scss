@@ -1,0 +1,33 @@
+:host ::ng-deep .mat-tab-label {
+  opacity: 1;
+}
+
+.tab-label-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
+.mat-tab-nav-bar.mat-primary .mat-ink-bar {
+  background-color: var(--buttonColor);
+}
+
+.tab-name {
+  color: var(--contrast);
+}
+
+.close-button {
+  color: var(--contrast);
+  display: flex;
+  font-size: 1.5rem;
+  opacity: 0.6;
+  justify-content: center;
+  align-items: center;
+}
+
+mat-icon:hover {
+  font-size: 1.8rem;
+  opacity: 1;
+}

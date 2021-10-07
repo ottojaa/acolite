@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
+import { ThemeService } from '../services/theme.service'
 
 @Component({
   selector: 'app-main',
@@ -13,10 +14,10 @@ import { Component, OnInit } from '@angular/core'
 })
 export class MainComponent implements OnInit {
   loadingApp = true
-  constructor() {}
+  constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
-    console.log('MainComponent INIT')
+    this.themeService.setTheme('Light grey')
     setTimeout(() => (this.loadingApp = false), 1000)
   }
 }

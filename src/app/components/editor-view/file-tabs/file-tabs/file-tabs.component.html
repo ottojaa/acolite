@@ -1,0 +1,12 @@
+<mat-tab-group>
+  <div>HUORA</div>
+  <ng-container *ngFor="let tab of tabs; let index = index">
+    <mat-tab *ngIf="closedTabs.indexOf(index) < 0">
+      <ng-template mat-tab-label>
+        <span class="tab-name" style="margin-left: 20px">{{ tab.name }}</span>
+        <mat-icon class="close-button" (click)="closeTab(index)">close</mat-icon>
+      </ng-template>
+      {{ tab.name }}
+    </mat-tab>
+  </ng-container>
+</mat-tab-group>

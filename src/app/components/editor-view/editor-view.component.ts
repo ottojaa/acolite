@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core'
 import { FileEntity } from '../../interfaces/File'
 
 @Component({
-  selector: 'app-default-view',
-  templateUrl: './default-view.component.html',
-  styleUrls: ['./default-view.component.scss'],
+  selector: 'app-editor-view',
+  templateUrl: './editor-view.component.html',
+  styleUrls: ['./editor-view.component.scss'],
 })
-export class DefaultViewComponent implements OnInit {
+export class EditorViewComponent implements OnInit {
   files: FileEntity[]
   constructor() {}
 

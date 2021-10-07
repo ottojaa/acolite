@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { ThemeOption } from '../../../interfaces/Theme'
+import { ThemeService } from '../../../services/theme.service'
 
 @Component({
   selector: 'app-theme-switcher',
@@ -9,20 +10,7 @@ import { ThemeOption } from '../../../interfaces/Theme'
 export class ThemeSwitcherComponent implements OnInit {
   @Input() options: ThemeOption[]
 
-  constructor() {}
+  constructor(public themeService: ThemeService) {}
 
-  ngOnInit(): void {
-    this.setTheme('Light grey')
-  }
-
-  setTheme(theme: string): void {
-    const selectedTheme = this.options.find((option) => option.name === theme)
-    if (selectedTheme) {
-      const { styles } = selectedTheme
-      Object.keys(styles).forEach((key) => {
-        const propName = '--' + key
-        document.documentElement.style.setProperty(propName, styles[key])
-      })
-    }
-  }
+  ngOnInit(): void {}
 }

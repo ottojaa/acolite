@@ -1,20 +1,5 @@
 [
   {
-    "name": "Red and grey",
-    "styles": {
-      "primary": "#282728",
-      "secondary": "#1f1e1f",
-      "topbarBg": "#fc0242",
-      "dropdownmenuBg": "#28313a",
-      "textHighlight": "#ff3939",
-      "textHighlightBg": "#735A3B",
-      "buttonColor": "#b90f3b",
-      "accent": "#00000021",
-      "gutterBg": "#100e0e",
-      "contrast": "#fafafa"
-    }
-  },
-  {
     "name": "Light grey",
     "styles": {
       "primary": "#37393E",
@@ -23,22 +8,7 @@
       "dropdownmenuBg": "#28313a",
       "textHighlight": "#56DB80",
       "textHighlightBg": "#735A3B",
-      "buttonColor": "#5765F2",
-      "accent": "#00000021",
-      "gutterBg": "#100e0e",
-      "contrast": "#fafafa"
-    }
-  },
-  {
-    "name": "Dark",
-    "styles": {
-      "primary": "#191D21",
-      "secondary": "#19171C",
-      "topbarBg": "#121016",
-      "dropdownmenuBg": "#28313a",
-      "textHighlight": "#ffffff",
-      "textHighlightBg": "#735A3B",
-      "buttonColor": "#1164A3",
+      "buttonColor": "#991F3C",
       "accent": "#00000021",
       "gutterBg": "#100e0e",
       "contrast": "#fafafa"
