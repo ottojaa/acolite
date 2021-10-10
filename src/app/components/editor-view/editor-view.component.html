@@ -1,3 +1,15 @@
 <div class="editor-view">
-  <app-file-tabs></app-file-tabs>
+  <div class="file-cards">
+    <ng-container *ngIf="tabs?.length === 3; else showTabs">
+      <ng-container *ngFor="let file of files">
+        <span class="file-card-container">
+          <app-file-card [file]="file"></app-file-card>
+        </span>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <ng-template #showTabs>
+    <app-file-tabs [tabs]="tabs" (closeTab)="onCloseTab($event)"></app-file-tabs>
+  </ng-template>
 </div>

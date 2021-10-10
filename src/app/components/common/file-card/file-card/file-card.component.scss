@@ -7,7 +7,31 @@
   }
   .p-card-footer,
   .p-card-content {
-    padding-top: 0;
+    padding: 1rem;
+  }
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary);
+  border-radius: 5px;
+  box-shadow: $box-shadow;
+
+  img {
+    position: relative;
+    object-fit: cover;
+    object-position: top;
+    width: 230px;
+    height: 130px;
+    margin-top: 20px;
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.5) 80%,
+      rgba(255, 255, 255, 0) 100%
+    );
   }
 }
 
@@ -47,13 +71,8 @@
   white-space: nowrap;
 }
 
-.card-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
+pre {
+  height: 80%;
 }
 
 .card-header {

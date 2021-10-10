@@ -1,6 +1,5 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core'
-import { FormControl } from '@angular/forms'
-import { MatTabGroup, MatTab } from '@angular/material/tabs'
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
+import { MatTabGroup } from '@angular/material/tabs'
 
 @Component({
   selector: 'app-file-tabs',
@@ -8,31 +7,18 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs'
   styleUrls: ['./file-tabs.component.scss'],
 })
 export class FileTabsComponent implements OnInit {
+  @Input() tabs: any[]
+  @Output() closeTab: EventEmitter<{ tabName: string; index: number }> = new EventEmitter()
   @ViewChild(MatTabGroup, { read: MatTabGroup })
-  @ViewChildren(MatTab, { read: MatTab })
   tabGroup: MatTabGroup
-  tabNodes: QueryList<MatTab>
-  closedTabs = []
-  tabs = [
-    {
-      tabType: 0,
-      name: 'Main',
-    },
-    {
-      tabType: 1,
-      name: 'Dashboard',
-    },
-    {
-      tabType: 2,
-      name: 'Tests',
-    },
-  ]
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.tabs)
+  }
 
-  closeTab(index: number) {
+  onCloseTab(tabName: string, index: number) {
     event.stopPropagation()
-    this.closedTabs.push(index)
-    this.tabGroup.selectedIndex = this.tabNodes.length - 1
+    this.closeTab.emit({ tabName, index })
+    this.tabGroup.selectedIndex = index - 1
   }
 }

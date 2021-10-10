@@ -8,10 +8,14 @@ import { FileEntity } from '../../interfaces/File'
 })
 export class EditorViewComponent implements OnInit {
   files: FileEntity[]
+  tabs: any[]
+  contrastColor: string
+
   constructor() {}
 
   ngOnInit(): void {
     this.files = this.getMockFiles()
+    this.tabs = this.getMockTabs()
   }
 
   getMockFiles(): FileEntity[] {
@@ -28,7 +32,7 @@ export class EditorViewComponent implements OnInit {
       iconName: '',
       type: 'file',
       content:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditateneque quas!',
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditateneque quas! ',
       createdDate: '05.05.2021',
       modifiedDate: '06.06.2021',
     }
@@ -48,5 +52,26 @@ export class EditorViewComponent implements OnInit {
     console.log(secondaryFiles)
 
     return [file1, ...secondaryFiles]
+  }
+
+  onCloseTab(event: { tabName: string; index: number }): void {
+    this.tabs = [...this.tabs.filter((tab) => tab.name !== event.tabName)]
+  }
+
+  getMockTabs(): any {
+    return [
+      {
+        tabType: 0,
+        name: 'Main',
+      },
+      {
+        tabType: 1,
+        name: 'Dashboard',
+      },
+      {
+        tabType: 2,
+        name: 'Tests',
+      },
+    ]
   }
 }
