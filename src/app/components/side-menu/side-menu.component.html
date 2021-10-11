@@ -1,6 +1,24 @@
 <div class="button-container">
-  <app-rounded-icon-button [icon]="'folder-open'" (onClick)="expandAll()"></app-rounded-icon-button>
-  <app-rounded-icon-button [icon]="'folder'" (onClick)="collapseAll()"></app-rounded-icon-button>
+  <app-rounded-icon-button
+    [icon]="'folder_open'"
+    [tooltip]="'Expand all'"
+    (onClick)="expandAll()"
+  ></app-rounded-icon-button>
+  <app-rounded-icon-button
+    [icon]="'folder'"
+    [tooltip]="'Collapse all'"
+    (onClick)="collapseAll()"
+  ></app-rounded-icon-button>
+  <app-rounded-icon-button
+    [icon]="'create_new_folder'"
+    [tooltip]="'Create new folder'"
+    (onClick)="createNewFolder()"
+  ></app-rounded-icon-button>
+  <app-rounded-icon-button
+    [icon]="'done'"
+    [tooltip]="'Create new folder'"
+    (onClick)="navigateToDirectorySelection()"
+  ></app-rounded-icon-button>
 </div>
 
 <p-tree

@@ -5,16 +5,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
   templateUrl: './rounded-icon-button.component.html',
   styleUrls: ['./rounded-icon-button.component.scss'],
 })
-export class RoundedIconButtonComponent implements OnInit {
+export class RoundedIconButtonComponent {
   @Input() icon: string
+  @Input() tooltip: string
   @Output() onClick: EventEmitter<void> = new EventEmitter()
 
   className: string
-  constructor() {}
-
-  ngOnInit(): void {
-    this.className = `pi pi-icon-` + this.icon
-  }
 
   handleClick(): void {
     this.onClick.emit()

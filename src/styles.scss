@@ -2,12 +2,12 @@
 @import '~primeicons/primeicons.css';
 @import '../node_modules/primeflex/primeflex.css';
 @import '~primeng/resources/themes/arya-green/theme.css';
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import '../src/variables.scss';
 
 body,
 body .p-component {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .mat-menu-content {
@@ -39,8 +39,58 @@ body .as-horizontal > .as-split-gutter {
   }
 }
 
+body .mat-dialog-container {
+  background-color: var(--primary);
+
+  color: var(--contrast);
+  .mat-form-field-label,
+  .mat-focused .mat-form-field-label {
+    color: var(--contrast);
+  }
+  .mat-button:hover {
+    background-color: var(--buttonColor);
+  }
+  .mat-form-field-underline,
+  .mat-form-field-ripple {
+    background-color: var(--buttonColor);
+  }
+  .mat-focused .mat-form-field-ripple {
+    /*change color of underline when focused*/
+    background-color: var(--buttonColor) !important;
+  }
+}
+
+.snackbar-success {
+  background-color: #cce7cd;
+  color: #375a38;
+  .mat-button-wrapper {
+    color: #375a38;
+  }
+}
+
+.snackbar-failure {
+  background-color: #fdd0d7;
+  color: #822026;
+  .mat-button-wrapper {
+    color: #822026;
+  }
+}
+
+.snackbar-info {
+  background-color: #b8e6fb;
+  color: #0088d1;
+  .mat-button-wrapper {
+    color: #0088d1;
+  }
+}
+
 body .topbar {
   background: var(--topbarBg);
+}
+
+body .p-tooltip {
+  background-color: black;
+  color: white;
 }
 
 body .p-inputtext {

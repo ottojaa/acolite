@@ -13,11 +13,11 @@ import { ThemeService } from '../services/theme.service'
   ],
 })
 export class MainComponent implements OnInit {
-  loadingApp = true
+  loadingApp = false
   constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
     this.themeService.setTheme('Light grey')
-    setTimeout(() => (this.loadingApp = false), 1000)
+    // setTimeout(() => (this.loadingApp = false), 1000)
   }
 }

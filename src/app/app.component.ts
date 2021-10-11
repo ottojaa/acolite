@@ -2,8 +2,15 @@ import { Component, OnInit } from '@angular/core'
 import { ElectronService } from './core/services'
 import { TranslateService } from '@ngx-translate/core'
 import { APP_CONFIG } from '../environments/environment'
+import appConfig from '../../app/acolite.config.json'
+import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
-import themes from '../assets/themes/theme-options.json'
+import { AppPreferences } from './interfaces/Preferences'
+import { FolderActionResponses, FolderActions } from './entities/folder/constants'
+import { StateService } from './services/state.service'
+
+type IPCEvent = Electron.IpcMessageEvent
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,8 +20,12 @@ export class AppComponent implements OnInit {
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    public state: StateService,
+    public dialogService: AppDialogService
   ) {
+    console.log(appConfig.baseDir)
+    this.state.updateState$.next({ key: 'baseDir', payload: appConfig.baseDir })
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
 
@@ -26,18 +37,57 @@ export class AppComponent implements OnInit {
     } else {
       console.log('Run in browser')
     }
-    this.electronService.on('pong', (event: Electron.IpcMessageEvent) => {
-      console.log('pong')
-    })
-
-    this.electronService.send('ping')
+    this.initIPCMainListeners()
   }
 
   ngOnInit(): void {
-    /* window.addEventListener('contextmenu', (e) => {
-      e.preventDefault()
-      console.log(e.target)
-      this.electronService.send('show-context-menu')
-    }) */
+    this.themeService.setTheme('Light grey')
+    if (this.state.getStatePartValue('baseDir')) {
+      this.readDir()
+    }
+  }
+
+  initIPCMainListeners(): void {
+    const actions = [
+      FolderActionResponses.ReadDirectorySuccess,
+      FolderActionResponses.ReadDirectoryFailure,
+      FolderActionResponses.MakeDirectorySuccess,
+      FolderActionResponses.MakeDirectoryFailure,
+      FolderActionResponses.ChooseDirectorySuccess,
+      FolderActionResponses.ChooseDirectoryCanceled,
+      FolderActionResponses.ChooseDirectoryFailure,
+      FolderActionResponses.SetDefaultDirFailure,
+      FolderActionResponses.SetDefaultDirSuccess,
+    ]
+
+    actions.forEach((action) => this.startListener(action))
+  }
+
+  startListener(action: FolderActions | FolderActionResponses): void {
+    console.log(action)
+    this.electronService.on(action, (ipcEvent: IPCEvent, arg) => {
+      if (action === FolderActionResponses.MakeDirectorySuccess) {
+        this.dialogService.openToast('Folder created succesfully', 'success')
+      }
+      if (action === FolderActionResponses.MakeDirectoryFailure) {
+        this.dialogService.openToast('Folder creation failed', 'failure')
+      }
+      console.log(ipcEvent)
+      console.log(arg)
+    })
+  }
+
+  readDir(): void {
+    const { baseDir } = this.state.getStatePartValue('baseDir')
+    if (baseDir) {
+      this.electronService.send('read-directory', baseDir)
+    }
+  }
+
+  askForDirectoryPath(): void {
+    const { baseDir } = this.state.getStatePartValue('baseDir')
+    if (baseDir) {
+      this.electronService.send('choose-base-directory', baseDir)
+    }
   }
 }

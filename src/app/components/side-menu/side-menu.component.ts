@@ -1,8 +1,14 @@
 import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
 import { MenuItem, TreeNode } from 'primeng/api'
+import { of } from 'rxjs'
+import { map, switchMap, take, tap } from 'rxjs/operators'
 import { ElectronService } from '../../core/services'
 import { FileActions } from '../../entities/file/constants'
+import { FolderActions } from '../../entities/folder/constants'
+import { AppDialogService } from '../../services/dialog.service'
 import { MenuService } from '../../services/menu.service'
+import { StateService } from '../../services/state.service'
 
 @Component({
   selector: 'app-side-menu',
@@ -14,7 +20,13 @@ export class SideMenuComponent implements OnInit {
   selectedFiles: TreeNode[]
   contextMenuItems: MenuItem[]
 
-  constructor(private menuService: MenuService, public electronService: ElectronService) {}
+  constructor(
+    private menuService: MenuService,
+    private dialogService: AppDialogService,
+    public electronService: ElectronService,
+    public state: StateService,
+    public router: Router
+  ) {}
 
   ngOnInit(): void {
     this.menuService.getMenuItems().then((files) => (this.files = files))
@@ -56,6 +68,31 @@ export class SideMenuComponent implements OnInit {
         this.expandRecursive(childNode, isExpand)
       })
     }
+  }
+
+  navigateToDirectorySelection(): void {
+    this.router.navigate(['/'])
+  }
+
+  createNewFolder(): void {
+    this.dialogService
+      .openFolderNameDialog()
+      .pipe(
+        take(1),
+        switchMap((name) => {
+          return this.state.getStatePart('baseDir').pipe(
+            tap((data) => console.log(data)),
+            map((baseDir) => ({ name, baseDir }))
+          )
+        })
+      )
+      .subscribe((data: { name: string; baseDir: string }) => {
+        console.log(data)
+        const { name, baseDir } = data
+        if (name && baseDir) {
+          this.electronService.send(FolderActions.MkDir, [name, baseDir])
+        }
+      })
   }
 
   /**

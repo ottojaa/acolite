@@ -1,9 +1,3 @@
-<button
-  *ngIf="icon"
-  pButton
-  type="button"
-  (click)="handleClick($event)"
-  class="p-button-text p-button-icon p-button-rounded"
->
-  <i class="icon pi pi-{{ icon }}"></i>
+<button class="container" type="button" [matTooltip]="tooltip">
+  <mat-icon aria-hidden="false" aria-label="Example home icon" (click)="handleClick($event)">{{ icon }}</mat-icon>
 </button>
