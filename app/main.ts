@@ -5,6 +5,11 @@ import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
 import { join } from 'path'
 
+interface TreeElement {
+  parentDir: string
+  children?: (TreeElement | string)[]
+}
+
 // Initialize remote module
 require('@electron/remote/main').initialize()
 
@@ -135,23 +140,33 @@ try {
     try {
       const directoryPath = baseDir
 
-      const isDirectory = (path) => fs.statSync(path).isDirectory()
-      const getDirectories = (path) =>
+      const isDirectory = (path: string) => fs.statSync(path).isDirectory()
+      const getDirectories = (path: string) =>
         fs
           .readdirSync(path)
           .map((name) => join(path, name))
           .filter(isDirectory)
 
-      const isFile = (path) => fs.statSync(path).isFile()
-      const getFiles = (path) =>
+      const isFile = (path: string) => fs.statSync(path).isFile()
+      const getFiles = (path: string) =>
         fs
           .readdirSync(path)
           .map((name) => join(path, name))
           .filter(isFile)
+          .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
 
-      const getFilesRecursively = (path) => {
+      const getFilesRecursively = (path: string): (TreeElement | string)[] => {
         let dirs = getDirectories(path)
-        let files = dirs.map((dir) => getFilesRecursively(dir)).reduce((a, b) => a.concat(b), [])
+        let files: (TreeElement | string)[] = dirs.map((dir) => {
+          return {
+            parentDir: dir,
+            children: getFilesRecursively(dir).reduce(
+              (directoryDescendants: (TreeElement | string)[], descendant: TreeElement | string) =>
+                directoryDescendants.concat(descendant),
+              []
+            ),
+          }
+        })
         return files.concat(getFiles(path))
       }
 

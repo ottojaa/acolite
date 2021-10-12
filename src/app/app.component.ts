@@ -64,7 +64,6 @@ export class AppComponent implements OnInit {
   }
 
   startListener(action: FolderActions | FolderActionResponses): void {
-    console.log(action)
     this.electronService.on(action, (ipcEvent: IPCEvent, arg) => {
       if (action === FolderActionResponses.MakeDirectorySuccess) {
         this.dialogService.openToast('Folder created succesfully', 'success')
@@ -72,22 +71,17 @@ export class AppComponent implements OnInit {
       if (action === FolderActionResponses.MakeDirectoryFailure) {
         this.dialogService.openToast('Folder creation failed', 'failure')
       }
-      console.log(ipcEvent)
-      console.log(arg)
+      if (action === FolderActionResponses.ReadDirectorySuccess) {
+        console.log(ipcEvent)
+        console.log(arg)
+      }
     })
   }
 
   readDir(): void {
-    const { baseDir } = this.state.getStatePartValue('baseDir')
+    const baseDir = this.state.getStatePartValue('baseDir')
     if (baseDir) {
-      this.electronService.send('read-directory', baseDir)
-    }
-  }
-
-  askForDirectoryPath(): void {
-    const { baseDir } = this.state.getStatePartValue('baseDir')
-    if (baseDir) {
-      this.electronService.send('choose-base-directory', baseDir)
+      this.electronService.send(FolderActions.ReadDir, baseDir)
     }
   }
 }
