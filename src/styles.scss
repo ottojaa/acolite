@@ -60,6 +60,32 @@ body .mat-dialog-container {
   }
 }
 
+body .mat-option {
+  background: var(--primary);
+  color: var(--contrast);
+}
+body .mat-option.mat-active {
+  color: var(--contrast);
+}
+
+body .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
+  color: var(--contrast);
+}
+body .mat-select-panel {
+  background: var(--primary);
+  color: var(--contrast);
+}
+
+body .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background-color: var(--buttonColor);
+}
+
+body .mat-select-content {
+  background: var(--primary);
+  color: var(--contrast);
+}
+
 .snackbar-success {
   background-color: #cce7cd;
   color: #375a38;

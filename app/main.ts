@@ -186,20 +186,27 @@ try {
   })
 
   ipcMain.on('make-directory', (event: IpcMainEvent, args: [string, string]) => {
-    console.log('args: ', args)
     const [name, baseDir] = args
     const directoryPath = path.join(baseDir, name)
-    console.log('dirPath:', directoryPath)
     fs.promises
       .mkdir(directoryPath, { recursive: true })
-      .then((dir) => {
-        console.log({ dir: dir })
+      .then(() => {
         const newDir = getFileEntityFromPath(directoryPath)
         event.sender.send('make-directory-success', { data: newDir, children: [] })
       })
       .catch((err) => {
         event.sender.send('make-directory-failure', err)
       })
+  })
+
+  ipcMain.on('create-file', (event: IpcMainEvent, path: string) => {
+    fs.writeFile(path, '', (err) => {
+      if (err) {
+        event.sender.send('create-file-failure', err)
+      }
+      const file = getFileEntityFromPath(path)
+      event.sender.send('create-file-success', file)
+    })
   })
 
   /**

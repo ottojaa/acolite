@@ -21,6 +21,7 @@ export enum EntityTypes {
 }
 
 export enum FileActions {
+  Create = 'create-file',
   Rename = 'rename-file',
   Delete = 'delete',
   Paste = 'paste-file',
@@ -28,4 +29,9 @@ export enum FileActions {
   Cut = 'cut-file',
   OpenInFolder = 'open-file-in-folder',
   ModifyTags = 'modify-tags',
+}
+
+export enum FileActionResponses {
+  CreateSuccess = 'create-file-success',
+  CreateFailure = 'create-file-failure',
 }

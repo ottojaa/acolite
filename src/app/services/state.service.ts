@@ -53,7 +53,6 @@ export class StateService extends AbstractComponent {
   getStatePart<K extends keyof State>(key: K): Observable<State[K]> {
     return this.state$.asObservable().pipe(
       map((state) => {
-        console.log(state)
         return state[key]
       })
     )

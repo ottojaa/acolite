@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
+import { FileCreationComponent } from '../components/dialogs/file-creation/file-creation.component'
 import { FolderNameDialogComponent } from '../components/dialogs/folder-name-dialog/folder-name-dialog/folder-name-dialog.component'
 
 @Injectable({
@@ -20,6 +21,12 @@ export class AppDialogService {
 
   openFolderNameDialog(): Observable<string | undefined> {
     const ref = this.dialog.open(FolderNameDialogComponent)
+
+    return ref.afterClosed().pipe(take(1))
+  }
+
+  openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
+    const ref = this.dialog.open(FileCreationComponent, { data: filePath })
 
     return ref.afterClosed().pipe(take(1))
   }

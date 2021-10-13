@@ -1,14 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { MenuItem, TreeNode } from 'primeng/api'
-import { Observable, of } from 'rxjs'
-import { delay, finalize, map, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { TreeNode } from 'primeng/api'
+import { Observable } from 'rxjs'
+import { delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { FileEntity } from '../../../../app/utils'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
-import { FileActions } from '../../entities/file/constants'
 import { FolderActions } from '../../entities/folder/constants'
 import { AppDialogService } from '../../services/dialog.service'
-import { MenuService } from '../../services/menu.service'
 import { StateService } from '../../services/state.service'
 
 @Component({
@@ -18,13 +17,11 @@ import { StateService } from '../../services/state.service'
 })
 export class SideMenuComponent extends AbstractComponent implements OnInit {
   menuLoading: boolean = true
-  treeNodes: TreeNode[]
-  selectedFiles: TreeNode[]
-  contextMenuItems: MenuItem[]
+  files: TreeNode<FileEntity>[]
 
   constructor(
-    private dialogService: AppDialogService,
     public electronService: ElectronService,
+    public dialogService: AppDialogService,
     public state: StateService,
     public router: Router,
     public cdRef: ChangeDetectorRef
@@ -33,37 +30,29 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.contextMenuItems = this.getMenuItems()
-    this.menuUpdateListener()
-  }
-
-  menuUpdateListener(): void {
+    this.menuLoading = true
     this.state
       .getStatePart('menuItems')
-      .pipe(takeUntil(this.destroy$), delay(3000))
-      .subscribe((data) => {
-        this.treeNodes = data.slice(0)
-        this.menuLoading = false
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((files) => {
+        console.log(files)
+        this.files = [...files].slice(0)
+        this.menuLoading = false // TODO: add to state
+        this.cdRef.detectChanges()
       })
   }
 
-  triggerMenuUpdate(): void {
-    const test = this.state.state$.value.menuItems
-    this.state.updateState$.next({ key: 'menuItems', payload: test })
-  }
-
-  onRightClick(event: any): void {}
-
-  onSelectFile(event: { node: TreeNode; originalEvent: MouseEvent }): void {
-    this.contextMenuItems = this.getMenuItems()
-  }
-
-  onClickOutside(): void {
-    this.selectedFiles = []
-  }
-
-  onUnselectFile(): void {
-    this.selectedFiles = []
+  createNewFolder(): void {
+    this.dialogService
+      .openFolderNameDialog()
+      .pipe(take(1))
+      .subscribe((name: string) => {
+        const baseDir = this.state.state$.value.baseDir
+        if (name && baseDir) {
+          console.log(name)
+          this.electronService.send(FolderActions.MkDir, [name, baseDir])
+        }
+      })
   }
 
   expandAll() {
@@ -89,71 +78,5 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
 
   navigateToDirectorySelection(): void {
     this.router.navigate(['/'])
-  }
-
-  createNewFolder(): void {
-    this.dialogService
-      .openFolderNameDialog()
-      .pipe(
-        take(1),
-        switchMap((name) => {
-          return this.state.getStatePart('baseDir').pipe(map((baseDir) => ({ name, baseDir })))
-        })
-      )
-      .subscribe((data: { name: string; baseDir: string }) => {
-        const { name, baseDir } = data
-        if (name && baseDir) {
-          this.electronService.send(FolderActions.MkDir, [name, baseDir])
-        }
-      })
-  }
-
-  /**
-   * Menuitems declared here instead of a separate class / component as otherwise we need to pass a component reference to it
-   */
-  getMenuItems(): MenuItem[] {
-    return [
-      {
-        label: 'File',
-        icon: 'pi pi-file',
-        items: [
-          {
-            label: 'Reveal in finder',
-            icon: 'pi pi-search',
-            command: (event) => this.electronService.send(FileActions.OpenInFolder, event),
-          },
-          {
-            label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
-            icon: 'pi pi-times',
-            command: (event) => {
-              this.electronService.send(FileActions.Delete, event)
-            },
-          },
-          {
-            label: 'Rename file',
-            icon: 'pi pi-pencil',
-            command: (event) => this.electronService.send(FileActions.Rename, event),
-          },
-        ],
-      },
-      {
-        label: 'Modify tags',
-        icon: 'pi pi-tags',
-        command: (event) => this.electronService.send(FileActions.ModifyTags, event),
-      },
-      {
-        separator: true,
-      },
-      {
-        label: 'Unselect',
-        icon: 'pi pi-times',
-        command: () => this.onUnselectFile(),
-      },
-    ]
-  }
-
-  isMultipleSelected(selectedFiles: MenuItem[]): boolean {
-    console.log(selectedFiles?.length > 1)
-    return selectedFiles?.length > 1
   }
 }

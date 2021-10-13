@@ -8,7 +8,7 @@ import { ThemeService } from './services/theme.service'
 import { AppPreferences } from './interfaces/Preferences'
 import { FolderActionResponses, FolderActions } from './entities/folder/constants'
 import { StateService } from './services/state.service'
-import { folderStructureToMenuItems } from './utils/menu-utils'
+import { folderStructureToMenuItems, makeFolderTreeNodeFromFileEntity } from './utils/menu-utils'
 import { MenuService } from './services/menu.service'
 
 type IPCEvent = Electron.IpcMessageEvent
@@ -91,12 +91,15 @@ export class AppComponent implements OnInit {
         break
       }
       case FolderActionResponses.MakeDirectorySuccess: {
-        const folderEntity = response
+        const menuItems = this.state.state$.value.menuItems
+        const folderEntity = makeFolderTreeNodeFromFileEntity(response.data)
+        this.state.updateState$.next({ key: 'menuItems', payload: [...menuItems, folderEntity] })
         console.log(folderEntity)
         break
       }
       default: {
         console.log({ message: 'default reducer', action, response })
+        break
       }
     }
   }

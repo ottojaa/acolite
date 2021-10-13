@@ -1,0 +1,28 @@
+<div class="form-fields-container">
+  <mat-form-field appearance="fill" required>
+    <mat-label>File name</mat-label>
+    <input matInput [(ngModel)]="fileName" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>File type</mat-label>
+    <mat-select matNativeControl required [(value)]="extension">
+      <mat-option *ngFor="let option of options" [value]="option.value">
+        {{ option.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div class="result mat-typography">
+  <ng-container *ngIf="result">
+    <h3>{{ result }}</h3>
+    <p>will be created</p>
+  </ng-container>
+</div>
+
+<mat-dialog-actions align="end">
+  <mat-checkbox [(ngModel)]="openFileAfterCreation"> Open file after creation? </mat-checkbox>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onCreateClick()" [disabled]="!result">Create</button>
+</mat-dialog-actions>

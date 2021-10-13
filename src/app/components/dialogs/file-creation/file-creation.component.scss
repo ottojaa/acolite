@@ -1,0 +1,29 @@
+:host ::ng-deep .mat-select-value {
+  color: var(--contrast);
+}
+
+:host ::ng-deep .mat-form-field.mat-focused.mat-primary .mat-select-arrow {
+  color: var(--buttonColor);
+}
+
+:host ::ng-deep .mat-checkbox-frame {
+  border-color: var(--contrast);
+}
+
+.result {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  h3 {
+    margin: 0;
+  }
+  p {
+    margin: 0;
+    padding-left: 5px;
+  }
+}
+
+mat-checkbox {
+  display: flex;
+  flex-grow: 1;
+}

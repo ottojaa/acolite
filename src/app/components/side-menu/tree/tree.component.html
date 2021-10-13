@@ -1,0 +1,23 @@
+<p-tree
+  [value]="files"
+  draggableNodes="true"
+  preventContextMenu
+  droppableNodes="true"
+  expanded="true"
+  selectionMode="multiple"
+  (contextmenu)="$event.preventDefault()"
+  [filter]="true"
+  [styleClass]="'tree'"
+  (clickOutside)="onClickOutside()"
+  [contextMenu]="contextMenu"
+  [(selection)]="selectedFiles"
+  (onNodeSelect)="onSelectFile($event)"
+  (onNodeContextMenuSelect)="onRightClick($event)"
+></p-tree>
+
+<p-contextMenu
+  #contextMenu
+  [model]="contextMenuItems"
+  [triggerEvent]="'none'"
+  (unselectFile)="onUnselectFile()"
+></p-contextMenu>
