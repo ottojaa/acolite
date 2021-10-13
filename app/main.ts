@@ -4,10 +4,11 @@ import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
 import { join } from 'path'
+import { FileEntity, getFileEntityFromPath } from './utils'
 
 interface TreeElement {
-  parentDir: string
-  children?: (TreeElement | string)[]
+  data: FileEntity
+  children?: (TreeElement | FileEntity)[]
 }
 
 // Initialize remote module
@@ -135,42 +136,48 @@ try {
       })
   })
 
-  // Reads the folder tree from the baseDir and returns a list of descendants and their paths
+  // Reads the folder tree from the baseDir and returns a list of descendants and their information
   ipcMain.on('read-directory', (event: IpcMainEvent, baseDir: string) => {
     try {
       const directoryPath = baseDir
 
       const isDirectory = (path: string) => fs.statSync(path).isDirectory()
-      const getDirectories = (path: string) =>
+      const getDirectories = (fileEntity: FileEntity) =>
         fs
-          .readdirSync(path)
-          .map((name) => join(path, name))
+          .readdirSync(fileEntity.filePath)
+          .map((name) => join(fileEntity.filePath, name))
           .filter(isDirectory)
+          .map(getFileEntityFromPath)
 
       const isFile = (path: string) => fs.statSync(path).isFile()
-      const getFiles = (path: string) =>
+      const getFiles = (fileEntity: FileEntity) =>
         fs
-          .readdirSync(path)
-          .map((name) => join(path, name))
+          .readdirSync(fileEntity.filePath)
+          .map((name) => join(fileEntity.filePath, name))
           .filter(isFile)
           .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
+          .map(getFileEntityFromPath)
 
-      const getFilesRecursively = (path: string): (TreeElement | string)[] => {
-        let dirs = getDirectories(path)
-        let files: (TreeElement | string)[] = dirs.map((dir) => {
+      const getFilesRecursively = (file: FileEntity): (TreeElement | FileEntity)[] => {
+        let dirs = getDirectories(file)
+        let files: (TreeElement | FileEntity)[] = dirs.map((dir) => {
           return {
-            parentDir: dir,
+            data: dir,
             children: getFilesRecursively(dir).reduce(
-              (directoryDescendants: (TreeElement | string)[], descendant: TreeElement | string) =>
+              (directoryDescendants: (TreeElement | FileEntity)[], descendant: TreeElement | FileEntity) =>
                 directoryDescendants.concat(descendant),
               []
             ),
           }
         })
-        return files.concat(getFiles(path))
+        return files.concat(getFiles(file))
       }
 
-      const fileStruct = getFilesRecursively(directoryPath)
+      const rootFolder = getFileEntityFromPath(directoryPath)
+      const fileStruct = getFilesRecursively(rootFolder)
+
+      console.log({ rootFolder, fileStruct })
+
       event.sender.send('read-directory-success', fileStruct)
     } catch (err) {
       console.log(err)
@@ -185,8 +192,10 @@ try {
     console.log('dirPath:', directoryPath)
     fs.promises
       .mkdir(directoryPath, { recursive: true })
-      .then(() => {
-        event.sender.send('make-directory-success')
+      .then((dir) => {
+        console.log({ dir: dir })
+        const newDir = getFileEntityFromPath(directoryPath)
+        event.sender.send('make-directory-success', { data: newDir, children: [] })
       })
       .catch((err) => {
         event.sender.send('make-directory-failure', err)

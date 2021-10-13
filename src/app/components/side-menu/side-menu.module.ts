@@ -6,11 +6,19 @@ import { TreeDragDropService } from 'primeng/api'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { ClickOutsideModule } from 'ng-click-outside'
 import { RoundedIconButtonModule } from '../common/rounded-icon-button/rounded-icon-button.module'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
 
 @NgModule({
   declarations: [SideMenuComponent],
   exports: [SideMenuComponent],
   providers: [TreeDragDropService],
-  imports: [CommonModule, TreeModule, ContextMenuModule, ClickOutsideModule, RoundedIconButtonModule],
+  imports: [
+    CommonModule,
+    TreeModule,
+    ContextMenuModule,
+    ClickOutsideModule,
+    RoundedIconButtonModule,
+    MatProgressBarModule,
+  ],
 })
 export class SideMenuModule {}

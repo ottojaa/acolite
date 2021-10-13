@@ -1,28 +1,40 @@
-<div class="button-container">
-  <app-rounded-icon-button
-    [icon]="'folder_open'"
-    [tooltip]="'Expand all'"
-    (onClick)="expandAll()"
-  ></app-rounded-icon-button>
-  <app-rounded-icon-button
-    [icon]="'folder'"
-    [tooltip]="'Collapse all'"
-    (onClick)="collapseAll()"
-  ></app-rounded-icon-button>
-  <app-rounded-icon-button
-    [icon]="'create_new_folder'"
-    [tooltip]="'Create new folder'"
-    (onClick)="createNewFolder()"
-  ></app-rounded-icon-button>
-  <app-rounded-icon-button
-    [icon]="'done'"
-    [tooltip]="'Create new folder'"
-    (onClick)="navigateToDirectorySelection()"
-  ></app-rounded-icon-button>
-</div>
+<span class="side-menu-topbar">
+  <div class="button-container">
+    <app-rounded-icon-button
+      [icon]="'folder_open'"
+      [tooltip]="'Expand all'"
+      (onClick)="expandAll()"
+    ></app-rounded-icon-button>
+    <app-rounded-icon-button
+      [icon]="'folder'"
+      [tooltip]="'Collapse all'"
+      (onClick)="collapseAll()"
+    ></app-rounded-icon-button>
+    <app-rounded-icon-button
+      [icon]="'create_new_folder'"
+      [tooltip]="'Create new folder'"
+      (onClick)="createNewFolder()"
+    ></app-rounded-icon-button>
+    <app-rounded-icon-button
+      [icon]="'done'"
+      [tooltip]="'Create new folder'"
+      (onClick)="navigateToDirectorySelection()"
+    ></app-rounded-icon-button>
+    <app-rounded-icon-button
+      [icon]="'done'"
+      [tooltip]="'Trigger update'"
+      (onClick)="triggerMenuUpdate()"
+    ></app-rounded-icon-button>
+  </div>
+  <div class="loader">
+    <ng-container *ngIf="menuLoading && !treeNodes">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </ng-container>
+  </div>
+</span>
 
 <p-tree
-  [value]="files"
+  [value]="treeNodes"
   draggableNodes="true"
   droppableNodes="true"
   expanded="true"

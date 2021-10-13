@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { MenuItem, TreeNode } from 'primeng/api'
-import { of } from 'rxjs'
-import { map, switchMap, take, tap } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { delay, finalize, map, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
 import { FileActions } from '../../entities/file/constants'
 import { FolderActions } from '../../entities/folder/constants'
@@ -15,27 +16,43 @@ import { StateService } from '../../services/state.service'
   templateUrl: './side-menu.component.html',
   styleUrls: ['./side-menu.component.scss'],
 })
-export class SideMenuComponent implements OnInit {
-  files: TreeNode[]
+export class SideMenuComponent extends AbstractComponent implements OnInit {
+  menuLoading: boolean = true
+  treeNodes: TreeNode[]
   selectedFiles: TreeNode[]
   contextMenuItems: MenuItem[]
 
   constructor(
-    private menuService: MenuService,
     private dialogService: AppDialogService,
     public electronService: ElectronService,
     public state: StateService,
-    public router: Router
-  ) {}
+    public router: Router,
+    public cdRef: ChangeDetectorRef
+  ) {
+    super()
+  }
 
   ngOnInit(): void {
-    this.menuService.getMenuItems().then((files) => (this.files = files))
     this.contextMenuItems = this.getMenuItems()
+    this.menuUpdateListener()
   }
 
-  onRightClick(event: any): void {
-    console.log(event)
+  menuUpdateListener(): void {
+    this.state
+      .getStatePart('menuItems')
+      .pipe(takeUntil(this.destroy$), delay(3000))
+      .subscribe((data) => {
+        this.treeNodes = data.slice(0)
+        this.menuLoading = false
+      })
   }
+
+  triggerMenuUpdate(): void {
+    const test = this.state.state$.value.menuItems
+    this.state.updateState$.next({ key: 'menuItems', payload: test })
+  }
+
+  onRightClick(event: any): void {}
 
   onSelectFile(event: { node: TreeNode; originalEvent: MouseEvent }): void {
     this.contextMenuItems = this.getMenuItems()
@@ -50,13 +67,13 @@ export class SideMenuComponent implements OnInit {
   }
 
   expandAll() {
-    this.files.forEach((node) => {
+    this.state.value.menuItems.forEach((node) => {
       this.expandRecursive(node, true)
     })
   }
 
   collapseAll() {
-    this.files.forEach((node) => {
+    this.state.value.menuItems.forEach((node) => {
       this.expandRecursive(node, false)
     })
   }
@@ -80,14 +97,10 @@ export class SideMenuComponent implements OnInit {
       .pipe(
         take(1),
         switchMap((name) => {
-          return this.state.getStatePart('baseDir').pipe(
-            tap((data) => console.log(data)),
-            map((baseDir) => ({ name, baseDir }))
-          )
+          return this.state.getStatePart('baseDir').pipe(map((baseDir) => ({ name, baseDir })))
         })
       )
       .subscribe((data: { name: string; baseDir: string }) => {
-        console.log(data)
         const { name, baseDir } = data
         if (name && baseDir) {
           this.electronService.send(FolderActions.MkDir, [name, baseDir])

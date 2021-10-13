@@ -8,6 +8,8 @@ import { ThemeService } from './services/theme.service'
 import { AppPreferences } from './interfaces/Preferences'
 import { FolderActionResponses, FolderActions } from './entities/folder/constants'
 import { StateService } from './services/state.service'
+import { folderStructureToMenuItems } from './utils/menu-utils'
+import { MenuService } from './services/menu.service'
 
 type IPCEvent = Electron.IpcMessageEvent
 
@@ -21,6 +23,7 @@ export class AppComponent implements OnInit {
     private electronService: ElectronService,
     private translate: TranslateService,
     private themeService: ThemeService,
+    public menuService: MenuService,
     public state: StateService,
     public dialogService: AppDialogService
   ) {
@@ -63,19 +66,39 @@ export class AppComponent implements OnInit {
     actions.forEach((action) => this.startListener(action))
   }
 
-  startListener(action: FolderActions | FolderActionResponses): void {
-    this.electronService.on(action, (ipcEvent: IPCEvent, arg) => {
-      if (action === FolderActionResponses.MakeDirectorySuccess) {
+  startListener(action: FolderActionResponses): void {
+    this.electronService.on(action, (_ipcEvent: IPCEvent, arg: any) => {
+      this.ipcEventReducer(action, arg)
+      /* if (action === FolderActionResponses.MakeDirectorySuccess) {
         this.dialogService.openToast('Folder created succesfully', 'success')
       }
       if (action === FolderActionResponses.MakeDirectoryFailure) {
         this.dialogService.openToast('Folder creation failed', 'failure')
       }
       if (action === FolderActionResponses.ReadDirectorySuccess) {
-        console.log(ipcEvent)
-        console.log(arg)
-      }
+        console.log(folderStructureToMenuItems(baseDir, arg))
+      } */
     })
+  }
+
+  ipcEventReducer(action: FolderActionResponses, response: any): void {
+    const baseDir = this.state.getStatePartValue('baseDir')
+
+    switch (action) {
+      case FolderActionResponses.ReadDirectorySuccess: {
+        const menuItems = folderStructureToMenuItems(baseDir, response)
+        this.state.updateState$.next({ key: 'menuItems', payload: menuItems })
+        break
+      }
+      case FolderActionResponses.MakeDirectorySuccess: {
+        const folderEntity = response
+        console.log(folderEntity)
+        break
+      }
+      default: {
+        console.log({ message: 'default reducer', action, response })
+      }
+    }
   }
 
   readDir(): void {
