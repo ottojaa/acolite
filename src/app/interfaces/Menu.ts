@@ -1,26 +1,21 @@
+import { TreeNode } from 'primeng/api'
+
 export enum MenuItemTypes {
   File = 'file',
   Folder = 'folder',
 }
 
 export interface FileEntity {
+  type: 'folder' | 'file'
   filePath: string
   parentPath: string
-  type: 'file'
+  size: number
   createdAt: Date
   modifiedAt: Date
-  size: number
-  fileExtension: string
+  fileExtension?: string
 }
 
-export interface TreeElement {
-  data: {
-    filePath: string
-    parentPath: string
-    type: 'folder'
-    createdAt: Date
-    modifiedAt: Date
-    size: number
-  }
-  children?: TreeElement[]
+export interface TreeElement extends TreeNode<FileEntity> {
+  data?: FileEntity
+  children?: (TreeNode<FileEntity> | FileEntity)[]
 }

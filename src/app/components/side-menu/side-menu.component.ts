@@ -1,12 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { TreeNode } from 'primeng/api'
-import { Observable } from 'rxjs'
-import { delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators'
-import { FileEntity } from '../../../../app/utils'
+import { take, takeUntil, tap } from 'rxjs/operators'
+import { FolderActions } from '../../../../app/actions'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
-import { FolderActions } from '../../entities/folder/constants'
+import { FileEntity } from '../../interfaces/Menu'
 import { AppDialogService } from '../../services/dialog.service'
 import { StateService } from '../../services/state.service'
 
@@ -49,7 +48,6 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       .subscribe((name: string) => {
         const baseDir = this.state.state$.value.baseDir
         if (name && baseDir) {
-          console.log(name)
           this.electronService.send(FolderActions.MkDir, [name, baseDir])
         }
       })

@@ -19,19 +19,3 @@ export enum EntityTypes {
   File = 'file',
   Folder = 'folder',
 }
-
-export enum FileActions {
-  Create = 'create-file',
-  Rename = 'rename-file',
-  Delete = 'delete',
-  Paste = 'paste-file',
-  Copy = 'copy-file',
-  Cut = 'cut-file',
-  OpenInFolder = 'open-file-in-folder',
-  ModifyTags = 'modify-tags',
-}
-
-export enum FileActionResponses {
-  CreateSuccess = 'create-file-success',
-  CreateFailure = 'create-file-failure',
-}

@@ -1,6 +1,5 @@
 import { TreeNode } from 'primeng/api'
 import { FileEntity, MenuItemTypes, TreeElement } from '../interfaces/Menu'
-import { cloneDeep } from 'lodash'
 
 export const folderStructureToMenuItems = (
   baseDir: string,

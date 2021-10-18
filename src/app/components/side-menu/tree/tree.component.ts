@@ -10,11 +10,11 @@ import {
 } from '@angular/core'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
-import { map, switchMap, take } from 'rxjs/operators'
-import { FileEntity } from '../../../../../app/utils'
+import { take } from 'rxjs/operators'
 import { ElectronService } from '../../../core/services'
 import { FileActions } from '../../../entities/file/constants'
 import { FolderActions } from '../../../entities/folder/constants'
+import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 

@@ -5,11 +5,10 @@ import { APP_CONFIG } from '../environments/environment'
 import appConfig from '../../app/acolite.config.json'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
-import { AppPreferences } from './interfaces/Preferences'
-import { FolderActionResponses, FolderActions } from './entities/folder/constants'
 import { StateService } from './services/state.service'
 import { folderStructureToMenuItems, makeFolderTreeNodeFromFileEntity } from './utils/menu-utils'
 import { MenuService } from './services/menu.service'
+import { FolderActionResponses, FolderActions } from '../../app/actions'
 
 type IPCEvent = Electron.IpcMessageEvent
 

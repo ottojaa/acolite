@@ -3,14 +3,23 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
-import { join } from 'path'
-import { FileEntity, getFileEntityFromPath } from './utils'
+import { getFileEntityFromPath, getMenuItemsFromBaseDirectory, getTreeStructureFromBaseDirectory } from './utils'
+import { folderStructureToMenuItems, makeFolderTreeNodeFromFileEntity } from '../src/app/utils/menu-utils'
+import {
+  CreateFile,
+  CreateNewDirectory,
+  ElectronAction,
+  FileActionResponses,
+  FileActions,
+  FolderActionResponses,
+  FolderActions,
+  ReadDirectory,
+} from './actions'
 
-interface TreeElement {
-  data: FileEntity
-  children?: (TreeElement | FileEntity)[]
-}
+type IPCChannel = Record<FileActions | FolderActions, string>
+type IPCChannelAction = FileActions | FolderActions
 
+type action<T extends keyof IPCChannel> = ElectronAction<T>
 // Initialize remote module
 require('@electron/remote/main').initialize()
 
@@ -71,6 +80,45 @@ function createWindow(): BrowserWindow {
   return win
 }
 
+const IPCChannels = [
+  FolderActions.ChooseDir,
+  FolderActions.ReadDir,
+  FolderActions.MkDir,
+  FolderActions.SetDefaultDir,
+  FileActions.Create,
+  FileActions.Delete,
+  FileActions.Rename,
+]
+
+const startIPCChannelListeners = () => {
+  IPCChannels.forEach((channel) => IPCChannelReducer(channel))
+}
+
+const IPCChannelReducer = (action: IPCChannelAction) => {
+  ipcMain.on(action, (event: IpcMainEvent, payload: ElectronAction<unknown>) => {
+    switch (action) {
+      case FolderActions.MkDir: {
+        createNewDirectory(event, <ElectronAction<CreateNewDirectory>>payload)
+        break
+      }
+      case FolderActions.ChooseDir: {
+        chooseDirectory(event)
+        break
+      }
+      case FolderActions.SetDefaultDir: {
+        setDefaultDirectory(event)
+        break
+      }
+      case FolderActions.ReadDir: {
+        readAndSendDirectoryTree(event, <ElectronAction<ReadDirectory>>payload)
+      }
+      case FileActions.Create: {
+        createFile(event, <ElectronAction<CreateFile>>payload)
+      }
+    }
+  })
+}
+
 try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
@@ -78,142 +126,7 @@ try {
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => setTimeout(createWindow, 400))
 
-  /*  ipcMain.on('show-context-menu', (event) => {
-    console.log('SHOW CONTEXTMENU')
-    const template: any[] = [
-      {
-        label: 'Menu Item 1',
-        click: () => {
-          event.sender.send('context-menu-command', 'menu-item-1')
-        },
-      },
-      { type: 'separator' },
-      { label: 'Menu Item 2', type: 'checkbox', checked: true },
-    ]
-    const menu: any = Menu.buildFromTemplate(template)
-    menu.popup(BrowserWindow.fromWebContents(event.sender))
-  }) */
-
-  /**
-   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * * * * * * * * * * * * *  START ipcMain-listeners  * * * * * * * * * * * * * *
-   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   */
-
-  ipcMain.on('choose-directory', (event: IpcMainEvent) => {
-    dialog
-      .showOpenDialog(win, {
-        properties: ['openDirectory', 'createDirectory'],
-      })
-      .then((result) => {
-        if (result.canceled) {
-          event.reply('choose-directory-canceled')
-        } else if (result.filePaths) {
-          // Take the dirPath chosen by the user and write it in the appConfig.json to overwrite the base-url
-          const filePathRef = { baseDir: result.filePaths[0] }
-          writeToFile(defaultConfigFilePath, filePathRef)
-            .then(() => {
-              event.reply('choose-directory-success', result.filePaths[0])
-            })
-            .catch((err) => {
-              throw err
-            })
-        }
-      })
-      .catch((err) => {
-        event.reply('choose-directory-failure', err)
-      })
-  })
-
-  ipcMain.on('set-default-directory', (event: IpcMainEvent) => {
-    const filePathRef = { baseDir: __dirname }
-    writeToFile(defaultConfigFilePath, filePathRef)
-      .then(() => {
-        event.sender.send('set-default-directory-success')
-      })
-      .catch((err) => {
-        event.sender.send('set-default-directory-failure', err)
-      })
-  })
-
-  // Reads the folder tree from the baseDir and returns a list of descendants and their information
-  ipcMain.on('read-directory', (event: IpcMainEvent, baseDir: string) => {
-    try {
-      const directoryPath = baseDir
-
-      const isDirectory = (path: string) => fs.statSync(path).isDirectory()
-      const getDirectories = (fileEntity: FileEntity) =>
-        fs
-          .readdirSync(fileEntity.filePath)
-          .map((name) => join(fileEntity.filePath, name))
-          .filter(isDirectory)
-          .map(getFileEntityFromPath)
-
-      const isFile = (path: string) => fs.statSync(path).isFile()
-      const getFiles = (fileEntity: FileEntity) =>
-        fs
-          .readdirSync(fileEntity.filePath)
-          .map((name) => join(fileEntity.filePath, name))
-          .filter(isFile)
-          .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
-          .map(getFileEntityFromPath)
-
-      const getFilesRecursively = (file: FileEntity): (TreeElement | FileEntity)[] => {
-        let dirs = getDirectories(file)
-        let files: (TreeElement | FileEntity)[] = dirs.map((dir) => {
-          return {
-            data: dir,
-            children: getFilesRecursively(dir).reduce(
-              (directoryDescendants: (TreeElement | FileEntity)[], descendant: TreeElement | FileEntity) =>
-                directoryDescendants.concat(descendant),
-              []
-            ),
-          }
-        })
-        return files.concat(getFiles(file))
-      }
-
-      const rootFolder = getFileEntityFromPath(directoryPath)
-      const fileStruct = getFilesRecursively(rootFolder)
-
-      console.log({ rootFolder, fileStruct })
-
-      event.sender.send('read-directory-success', fileStruct)
-    } catch (err) {
-      console.log(err)
-      event.sender.send('read-directory-failure', err)
-    }
-  })
-
-  ipcMain.on('make-directory', (event: IpcMainEvent, args: [string, string]) => {
-    const [name, baseDir] = args
-    const directoryPath = path.join(baseDir, name)
-    fs.promises
-      .mkdir(directoryPath, { recursive: true })
-      .then(() => {
-        const newDir = getFileEntityFromPath(directoryPath)
-        event.sender.send('make-directory-success', { data: newDir, children: [] })
-      })
-      .catch((err) => {
-        event.sender.send('make-directory-failure', err)
-      })
-  })
-
-  ipcMain.on('create-file', (event: IpcMainEvent, path: string) => {
-    fs.writeFile(path, '', (err) => {
-      if (err) {
-        event.sender.send('create-file-failure', err)
-      }
-      const file = getFileEntityFromPath(path)
-      event.sender.send('create-file-success', file)
-    })
-  })
-
-  /**
-   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   * * * * * * * * * * * * *  END ipcMain-listeners  * * * * * * * * * * * * * * *
-   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-   */
+  startIPCChannelListeners()
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -247,5 +160,77 @@ const writeToFile = <T extends {}>(filePath: string, args: T): Promise<void> => 
         resolve()
       })
     })
+  })
+}
+
+const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateNewDirectory>) => {
+  const { directoryName, baseDir, menuItems } = payload.data
+  const directoryPath = path.join(baseDir, directoryName)
+  fs.promises
+    .mkdir(directoryPath, { recursive: true })
+    .then(() => {
+      const newDir = getFileEntityFromPath(directoryPath)
+      const updatedMenuItems = [...menuItems, { data: newDir, children: [] }]
+      event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedMenuItems)
+    })
+    .catch((err) => {
+      event.sender.send(FolderActionResponses.MakeDirectoryFailure, err)
+    })
+}
+
+const chooseDirectory = (event: IpcMainEvent) => {
+  dialog
+    .showOpenDialog(win, {
+      properties: ['openDirectory', 'createDirectory'],
+    })
+    .then((result) => {
+      if (result.canceled) {
+        event.reply(FolderActionResponses.ChooseDirectoryCanceled)
+      } else if (result.filePaths) {
+        // Take the dirPath chosen by the user and write it in the appConfig.json to overwrite the base-url
+        const filePathRef = { baseDir: result.filePaths[0] }
+        writeToFile(defaultConfigFilePath, filePathRef)
+          .then(() => {
+            event.reply(FolderActionResponses.ChooseDirectorySuccess, result.filePaths[0])
+          })
+          .catch((err) => {
+            throw err
+          })
+      }
+    })
+    .catch((err) => {
+      event.reply(FolderActionResponses.ChooseDirectoryFailure, err)
+    })
+}
+
+const setDefaultDirectory = (event: IpcMainEvent) => {
+  const filePathRef = { baseDir: __dirname }
+  writeToFile(defaultConfigFilePath, filePathRef)
+    .then(() => {
+      event.sender.send(FolderActionResponses.SetDefaultDirSuccess)
+    })
+    .catch((err) => {
+      event.sender.send(FolderActionResponses.SetDefaultDirFailure, err)
+    })
+}
+
+const readAndSendDirectoryTree = (event: IpcMainEvent, action: ElectronAction<ReadDirectory>) => {
+  try {
+    const menuItems = getMenuItemsFromBaseDirectory(action.data.baseDir)
+    event.sender.send(FolderActionResponses.ReadDirectorySuccess, menuItems)
+  } catch (err) {
+    console.log(err)
+    event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
+  }
+}
+
+const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => {
+  const { path, menuItems } = action.data
+  fs.writeFile(path, '', (err) => {
+    if (err) {
+      event.sender.send(FileActionResponses.CreateFailure, err)
+    }
+    const file = getFileEntityFromPath(path)
+    event.sender.send(FileActionResponses.CreateSuccess, file)
   })
 }
