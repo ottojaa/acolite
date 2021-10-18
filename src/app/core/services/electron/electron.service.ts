@@ -6,6 +6,13 @@ import { ipcRenderer, webFrame } from 'electron'
 import * as remote from '@electron/remote'
 import * as childProcess from 'child_process'
 import * as fs from 'fs'
+import {
+  CreateFile,
+  CreateNewDirectory,
+  ElectronAction,
+  FolderActions,
+  ReadDirectory,
+} from '../../../../../app/actions'
 
 @Injectable({
   providedIn: 'root',
@@ -45,5 +52,29 @@ export class ElectronService {
       return
     }
     this.ipcRenderer.send(channel, ...args)
+  }
+
+  // Folder actions
+
+  readDirectoryRequest(payload: ElectronAction<ReadDirectory>): void {
+    this.send(FolderActions.ReadDir, payload)
+  }
+
+  createNewFolderRequest(payload: ElectronAction<CreateNewDirectory>): void {
+    this.send(FolderActions.MkDir, payload)
+  }
+
+  setDefaultDir(): void {
+    this.send(FolderActions.SetDefaultDir)
+  }
+
+  chooseDirectory(): void {
+    this.send(FolderActions.ChooseDir)
+  }
+
+  // File actions
+
+  createNewFileRequest(channel: string, payload: ElectronAction<CreateFile>): void {
+    this.send(channel, payload)
   }
 }

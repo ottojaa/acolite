@@ -2,21 +2,21 @@ import { TreeNode } from 'primeng/api'
 import { FileEntity } from '../src/app/interfaces/Menu'
 
 export interface CreateFile {
-  type: FileActions.Create
   path: string
   menuItems: TreeNode<FileEntity>[]
 }
 export interface ReadDirectory {
-  type: FolderActions.ReadDir
   baseDir: string
 }
 
 export interface CreateNewDirectory {
-  type: FolderActions.MkDir
   directoryName: string
   baseDir: string
   menuItems: TreeNode<FileEntity>[]
+  parentPath?: string
 }
+
+export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {
   data: T

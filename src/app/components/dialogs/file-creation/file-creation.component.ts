@@ -2,8 +2,8 @@ import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
+import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
-import { FileActionResponses, FileActions } from '../../../entities/file/constants'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -46,12 +46,15 @@ export class FileCreationComponent {
     public state: StateService,
     public ngZone: NgZone
   ) {
-    this.electronService.on(FileActionResponses.CreateSuccess, (_event: Electron.IpcMessageEvent, file: FileEntity) => {
-      this.updateMenuItems(file)
-      this.ngZone.run(() => {
-        this.dialogRef.close()
-      })
-    })
+    this.electronService.on(
+      FileActionResponses.CreateSuccess,
+      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
+        this.updateMenuItems(updatedMenuItems)
+        this.ngZone.run(() => {
+          this.dialogRef.close()
+        })
+      }
+    )
     this.electronService.on(FileActionResponses.CreateFailure, (_event: Electron.IpcMessageEvent, args: any) => {
       this.dialogService.openToast('File creation failed', 'failure')
     })
@@ -62,22 +65,12 @@ export class FileCreationComponent {
   }
 
   onCreateClick(): void {
-    const filePath = `${this.data}/${this.fileName}.${this.extension}`
-    this.electronService.send(FileActions.Create, filePath)
+    const path = `${this.data}/${this.fileName}.${this.extension}`
+    const { menuItems } = this.state.state$.value
+    this.electronService.createNewFileRequest(FileActions.Create, { data: { path, menuItems } })
   }
 
-  updateMenuItems(file: FileEntity): void {
-    const { baseDir, menuItems } = this.state.state$.value
-
-    const updateState = (payload: TreeNode<FileEntity>[]) => {
-      this.state.updateState$.next({ key: 'menuItems', payload })
-    }
-    if (file.parentPath === baseDir) {
-      const updatedMenuItems = addFileToBaseDir(menuItems, file)
-      updateState(updatedMenuItems)
-    } else {
-      const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file)
-      updateState(updatedMenuItems)
-    }
+  updateMenuItems(updatedMenuItems: TreeNode<FileEntity>[]): void {
+    this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
   }
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core'
-import { MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { Component } from '@angular/core'
+import { MatDialogRef } from '@angular/material/dialog'
+import { FolderActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
-import { FolderActionResponses, FolderActions } from '../../../entities/folder/constants'
 
 type IPCEvent = Electron.IpcMessageEvent
 
@@ -14,11 +14,11 @@ export class BaseDirectoryDialogComponent {
   constructor(public dialogRef: MatDialogRef<BaseDirectoryDialogComponent>, private electronService: ElectronService) {}
 
   onChooseDirectory(): void {
-    this.electronService.send(FolderActions.ChooseDir)
+    this.electronService.chooseDirectory()
   }
 
   onSetDefaultDirectory(): void {
-    this.electronService.send(FolderActions.SetDefaultDir)
+    this.electronService.setDefaultDir()
   }
 
   closeDialog(): void {}

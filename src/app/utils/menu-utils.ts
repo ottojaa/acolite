@@ -7,7 +7,7 @@ export const folderStructureToMenuItems = (
 ): TreeNode<FileEntity>[] => folderStruct.map((descendant) => createMenuItemsRecursive(baseDir, descendant))
 
 const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
-  if (isFolder(element)) {
+  if (isFolder(element) && element.data.type === 'folder') {
     const { data, children } = element
     return {
       label: getFileNameFromPath(data.filePath),
@@ -18,7 +18,7 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
       data,
     }
   } else if (isFile(element)) {
-    return getTreeNodeFromEntity(element)
+    return getTreeNodeFromFile(element)
   }
   throw new Error('createMenuItemsRecursive failed, invalid element')
 }
@@ -29,7 +29,9 @@ export const getUpdatedMenuItemsRecursive = (
 ): TreeNode<FileEntity>[] => {
   for (let item of menuItems) {
     if (item.data.filePath === newItem.parentPath) {
-      item.children = [...item.children, getTreeNodeFromEntity(newItem)]
+      debugger
+      const treeNode = item.data.type === 'folder' ? getTreeNodeFromFolder(newItem) : getTreeNodeFromFile(newItem)
+      item.children = [...item.children, treeNode]
       item.expanded = true
       break
     } else if (item.children?.length) {
@@ -40,7 +42,7 @@ export const getUpdatedMenuItemsRecursive = (
   return menuItems
 }
 
-export const makeFolderTreeNodeFromFileEntity = (data: FileEntity): TreeNode<FileEntity> => {
+export const getTreeNodeFromFolder = (data: FileEntity): TreeNode<FileEntity> => {
   return {
     data,
     label: getFileNameFromPath(data.filePath),
@@ -51,18 +53,17 @@ export const makeFolderTreeNodeFromFileEntity = (data: FileEntity): TreeNode<Fil
   }
 }
 
-export const addFileToBaseDir = (menuItems: TreeNode<FileEntity>[], newItem: FileEntity) => {
-  console.log('added file to base dir: ', newItem)
-  return [...menuItems, newItem]
-}
-
-const getTreeNodeFromEntity = (item: FileEntity): TreeNode => {
+const getTreeNodeFromFile = (item: FileEntity): TreeNode<FileEntity> => {
   return {
     label: getFileNameFromPath(item.filePath),
     icon: 'pi pi-file',
     type: MenuItemTypes.File,
     data: item,
   }
+}
+
+export const addFileToBaseDir = (menuItems: TreeNode<FileEntity>[], newItem: FileEntity) => {
+  return [...menuItems, newItem]
 }
 
 const getFileNameFromPath = (path: string) => {

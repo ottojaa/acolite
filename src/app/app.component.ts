@@ -6,7 +6,6 @@ import appConfig from '../../app/acolite.config.json'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { StateService } from './services/state.service'
-import { folderStructureToMenuItems, makeFolderTreeNodeFromFileEntity } from './utils/menu-utils'
 import { MenuService } from './services/menu.service'
 import { FolderActionResponses, FolderActions } from '../../app/actions'
 
@@ -26,7 +25,6 @@ export class AppComponent implements OnInit {
     public state: StateService,
     public dialogService: AppDialogService
   ) {
-    console.log(appConfig.baseDir)
     this.state.updateState$.next({ key: 'baseDir', payload: appConfig.baseDir })
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
@@ -45,6 +43,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.themeService.setTheme('Light grey')
     if (this.state.getStatePartValue('baseDir')) {
+      console.log('hehe')
       this.readDir()
     }
   }
@@ -68,32 +67,18 @@ export class AppComponent implements OnInit {
   startListener(action: FolderActionResponses): void {
     this.electronService.on(action, (_ipcEvent: IPCEvent, arg: any) => {
       this.ipcEventReducer(action, arg)
-      /* if (action === FolderActionResponses.MakeDirectorySuccess) {
-        this.dialogService.openToast('Folder created succesfully', 'success')
-      }
-      if (action === FolderActionResponses.MakeDirectoryFailure) {
-        this.dialogService.openToast('Folder creation failed', 'failure')
-      }
-      if (action === FolderActionResponses.ReadDirectorySuccess) {
-        console.log(folderStructureToMenuItems(baseDir, arg))
-      } */
     })
   }
 
   ipcEventReducer(action: FolderActionResponses, response: any): void {
-    const baseDir = this.state.getStatePartValue('baseDir')
-
     switch (action) {
       case FolderActionResponses.ReadDirectorySuccess: {
-        const menuItems = folderStructureToMenuItems(baseDir, response)
-        this.state.updateState$.next({ key: 'menuItems', payload: menuItems })
+        this.state.updateState$.next({ key: 'menuItems', payload: response })
         break
       }
       case FolderActionResponses.MakeDirectorySuccess: {
-        const menuItems = this.state.state$.value.menuItems
-        const folderEntity = makeFolderTreeNodeFromFileEntity(response.data)
-        this.state.updateState$.next({ key: 'menuItems', payload: [...menuItems, folderEntity] })
-        console.log(folderEntity)
+        this.state.updateState$.next({ key: 'menuItems', payload: response })
+        console.log(response)
         break
       }
       default: {
@@ -106,7 +91,7 @@ export class AppComponent implements OnInit {
   readDir(): void {
     const baseDir = this.state.getStatePartValue('baseDir')
     if (baseDir) {
-      this.electronService.send(FolderActions.ReadDir, baseDir)
+      this.electronService.readDirectoryRequest({ data: { baseDir } })
     }
   }
 }

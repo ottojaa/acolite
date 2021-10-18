@@ -15,7 +15,7 @@ export class FolderNameDialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<FolderNameDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Inject(MAT_DIALOG_DATA) public data: { filePath: string }
   ) {}
 
   onNoClick(): void {

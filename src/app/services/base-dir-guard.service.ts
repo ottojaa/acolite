@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core'
 import { CanActivate } from '@angular/router'
 import { Router } from '@angular/router'
+import { MenuItem } from 'primeng/api'
 import appConfig from '../../../app/acolite.config.json'
+
+interface AppConfig {
+  baseDir?: string
+  menuItems?: MenuItem[]
+}
 
 @Injectable()
 export class BaseDirGuard implements CanActivate {
   canActivate() {
-    console.log(appConfig)
-    if (appConfig.baseDir) {
+    const config: AppConfig = appConfig
+    if (config?.baseDir) {
       this.router.navigate(['main'])
     }
     return true

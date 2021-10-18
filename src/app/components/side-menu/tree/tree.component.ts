@@ -11,9 +11,8 @@ import {
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
+import { FileActions, FolderActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
-import { FileActions } from '../../../entities/file/constants'
-import { FolderActions } from '../../../entities/folder/constants'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -26,11 +25,6 @@ import { StateService } from '../../../services/state.service'
 export class TreeComponent implements OnInit {
   @Input() files: TreeNode<FileEntity>[]
   @ViewChild('contextMenu') cm: ContextMenu
-
-  @HostListener('keydown', ['$event'])
-  test(event): void {
-    console.log(event)
-  }
 
   selectedFiles: TreeNode<FileEntity>[]
   contextMenuItems: MenuItem[]
@@ -65,15 +59,18 @@ export class TreeComponent implements OnInit {
     this.selectedFiles = []
   }
 
-  createNewFolder(): void {
+  createNewFolder(filePath: string): void {
+    const baseDir = this.state.state$.value.baseDir
+
     this.dialogService
-      .openFolderNameDialog()
+      .openFolderNameDialog(filePath)
       .pipe(take(1))
       .subscribe((name: string) => {
-        const baseDir = this.state.state$.value.baseDir
-        if (name && baseDir) {
-          console.log(name)
-          this.electronService.send(FolderActions.MkDir, [name, baseDir])
+        if (name) {
+          const menuItems = this.state.getStatePartValue('menuItems')
+          this.electronService.createNewFolderRequest({
+            data: { directoryName: name, baseDir, menuItems, parentPath: filePath },
+          })
         }
       })
   }
@@ -132,9 +129,14 @@ export class TreeComponent implements OnInit {
     if (this.isFolderSelected(this.selectedFiles)) {
       baseItems[0].items = [
         {
-          label: 'Create new file',
+          label: 'New file',
           icon: 'pi pi-plus',
           command: () => this.openNewFileDialog(),
+        },
+        {
+          label: 'New folder',
+          icon: 'pi pi-folder',
+          command: () => this.createNewFolder(this.selectedFiles[0].data.filePath),
         },
         ...baseItems[0].items,
       ]

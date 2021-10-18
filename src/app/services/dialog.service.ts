@@ -19,8 +19,8 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openFolderNameDialog(): Observable<string | undefined> {
-    const ref = this.dialog.open(FolderNameDialogComponent)
+  openFolderNameDialog(filePath: string): Observable<string | undefined> {
+    const ref = this.dialog.open(FolderNameDialogComponent, { data: filePath })
 
     return ref.afterClosed().pipe(take(1))
   }

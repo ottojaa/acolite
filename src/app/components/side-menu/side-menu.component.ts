@@ -42,13 +42,17 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   }
 
   createNewFolder(): void {
+    const baseDir = this.state.state$.value.baseDir
+
     this.dialogService
-      .openFolderNameDialog()
+      .openFolderNameDialog(baseDir)
       .pipe(take(1))
       .subscribe((name: string) => {
-        const baseDir = this.state.state$.value.baseDir
         if (name && baseDir) {
-          this.electronService.send(FolderActions.MkDir, [name, baseDir])
+          const menuItems = this.state.getStatePartValue('menuItems')
+          this.electronService.createNewFolderRequest({
+            data: { directoryName: name, baseDir, menuItems },
+          })
         }
       })
   }
