@@ -13,21 +13,14 @@
     />
 
     <!-- Dropdown Menu -->
-    <ul
-      *ngIf="openDrop && filterFiles.length"
-      class="drop-down"
-      keyboardNavigationList
-    >
-      <div class="list-item" *ngFor="let file of filterFiles; let i = index">
+    <ul *ngIf="openDrop && filterFiles.length" class="drop-down" keyboardNavigationList>
+      <div class="list-item" id="item" *ngFor="let file of filterFiles; let i = index">
         <li role="option" keyboardNavigationItem>
           <div class="list-item-information">
             <div class="top-row">
               <p class="text-highlight">{{ file.name }}</p>
             </div>
-            <div
-              class="bottom-row"
-              *ngIf="file.highlightContentText as highlight"
-            >
+            <div class="bottom-row" *ngIf="file.highlightContentText as highlight">
               <div class="filler"></div>
               <p [innerHtml]="highlight"></p>
             </div>

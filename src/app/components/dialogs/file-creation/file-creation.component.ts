@@ -1,13 +1,12 @@
-import { Component, Inject, NgZone, OnInit } from '@angular/core'
+import { Component, Inject, NgZone } from '@angular/core'
+import { FormBuilder, FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
 import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
-import { addFileToBaseDir, getUpdatedMenuItemsRecursive } from '../../../utils/menu-utils'
 
 @Component({
   selector: 'app-file-creation',
@@ -15,9 +14,9 @@ import { addFileToBaseDir, getUpdatedMenuItemsRecursive } from '../../../utils/m
   styleUrls: ['./file-creation.component.scss'],
 })
 export class FileCreationComponent {
-  fileName: string
+  fileName = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$')])
+  extension = new FormControl('txt', [Validators.required])
   openFileAfterCreation = true
-  extension: 'txt' | 'md'
   options = [
     {
       icon: 'text',
@@ -32,24 +31,35 @@ export class FileCreationComponent {
   ]
 
   get result(): string {
-    if (!this.fileName || !this.extension) {
+    const name = this.fileName.value
+    const extension = this.extension.value
+    if (!name || !extension) {
       return
     }
-    return this.fileName + '.' + this.extension
+    return name + '.' + extension
+  }
+
+  get parent(): string {
+    return this.getParentNameFromPath()
+  }
+
+  get formValid(): boolean {
+    return this.fileName.valid && this.fileName.valid
   }
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { filePath: string },
+    @Inject(MAT_DIALOG_DATA) public data: string,
     public dialogRef: MatDialogRef<FileCreationComponent>,
     public electronService: ElectronService,
     public dialogService: AppDialogService,
     public state: StateService,
-    public ngZone: NgZone
+    public ngZone: NgZone,
+    public fb: FormBuilder
   ) {
     this.electronService.on(
       FileActionResponses.CreateSuccess,
       (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
-        this.updateMenuItems(updatedMenuItems)
+        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
         this.ngZone.run(() => {
           this.dialogRef.close()
         })
@@ -64,13 +74,27 @@ export class FileCreationComponent {
     this.dialogRef.close()
   }
 
+  getErrorMessage(): string | undefined {
+    if (this.fileName.hasError('required')) {
+      return 'You must enter a file name'
+    }
+    if (this.fileName.hasError('pattern')) {
+      return 'File name can only contain letters and numbers'
+    }
+    if (this.extension.hasError('required')) {
+      return 'You must choose an extension'
+    }
+  }
+
   onCreateClick(): void {
-    const path = `${this.data}/${this.fileName}.${this.extension}`
+    const path = `${this.data}/${this.result}`
     const { menuItems } = this.state.state$.value
     this.electronService.createNewFileRequest(FileActions.Create, { data: { path, menuItems } })
   }
 
-  updateMenuItems(updatedMenuItems: TreeNode<FileEntity>[]): void {
-    this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
+  getParentNameFromPath(): string {
+    const filePath = this.data
+    const lastIdx = filePath.lastIndexOf('/')
+    return filePath.substring(lastIdx + 1, filePath.length)
   }
 }

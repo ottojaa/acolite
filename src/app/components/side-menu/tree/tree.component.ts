@@ -77,10 +77,12 @@ export class TreeComponent implements OnInit {
 
   openNewFileDialog(): void {
     const { filePath } = this.selectedFiles[0].data
-    this.dialogService
-      .openNewFileCreationDialog(filePath)
-      .pipe(take(1))
-      .subscribe((data) => console.log(data))
+    this.dialogService.openNewFileCreationDialog(filePath).pipe(take(1)).subscribe()
+  }
+
+  openRenameFileDialog(): void {
+    const { filePath } = this.selectedFiles[0].data
+    this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
   }
 
   /**
@@ -103,11 +105,6 @@ export class TreeComponent implements OnInit {
             command: (event) => {
               this.electronService.send(FileActions.Delete, event)
             },
-          },
-          {
-            label: 'Rename file',
-            icon: 'pi pi-pencil',
-            command: (event) => this.electronService.send(FileActions.Rename, event),
           },
         ],
       },
@@ -139,6 +136,16 @@ export class TreeComponent implements OnInit {
           command: () => this.createNewFolder(this.selectedFiles[0].data.filePath),
         },
         ...baseItems[0].items,
+      ]
+    }
+    if (!this.isMultipleSelected(this.selectedFiles)) {
+      baseItems[0].items = [
+        ...baseItems[0].items,
+        {
+          label: 'Rename file',
+          icon: 'pi pi-pencil',
+          command: (_event) => this.openRenameFileDialog(),
+        },
       ]
     }
 

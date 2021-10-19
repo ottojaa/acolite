@@ -16,6 +16,11 @@ export interface CreateNewDirectory {
   parentPath?: string
 }
 
+export interface RenameFile {
+  oldPath: string
+  newPath: string
+}
+
 export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {

@@ -7,12 +7,13 @@
 .list-item {
   position: relative;
   background-color: var(--secondary);
+  cursor: pointer;
   transition: background-color 100ms linear;
   :hover {
-    background-color: var(--buttonColor) !important;
+    background-color: #484a4e !important;
   }
   :focus {
-    background-color: var(--buttonColor) !important;
+    background-color: #484a4e !important;
   }
 }
 
@@ -21,7 +22,7 @@
   padding: 1rem;
   margin-top: 1px;
   outline: none;
-  background: var(--primary);
+  background-color: var(--primary);
   height: auto;
   display: flex;
   flex-direction: row;
@@ -42,7 +43,7 @@
     p {
       font-size: 15px;
       font-weight: bolder;
-      color: var(--textHighlight);
+      color: var(--buttonColor);
     }
   }
   .bottom-row {

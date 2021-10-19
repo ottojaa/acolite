@@ -1,0 +1,14 @@
+<div class="container">
+  <h1 mat-dialog-title>Folder name</h1>
+  <div mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput [formControl]="folderName" />
+    </mat-form-field>
+    <mat-error *ngIf="!folderName.pristine && folderName.invalid">{{ getErrorMessage() }}</mat-error>
+  </div>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="folderName.value" [disabled]="folderName.invalid">Create</button>
+  </mat-dialog-actions>
+</div>

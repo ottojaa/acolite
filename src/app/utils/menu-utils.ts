@@ -1,6 +1,8 @@
 import { TreeNode } from 'primeng/api'
 import { FileEntity, MenuItemTypes, TreeElement } from '../interfaces/Menu'
 
+export type UpdateStrategy = 'create' | 'rename' | 'delete'
+
 export const folderStructureToMenuItems = (
   baseDir: string,
   folderStruct: (TreeElement | FileEntity)[]
@@ -24,25 +26,55 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
 }
 
 export const getUpdatedMenuItemsRecursive = (
-  menuItems: TreeNode<FileEntity>[],
-  newItem: FileEntity
-): TreeNode<FileEntity>[] => {
+  menuItems: TreeElement[],
+  updatedItem: FileEntity,
+  strategy: UpdateStrategy
+): TreeElement[] => {
+  removeExistingStyleClasses(menuItems)
+
   for (let item of menuItems) {
-    if (item.data.filePath === newItem.parentPath) {
-      debugger
-      const treeNode = item.data.type === 'folder' ? getTreeNodeFromFolder(newItem) : getTreeNodeFromFile(newItem)
-      item.children = [...item.children, treeNode]
-      item.expanded = true
+    if (item.data.filePath === updatedItem.parentPath) {
+      switch (strategy) {
+        case 'create': {
+          const treeNode =
+            item.data.type === 'folder'
+              ? getTreeNodeFromFolder(updatedItem, 'new-file')
+              : getTreeNodeFromFile(updatedItem, 'new-file')
+
+          item.children = [...item.children, treeNode]
+          item.expanded = true
+          break
+        }
+        case 'rename': {
+          item.label = getFileNameFromPath(updatedItem.filePath)
+          break
+        }
+        case 'delete': {
+          item.children = item.children.filter((el) => el.data.filePath !== updatedItem.filePath)
+          break
+        }
+      }
       break
     } else if (item.children?.length) {
-      getUpdatedMenuItemsRecursive(item.children, newItem)
+      getUpdatedMenuItemsRecursive(item.children, updatedItem, strategy)
     }
   }
 
   return menuItems
 }
 
-export const getTreeNodeFromFolder = (data: FileEntity): TreeNode<FileEntity> => {
+export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
+  menuItems.forEach((item) => {
+    if (item.styleClass) {
+      delete item.styleClass
+    }
+    if (item.children?.length) {
+      removeExistingStyleClasses(item.children)
+    }
+  })
+}
+
+export const getTreeNodeFromFolder = (data: FileEntity, styleClass?: string): TreeNode<FileEntity> => {
   return {
     data,
     label: getFileNameFromPath(data.filePath),
@@ -50,10 +82,11 @@ export const getTreeNodeFromFolder = (data: FileEntity): TreeNode<FileEntity> =>
     expandedIcon: 'pi pi-folder-open',
     collapsedIcon: 'pi pi-folder',
     children: [],
+    ...(styleClass && { styleClass }),
   }
 }
 
-const getTreeNodeFromFile = (item: FileEntity): TreeNode<FileEntity> => {
+const getTreeNodeFromFile = (item: FileEntity, styleClass?: string): TreeNode<FileEntity> => {
   return {
     label: getFileNameFromPath(item.filePath),
     icon: 'pi pi-file',

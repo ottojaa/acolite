@@ -1,12 +1,12 @@
 <div class="form-fields-container">
-  <mat-form-field appearance="fill" required>
+  <mat-form-field appearance="fill">
     <mat-label>File name</mat-label>
-    <input matInput [(ngModel)]="fileName" />
+    <input matInput [formControl]="fileName" required />
   </mat-form-field>
 
   <mat-form-field appearance="fill">
     <mat-label>File type</mat-label>
-    <mat-select matNativeControl required [(value)]="extension">
+    <mat-select [formControl]="extension" required [(value)]="extension">
       <mat-option *ngFor="let option of options" [value]="option.value">
         {{ option.label }}
       </mat-option>
@@ -15,14 +15,19 @@
 </div>
 
 <div class="result mat-typography">
-  <ng-container *ngIf="result">
+  <ng-container *ngIf="result && formValid; else showError">
     <h3>{{ result }}</h3>
-    <p>will be created</p>
+    <p>will be created under</p>
+    <h3>{{ parent }}</h3>
   </ng-container>
+
+  <ng-template #showError>
+    <mat-error *ngIf="!fileName.pristine && !formValid">{{ getErrorMessage() }}</mat-error>
+  </ng-template>
 </div>
 
 <mat-dialog-actions align="end">
   <mat-checkbox [(ngModel)]="openFileAfterCreation"> Open file after creation? </mat-checkbox>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button (click)="onCreateClick()" [disabled]="!result">Create</button>
+  <button mat-button (click)="onCreateClick()" [disabled]="fileName.invalid || extension.invalid">Create</button>
 </mat-dialog-actions>

@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, IpcMessageEvent, Menu, screen, dialog } fr
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import { stringify, parse, fromJSON } from 'flatted'
 import { IpcMainEvent } from 'electron/main'
 import { getFileEntityFromPath, getMenuItemsFromBaseDirectory, getTreeStructureFromBaseDirectory } from './utils'
 import { getTreeNodeFromFolder, getUpdatedMenuItemsRecursive } from '../src/app/utils/menu-utils'
@@ -15,6 +14,7 @@ import {
   FolderActionResponses,
   FolderActions,
   ReadDirectory,
+  RenameFile,
 } from './actions'
 
 type IPCChannelAction = FileActions | FolderActions
@@ -115,6 +115,8 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         createFile(event, <ElectronAction<CreateFile>>payload)
         break
       }
+      case FileActions.Rename: {
+      }
     }
   })
 }
@@ -150,20 +152,19 @@ try {
 }
 
 /**
- * Used to update the config file. JSON files cannot contain circular references (menuItems), so we have to (de)serialize with a library
- * that replaces object references in a way that circumvents the problem (flatted replaces property values with indexes).
+ *
  * @param filePath path to acolite.config.json
  * @param args object data to be added to the config
  */
-const writeToFile = <T extends { payload: any; key: string }>(filePath: string, args: T): Promise<void> => {
+export const writeToFile = <T extends { key: string; payload: any }>(filePath: string, args: T): Promise<void> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) reject()
       const { payload, key } = args
-      const configurationObject = JSON.parse(data.toString())
-      configurationObject[key] = payload[key]
+      const configurationObject = JSON.parse(data)
+      configurationObject[key] = payload
 
-      const config = stringify(configurationObject, null, 2)
+      const config = JSON.stringify(configurationObject, null, 2)
       fs.writeFile(filePath, config, (err) => {
         if (err) reject()
         resolve()
@@ -180,7 +181,7 @@ const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateN
     .then(() => {
       const newDir = getFileEntityFromPath(directoryPath)
       const updatedMenuItems = parentPath
-        ? getUpdatedMenuItemsRecursive(menuItems, newDir)
+        ? getUpdatedMenuItemsRecursive(menuItems, newDir, 'create')
         : [...menuItems, getTreeNodeFromFolder(newDir)]
 
       event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedMenuItems)
@@ -200,10 +201,10 @@ const chooseDirectory = (event: IpcMainEvent) => {
         event.reply(FolderActionResponses.ChooseDirectoryCanceled)
       } else if (result.filePaths) {
         // Take the dirPath chosen by the user and write it in the acolite.config.json to overwrite the base-url
-        const filePathRef = { baseDir: result.filePaths[0] }
+        const filePathRef = result.filePaths[0]
         writeToFile(defaultConfigFilePath, { key: 'baseDir', payload: filePathRef })
           .then(() => {
-            event.reply(FolderActionResponses.ChooseDirectorySuccess, result.filePaths[0])
+            event.reply(FolderActionResponses.ChooseDirectorySuccess, filePathRef)
           })
           .catch((err) => {
             throw err
@@ -216,8 +217,7 @@ const chooseDirectory = (event: IpcMainEvent) => {
 }
 
 const setDefaultDirectory = (event: IpcMainEvent) => {
-  const filePathRef = { baseDir: __dirname }
-  writeToFile(defaultConfigFilePath, { key: 'baseDir', payload: filePathRef })
+  writeToFile(defaultConfigFilePath, { key: 'baseDir', payload: __dirname })
     .then(() => {
       event.sender.send(FolderActionResponses.SetDefaultDirSuccess)
     })
@@ -244,9 +244,9 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
       event.sender.send(FileActionResponses.CreateFailure, err)
     }
     const file = getFileEntityFromPath(path)
-    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file)
+    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file, 'create')
     event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
-    /* writeToFile(defaultConfigFilePath, { key: 'menuItems', payload: { menuItems: updatedMenuItems } }).then(
+    /* writeToFile(defaultConfigFilePath, { key: 'menuItems', payload: updatedMenuItems }).then(
       () => {
         event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
       },
@@ -255,4 +255,8 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
       }
     ) */
   })
+}
+
+const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
+  const { oldPath, newPath } = action
 }

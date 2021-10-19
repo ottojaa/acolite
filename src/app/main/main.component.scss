@@ -29,3 +29,28 @@
   justify-content: center;
   background-color: var(--secondary) !important;
 }
+
+:host {
+  .app-container as-split {
+    ::ng-deep .as-split-gutter {
+      background-color: transparent !important;
+      position: relative;
+    }
+  }
+
+  ::ng-deep .as-split-gutter-icon {
+    background-image: none !important;
+    background-color: var(--gutterBg);
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    position: absolute;
+  }
+
+  ::ng-deep .as-split-gutter.as-dragged .as-split-gutter-icon,
+  ::ng-deep .as-split-gutter-icon:hover {
+    opacity: 0.8;
+    width: 7px !important;
+    left: -3px;
+    right: 3px;
+  }
+}

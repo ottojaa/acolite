@@ -12,6 +12,7 @@ import {
   ElectronAction,
   FolderActions,
   ReadDirectory,
+  RenameFile,
 } from '../../../../../app/actions'
 
 @Injectable({
@@ -51,6 +52,7 @@ export class ElectronService {
     if (!this.ipcRenderer) {
       return
     }
+    console.log(channel)
     this.ipcRenderer.send(channel, ...args)
   }
 
@@ -75,6 +77,10 @@ export class ElectronService {
   // File actions
 
   createNewFileRequest(channel: string, payload: ElectronAction<CreateFile>): void {
+    this.send(channel, payload)
+  }
+
+  renameFileRequest(channel: string, payload: ElectronAction<RenameFile>): void {
     this.send(channel, payload)
   }
 }

@@ -1,18 +1,14 @@
 <div class="app-container" @componentLoaded *ngIf="!this.loadingApp; else loading">
-  <!-- Topbar -->
-  <as-split direction="vertical" class="split-vertical">
-    <!-- Sidemenu and editor view -->
-    <as-split direction="horizontal" style="height: 100%">
-      <as-split-area class="side-menu-split" [size]="20">
-        <app-side-menu></app-side-menu>
-      </as-split-area>
-      <as-split-area [size]="80">
-        <div class="editor-container">
-          <app-top-bar></app-top-bar>
-          <app-editor-view></app-editor-view>
-        </div>
-      </as-split-area>
-    </as-split>
+  <as-split direction="horizontal" style="height: 100%" class="as-horizontal" gutterSize="1">
+    <as-split-area class="side-menu-split" [size]="20">
+      <app-side-menu></app-side-menu>
+    </as-split-area>
+    <as-split-area [size]="80">
+      <div class="editor-container">
+        <app-top-bar></app-top-bar>
+        <app-editor-view></app-editor-view>
+      </div>
+    </as-split-area>
   </as-split>
 
   <!--   <a routerLink="/">{{ 'PAGES.DETAIL.BACK_TO_HOME' | translate }}</a> -->

@@ -19,8 +19,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppDialogService } from './services/dialog.service'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
 import { BaseDirectoryDialogModule } from './components/dialogs/base-directory-dialog/base-directory-dialog.module'
-import { FolderNameDialogModule } from './components/dialogs/folder-name-dialog/folder-name-dialog/folder-name-dialog.module'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { FolderCreationDialogModule } from './components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.module'
+import { RenameFileDialogModule } from './components/dialogs/rename-file-dialog/rename-file-dialog.module'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -41,7 +42,8 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatDialogModule,
     ReactiveFormsModule,
     BaseDirectoryDialogModule,
-    FolderNameDialogModule,
+    FolderCreationDialogModule,
+    RenameFileDialogModule,
     MatSnackBarModule,
     TranslateModule.forRoot({
       loader: {

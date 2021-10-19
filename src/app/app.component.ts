@@ -78,7 +78,6 @@ export class AppComponent implements OnInit {
       }
       case FolderActionResponses.MakeDirectorySuccess: {
         this.state.updateState$.next({ key: 'menuItems', payload: response })
-        console.log(response)
         break
       }
       default: {

@@ -15,7 +15,4 @@ export interface FileEntity {
   fileExtension?: string
 }
 
-export interface TreeElement extends TreeNode<FileEntity> {
-  data?: FileEntity
-  children?: (TreeNode<FileEntity> | FileEntity)[]
-}
+export type TreeElement = TreeNode<FileEntity>

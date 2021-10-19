@@ -45,23 +45,54 @@
   }
 }
 
-:host ::ng-deep .p-contextmenu {
-  background-color: var(--secondary);
-  .p-menuitem > .p-menuitem-link {
-    .p-submenu-icon,
-    .p-menuitem-icon,
-    .p-menuitem-text {
+@keyframes slide {
+  0% {
+    background: var(--buttonColor);
+    border-radius: 5px;
+    opacity: 0;
+    transform: translateX(-20px);
+    box-shadow: none;
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(0);
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 15%);
+  }
+  90% {
+    background: var(--buttonColor);
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
+  }
+  100% {
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+  }
+}
+
+:host {
+  ::ng-deep .new-file {
+    animation: slide 2s ease;
+  }
+  ::ng-deep .p-contextmenu {
+    background-color: var(--secondary);
+    .p-menuitem > .p-menuitem-link {
+      .p-submenu-icon,
+      .p-menuitem-icon,
+      .p-menuitem-text {
+        color: var(--contrast);
+      }
+    }
+    .p-menuitem-link .p-menuitem-icon {
       color: var(--contrast);
     }
-  }
-  .p-menuitem-link .p-menuitem-icon {
-    color: var(--contrast);
-  }
-  .p-menuitem.p-menuitem-active > .p-menuitem-link {
-    background: var(--buttonColor);
-    color: var(--contrast);
-  }
-  .p-submenu-list {
-    background-color: var(--secondary);
+    .p-menuitem.p-menuitem-active > .p-menuitem-link {
+      background: var(--buttonColor);
+      color: var(--contrast);
+    }
+    .p-submenu-list {
+      background-color: var(--secondary);
+    }
   }
 }
