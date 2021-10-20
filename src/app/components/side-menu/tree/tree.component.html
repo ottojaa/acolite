@@ -13,7 +13,20 @@
   [(selection)]="selectedFiles"
   (onNodeSelect)="onSelectFile($event)"
   (onNodeContextMenuSelect)="onRightClick($event)"
-></p-tree>
+>
+  <ng-template let-node pTemplate="file">
+    <div class="node-row">
+      <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
+      <p>{{ node.label }}</p>
+    </div>
+  </ng-template>
+  <!--   <ng-template let-node pTemplate="folder">
+    <div class="node-row">
+      <mat-icon *ngIf="!node.children.length">{{ node.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+      <p>{{ node.label }}</p>
+    </div>
+  </ng-template> -->
+</p-tree>
 
 <p-contextMenu
   #contextMenu

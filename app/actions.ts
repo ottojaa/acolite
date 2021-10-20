@@ -1,5 +1,5 @@
 import { TreeNode } from 'primeng/api'
-import { FileEntity } from '../src/app/interfaces/Menu'
+import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
 
 export interface CreateFile {
   path: string
@@ -19,6 +19,8 @@ export interface CreateNewDirectory {
 export interface RenameFile {
   oldPath: string
   newPath: string
+  isFolder: boolean
+  menuItems: TreeElement[]
 }
 
 export interface SetDefaultDir {}
@@ -60,4 +62,6 @@ export enum FileActions {
 export enum FileActionResponses {
   CreateSuccess = 'create-file-success',
   CreateFailure = 'create-file-failure',
+  RenameSuccess = 'rename-file-success',
+  RenameFailure = 'rename-file-failure',
 }

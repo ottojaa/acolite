@@ -18,6 +18,11 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
     return filePath.substring(0, lastIdx)
   }
 
+  const getIcon = (extension: string) => extension + '.svg'
+
+  const fileExtension = isFolder ? null : getExtension(filePath)
+  const icon = isFolder ? null : getIcon(fileExtension)
+
   return {
     filePath,
     parentPath: getParentPath(filePath),
@@ -25,7 +30,7 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
     size: fileInfo.size,
     createdAt: fileInfo.birthtime,
     modifiedAt: fileInfo.mtime,
-    ...(!isFolder && { fileExtension: getExtension(filePath) }),
+    ...(!isFolder && { fileExtension, icon }),
   }
 }
 
@@ -71,4 +76,17 @@ export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
 
   const rootFolder = getFileEntityFromPath(directoryPath)
   return getFilesRecursively(rootFolder)
+}
+
+export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: T, key: K) => {
+  const copy = collection.slice(0)
+  const index = copy.findIndex((el) => el[key] === newEl[key])
+
+  if (index > -1) {
+    copy[index] = newEl
+  } else {
+    console.error(`no element with identifier ${key} === ${newEl[key]} found in collection`)
+  }
+
+  return copy
 }

@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getFileEntityFromPath = void 0;
+exports.patchCollectionBy = exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getFileEntityFromPath = void 0;
 var path = require("path");
 var fs = require("fs");
 var path_1 = require("path");
@@ -27,7 +27,11 @@ var getFileEntityFromPath = function (filePath) {
         var lastIdx = filePath.lastIndexOf('/');
         return filePath.substring(0, lastIdx);
     };
-    return __assign({ filePath: filePath, parentPath: getParentPath(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: getExtension(filePath) }));
+    var getIcon = function (extension) { return extension + '.svg'; };
+    var fileExtension = isFolder ? null : getExtension(filePath);
+    var icon = isFolder ? null : getIcon(fileExtension);
+    console.log('isFolder', isFolder);
+    return __assign({ filePath: filePath, parentPath: getParentPath(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
 };
 exports.getFileEntityFromPath = getFileEntityFromPath;
 var getMenuItemsFromBaseDirectory = function (baseDir) {
@@ -70,4 +74,16 @@ var getTreeStructureFromBaseDirectory = function (baseDir) {
     return getFilesRecursively(rootFolder);
 };
 exports.getTreeStructureFromBaseDirectory = getTreeStructureFromBaseDirectory;
+var patchCollectionBy = function (collection, newEl, key) {
+    var copy = collection.slice(0);
+    var index = copy.findIndex(function (el) { return el[key] === newEl[key]; });
+    if (index > -1) {
+        copy[index] = newEl;
+    }
+    else {
+        console.error("no element with identifier " + key + " === " + newEl[key] + " found in collection");
+    }
+    return copy;
+};
+exports.patchCollectionBy = patchCollectionBy;
 //# sourceMappingURL=utils.js.map

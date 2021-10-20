@@ -1,4 +1,17 @@
 :host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-icon {
-  color: var(--buttonColor);
+  color: #009fff;
   font-size: 1.3rem;
+}
+
+.node-row {
+  transform: translateX(-0.3rem);
+  display: flex;
+  align-items: center;
+  p {
+    margin: 0 0.5rem;
+  }
+}
+
+.icon {
+  width: 2rem;
 }

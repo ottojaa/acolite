@@ -1,17 +1,8 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core'
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
-import { FileActions, FolderActions } from '../../../../../app/actions'
+import { FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
@@ -47,8 +38,7 @@ export class TreeComponent implements OnInit {
   }
 
   onRightClick(event: any): void {
-    console.log(event)
-    this.cm.model = this.getMenuItems()
+    this.cm.model = [...this.getMenuItems()]
   }
 
   onClickOutside(): void {

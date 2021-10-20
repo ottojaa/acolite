@@ -1,6 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core'
+import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { TreeNode } from 'primeng/api'
+import { FileActionResponses, FileActions } from '../../../../../app/actions'
+import { ElectronService } from '../../../core/services'
+import { FileEntity } from '../../../interfaces/Menu'
+import { AppDialogService } from '../../../services/dialog.service'
+import { StateService } from '../../../services/state.service'
 
 @Component({
   selector: 'app-rename-file-dialog',
@@ -11,11 +17,31 @@ export class RenameFileDialogComponent {
   extension: string
   fileName = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$')])
 
-  constructor(public dialogRef: MatDialogRef<RenameFileDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: string) {
+  constructor(
+    public dialogRef: MatDialogRef<RenameFileDialogComponent>,
+    public electronService: ElectronService,
+    public dialogService: AppDialogService,
+    public state: StateService,
+    public ngZone: NgZone,
+    @Inject(MAT_DIALOG_DATA) public data: string
+  ) {
     this.initFileNameAndExtension(data)
+
+    this.electronService.on(
+      FileActionResponses.RenameSuccess,
+      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
+        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
+        this.ngZone.run(() => {
+          this.dialogRef.close()
+        })
+      }
+    )
+    this.electronService.on(FileActionResponses.CreateFailure, (_event: Electron.IpcMessageEvent, args: any) => {
+      this.dialogService.openToast('File creation failed', 'failure')
+    })
   }
 
-  onNoClick(): void {
+  onCancelClick(): void {
     this.dialogRef.close()
   }
 
@@ -32,5 +58,20 @@ export class RenameFileDialogComponent {
     const [fileName, extension] = filePath.split('/').pop().split('.')
     this.fileName.setValue(fileName)
     this.extension = extension
+  }
+
+  onRenameClick(): void {
+    const { menuItems } = this.state.state$.value
+    const lastIdx = this.data.lastIndexOf('/')
+    const oldPathParent = this.data.substring(0, lastIdx + 1)
+    const oldPath = this.data
+    const isFile = !!this.extension
+    const newPath = isFile
+      ? `${oldPathParent}${this.fileName.value}.${this.extension}`
+      : `${oldPathParent}${this.fileName.value}`
+
+    this.electronService.renameFileRequest(FileActions.Rename, {
+      data: { oldPath, newPath, isFolder: !isFile, menuItems },
+    })
   }
 }

@@ -1,5 +1,5 @@
 <div class="container">
-  <h1 mat-dialog-title>Change file name</h1>
+  <h1 mat-dialog-title>Rename file</h1>
   <div mat-dialog-content>
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label>
@@ -9,7 +9,7 @@
     <mat-error *ngIf="!fileName.pristine && fileName.invalid">{{ getErrorMessage() }}</mat-error>
   </div>
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onNoClick()">Cancel</button>
-    <button mat-button [mat-dialog-close]="fileName.value" [disabled]="fileName.invalid">Create</button>
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button (click)="onRenameClick()" [disabled]="fileName.invalid">Rename</button>
   </mat-dialog-actions>
 </div>

@@ -7,6 +7,7 @@ export enum MenuItemTypes {
 
 export interface FileEntity {
   type: 'folder' | 'file'
+  icon?: string
   filePath: string
   parentPath: string
   size: number

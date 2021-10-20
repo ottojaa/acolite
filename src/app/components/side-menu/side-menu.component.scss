@@ -47,7 +47,7 @@
 
 @keyframes slide {
   0% {
-    background: var(--buttonColor);
+    background: deepskyblue;
     border-radius: 5px;
     opacity: 0;
     transform: translateX(-20px);
@@ -59,8 +59,10 @@
     border-radius: 5px;
     box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 15%);
   }
+  70% {
+    background: deepskyblue;
+  }
   90% {
-    background: var(--buttonColor);
     border-radius: 5px;
     box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
   }
@@ -73,7 +75,7 @@
 
 :host {
   ::ng-deep .new-file {
-    animation: slide 2s ease;
+    animation: slide 1.3s ease-in-out;
   }
   ::ng-deep .p-contextmenu {
     background-color: var(--secondary);

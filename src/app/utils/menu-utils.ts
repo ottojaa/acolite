@@ -1,7 +1,16 @@
+import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
+import { patchCollectionBy } from '../../../app/utils'
 import { FileEntity, MenuItemTypes, TreeElement } from '../interfaces/Menu'
 
 export type UpdateStrategy = 'create' | 'rename' | 'delete'
+
+export interface Config {
+  oldPath?: string
+  newPath?: string
+  isFolder?: boolean
+  isInRootDir?: boolean
+}
 
 export const folderStructureToMenuItems = (
   baseDir: string,
@@ -28,16 +37,16 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
 export const getUpdatedMenuItemsRecursive = (
   menuItems: TreeElement[],
   updatedItem: FileEntity,
-  strategy: UpdateStrategy
+  strategy: UpdateStrategy,
+  config?: Config
 ): TreeElement[] => {
-  removeExistingStyleClasses(menuItems)
-
   for (let item of menuItems) {
+    // Find the updated item's parent, and update it
     if (item.data.filePath === updatedItem.parentPath) {
       switch (strategy) {
         case 'create': {
           const treeNode =
-            item.data.type === 'folder'
+            updatedItem.type === 'folder'
               ? getTreeNodeFromFolder(updatedItem, 'new-file')
               : getTreeNodeFromFile(updatedItem, 'new-file')
 
@@ -46,7 +55,7 @@ export const getUpdatedMenuItemsRecursive = (
           break
         }
         case 'rename': {
-          item.label = getFileNameFromPath(updatedItem.filePath)
+          item = getUpdatedFilePathsRecursive(item, config.newPath, config.oldPath)
           break
         }
         case 'delete': {
@@ -56,11 +65,32 @@ export const getUpdatedMenuItemsRecursive = (
       }
       break
     } else if (item.children?.length) {
-      getUpdatedMenuItemsRecursive(item.children, updatedItem, strategy)
+      getUpdatedMenuItemsRecursive(item.children, updatedItem, strategy, config)
     }
   }
 
   return menuItems
+}
+
+/**
+ * Updates the menuitem and its (possible) descendants by replacing the old filePaths / parentPaths with the new one
+ */
+const getUpdatedFilePathsRecursive = (item: TreeElement, newPath: string, oldPath: string): TreeElement => {
+  item.data.filePath = item.data.filePath.replace(oldPath, newPath)
+  item.data.parentPath = item.data.parentPath.replace(oldPath, newPath)
+
+  if (item.data.filePath === newPath) {
+    item.label = getFileNameFromPath(newPath)
+  }
+
+  if (!item.children) {
+    return item
+  }
+
+  return {
+    ...item,
+    children: item.children.map((child) => getUpdatedFilePathsRecursive(child, newPath, oldPath)),
+  }
 }
 
 export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
@@ -78,9 +108,9 @@ export const getTreeNodeFromFolder = (data: FileEntity, styleClass?: string): Tr
   return {
     data,
     label: getFileNameFromPath(data.filePath),
-    type: MenuItemTypes.Folder,
     expandedIcon: 'pi pi-folder-open',
     collapsedIcon: 'pi pi-folder',
+    type: MenuItemTypes.Folder,
     children: [],
     ...(styleClass && { styleClass }),
   }
@@ -89,9 +119,9 @@ export const getTreeNodeFromFolder = (data: FileEntity, styleClass?: string): Tr
 const getTreeNodeFromFile = (item: FileEntity, styleClass?: string): TreeNode<FileEntity> => {
   return {
     label: getFileNameFromPath(item.filePath),
-    icon: 'pi pi-file',
     type: MenuItemTypes.File,
     data: item,
+    ...(styleClass && { styleClass }),
   }
 }
 

@@ -116,6 +116,8 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FileActions.Rename: {
+        renameFile(event, <ElectronAction<RenameFile>>payload)
+        break
       }
     }
   })
@@ -242,6 +244,7 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
   fs.writeFile(path, '', (err) => {
     if (err) {
       event.sender.send(FileActionResponses.CreateFailure, err)
+      return
     }
     const file = getFileEntityFromPath(path)
     const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file, 'create')
@@ -258,5 +261,14 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
 }
 
 const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
-  const { oldPath, newPath } = action
+  const { oldPath, newPath, isFolder, menuItems } = action.data
+  fs.rename(oldPath, newPath, (err) => {
+    if (err) {
+      event.sender.send(FileActionResponses.RenameFailure)
+      return
+    }
+    const file = getFileEntityFromPath(newPath)
+    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file, 'rename', { oldPath, newPath, isFolder })
+    event.sender.send(FileActionResponses.RenameSuccess, updatedMenuItems)
+  })
 }

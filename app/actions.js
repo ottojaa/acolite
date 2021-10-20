@@ -35,5 +35,7 @@ var FileActionResponses;
 (function (FileActionResponses) {
     FileActionResponses["CreateSuccess"] = "create-file-success";
     FileActionResponses["CreateFailure"] = "create-file-failure";
+    FileActionResponses["RenameSuccess"] = "rename-file-success";
+    FileActionResponses["RenameFailure"] = "rename-file-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
 //# sourceMappingURL=actions.js.map

@@ -25,7 +25,7 @@ export class AppDialogService {
   }
 
   openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
-    const ref = this.dialog.open(FileCreationComponent, { data: filePath })
+    const ref = this.dialog.open(FileCreationComponent, { data: filePath, width: '40%', minWidth: '500px' })
     return ref.afterClosed().pipe(take(1))
   }
 

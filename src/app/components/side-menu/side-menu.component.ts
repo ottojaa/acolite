@@ -2,12 +2,12 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { TreeNode } from 'primeng/api'
 import { take, takeUntil, tap } from 'rxjs/operators'
-import { FolderActions } from '../../../../app/actions'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
-import { FileEntity } from '../../interfaces/Menu'
+import { TreeElement } from '../../interfaces/Menu'
 import { AppDialogService } from '../../services/dialog.service'
 import { StateService } from '../../services/state.service'
+import { removeExistingStyleClasses } from '../../utils/menu-utils'
 
 @Component({
   selector: 'app-side-menu',
@@ -16,7 +16,7 @@ import { StateService } from '../../services/state.service'
 })
 export class SideMenuComponent extends AbstractComponent implements OnInit {
   menuLoading: boolean = true
-  files: TreeNode<FileEntity>[]
+  files: TreeElement[]
 
   constructor(
     public electronService: ElectronService,
@@ -38,6 +38,12 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
         this.files = [...files].slice(0)
         this.menuLoading = false // TODO: add to state
         this.cdRef.detectChanges()
+
+        // PrimeNG styleClasses get applied back on each rerender, so in order to do enter animations that don't happen on each rerender
+        // we have to remove the styleClass properties from the menuItems after the animation is done.
+        setTimeout(() => {
+          removeExistingStyleClasses(this.files)
+        }, 2000)
       })
   }
 

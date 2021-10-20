@@ -9,6 +9,13 @@
 :host ::ng-deep .mat-checkbox-frame {
   border-color: var(--contrast);
 }
+:host .mat-form-field {
+  flex-grow: 1;
+}
+
+.form-fields-container {
+  display: flex;
+}
 
 .result {
   height: 20px;
