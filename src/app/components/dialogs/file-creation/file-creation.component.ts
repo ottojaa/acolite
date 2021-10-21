@@ -7,6 +7,7 @@ import { ElectronService } from '../../../core/services'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
+import { getBaseName, getDirName, getJoinedPath } from '../../../utils/file-utils'
 
 @Component({
   selector: 'app-file-creation',
@@ -40,7 +41,7 @@ export class FileCreationComponent {
   }
 
   get parent(): string {
-    return this.getParentNameFromPath()
+    return getBaseName(this.data)
   }
 
   get formValid(): boolean {
@@ -56,18 +57,20 @@ export class FileCreationComponent {
     public ngZone: NgZone,
     public fb: FormBuilder
   ) {
-    this.electronService.on(
+    this.startListener()
+  }
+
+  startListener(): void {
+    this.electronService.once(
       FileActionResponses.CreateSuccess,
       (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
+        console.log('multiple??')
         this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
         this.ngZone.run(() => {
           this.dialogRef.close()
         })
       }
     )
-    this.electronService.on(FileActionResponses.CreateFailure, (_event: Electron.IpcMessageEvent, args: any) => {
-      this.dialogService.openToast('File creation failed', 'failure')
-    })
   }
 
   onNoClick(): void {
@@ -87,14 +90,8 @@ export class FileCreationComponent {
   }
 
   onCreateClick(): void {
-    const path = `${this.data}/${this.result}`
+    const path = getJoinedPath([this.data, this.result])
     const { menuItems } = this.state.state$.value
     this.electronService.createNewFileRequest(FileActions.Create, { data: { path, menuItems } })
-  }
-
-  getParentNameFromPath(): string {
-    const filePath = this.data
-    const lastIdx = filePath.lastIndexOf('/')
-    return filePath.substring(lastIdx + 1, filePath.length)
   }
 }

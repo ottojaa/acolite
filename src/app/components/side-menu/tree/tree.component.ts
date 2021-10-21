@@ -75,6 +75,10 @@ export class TreeComponent implements OnInit {
     this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
   }
 
+  openDeleteFilesDialog(): void {
+    this.dialogService.openDeleteFilesDialog(this.selectedFiles).pipe(take(1)).subscribe()
+  }
+
   /**
    * Menuitems declared here instead of a separate class / component as otherwise we need to pass a component reference to it
    */
@@ -92,9 +96,7 @@ export class TreeComponent implements OnInit {
           {
             label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
             icon: 'pi pi-times',
-            command: (event) => {
-              this.electronService.send(FileActions.Delete, event)
-            },
+            command: (_event) => this.openDeleteFilesDialog(),
           },
         ],
       },

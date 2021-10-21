@@ -9,6 +9,7 @@ import * as fs from 'fs'
 import {
   CreateFile,
   CreateNewDirectory,
+  DeleteFiles,
   ElectronAction,
   FolderActions,
   ReadDirectory,
@@ -52,8 +53,14 @@ export class ElectronService {
     if (!this.ipcRenderer) {
       return
     }
-    console.log(channel)
     this.ipcRenderer.send(channel, ...args)
+  }
+
+  public once(channel: string, listener: any): void {
+    if (!this.ipcRenderer) {
+      return
+    }
+    this.ipcRenderer.once(channel, listener)
   }
 
   // Folder actions
@@ -81,6 +88,10 @@ export class ElectronService {
   }
 
   renameFileRequest(channel: string, payload: ElectronAction<RenameFile>): void {
+    this.send(channel, payload)
+  }
+
+  deleteFilesRequest(channel: string, payload: ElectronAction<DeleteFiles>): void {
     this.send(channel, payload)
   }
 }

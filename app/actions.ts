@@ -23,6 +23,13 @@ export interface RenameFile {
   menuItems: TreeElement[]
 }
 
+export interface DeleteFiles {
+  baseDir: string
+  menuItems: TreeElement[]
+  directoryPaths: string[]
+  filePaths: string[]
+}
+
 export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {
@@ -57,6 +64,7 @@ export enum FileActions {
   Cut = 'cut-file',
   OpenInFolder = 'open-file-in-folder',
   ModifyTags = 'modify-tags',
+  DeleteFiles = 'delete-files',
 }
 
 export enum FileActionResponses {
@@ -64,4 +72,7 @@ export enum FileActionResponses {
   CreateFailure = 'create-file-failure',
   RenameSuccess = 'rename-file-success',
   RenameFailure = 'rename-file-failure',
+  DeleteSuccess = 'delete-files-success',
+  DeletePartialSuccess = 'delete-partial-success',
+  DeleteFailure = 'delete-files-failure',
 }

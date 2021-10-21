@@ -7,6 +7,7 @@ import { ElectronService } from '../../../core/services'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
+import { getBaseName, getDirName } from '../../../utils/file-utils'
 
 @Component({
   selector: 'app-rename-file-dialog',
@@ -55,15 +56,14 @@ export class RenameFileDialogComponent {
   }
 
   initFileNameAndExtension(filePath: string): void {
-    const [fileName, extension] = filePath.split('/').pop().split('.')
+    const [fileName, extension] = getBaseName(filePath).split('.')
     this.fileName.setValue(fileName)
     this.extension = extension
   }
 
   onRenameClick(): void {
     const { menuItems } = this.state.state$.value
-    const lastIdx = this.data.lastIndexOf('/')
-    const oldPathParent = this.data.substring(0, lastIdx + 1)
+    const oldPathParent = getDirName(this.data)
     const oldPath = this.data
     const isFile = !!this.extension
     const newPath = isFile

@@ -3,11 +3,17 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
-import { getFileEntityFromPath, getMenuItemsFromBaseDirectory, getTreeStructureFromBaseDirectory } from './utils'
+import {
+  getDeletedFileEntityMock,
+  getFileEntityFromPath,
+  getMenuItemsFromBaseDirectory,
+  getTreeStructureFromBaseDirectory,
+} from './utils'
 import { getTreeNodeFromFolder, getUpdatedMenuItemsRecursive } from '../src/app/utils/menu-utils'
 import {
   CreateFile,
   CreateNewDirectory,
+  DeleteFiles,
   ElectronAction,
   FileActionResponses,
   FileActions,
@@ -86,6 +92,7 @@ const IPCChannels = [
   FileActions.Create,
   FileActions.Delete,
   FileActions.Rename,
+  FileActions.DeleteFiles,
 ]
 
 const startIPCChannelListeners = () => {
@@ -117,6 +124,11 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
       }
       case FileActions.Rename: {
         renameFile(event, <ElectronAction<RenameFile>>payload)
+        break
+      }
+      case FileActions.DeleteFiles: {
+        console.log(payload)
+        deleteFiles(event, <ElectronAction<DeleteFiles>>payload)
         break
       }
     }
@@ -183,7 +195,7 @@ const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateN
     .then(() => {
       const newDir = getFileEntityFromPath(directoryPath)
       const updatedMenuItems = parentPath
-        ? getUpdatedMenuItemsRecursive(menuItems, newDir, 'create')
+        ? getUpdatedMenuItemsRecursive(menuItems, [newDir], 'create')
         : [...menuItems, getTreeNodeFromFolder(newDir)]
 
       event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedMenuItems)
@@ -247,7 +259,7 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
       return
     }
     const file = getFileEntityFromPath(path)
-    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file, 'create')
+    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, [file], 'create')
     event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
     /* writeToFile(defaultConfigFilePath, { key: 'menuItems', payload: updatedMenuItems }).then(
       () => {
@@ -268,7 +280,67 @@ const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => 
       return
     }
     const file = getFileEntityFromPath(newPath)
-    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, file, 'rename', { oldPath, newPath, isFolder })
+    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, [file], 'rename', { oldPath, newPath, isFolder })
     event.sender.send(FileActionResponses.RenameSuccess, updatedMenuItems)
   })
+}
+
+const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) => {
+  const { directoryPaths, filePaths, baseDir, menuItems } = action.data
+  const paths = [...directoryPaths, ...filePaths]
+  const totalCount = paths.length
+  let failedToDelete = []
+
+  const promises: Promise<void>[] = paths.map(
+    (filePath) =>
+      new Promise((resolve, reject) => {
+        fs.rm(filePath, { recursive: true, force: true }, (err) => {
+          if (err) {
+            failedToDelete.push(filePath)
+            reject()
+          }
+          resolve()
+        })
+      })
+  )
+  Promise.all(promises).then(
+    () => {
+      const getReply = () => {
+        if (failedToDelete.length === 0) {
+          return FileActionResponses.DeleteSuccess
+        } else if (failedToDelete.length > 0 && failedToDelete.length < totalCount) {
+          return FileActionResponses.DeletePartialSuccess
+        } else {
+          return FileActionResponses.DeleteFailure
+        }
+      }
+      const files = paths
+        .filter((el) => !failedToDelete.includes(el))
+        .map((filePath) => getDeletedFileEntityMock(filePath))
+      console.log('MOCKED FILES', files)
+
+      const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, files, 'delete', { baseDir })
+      const errorMsg = `${failedToDelete.length} out of ${totalCount} files' deletion failed`
+
+      event.sender.send(getReply(), updatedMenuItems, errorMsg)
+    },
+    (err) => {
+      console.error(err)
+      event.sender.send(FileActionResponses.DeleteFailure)
+    }
+  )
+  /* return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) reject()
+      const { payload, key } = args
+      const configurationObject = JSON.parse(data)
+      configurationObject[key] = payload
+
+      const config = JSON.stringify(configurationObject, null, 2)
+      fs.writeFile(filePath, config, (err) => {
+        if (err) reject()
+        resolve()
+      })
+    })
+  }) */
 }

@@ -11,11 +11,12 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.patchCollectionBy = exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getFileEntityFromPath = void 0;
+exports.patchCollectionBy = exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getDeletedFileEntityMock = exports.getFileEntityFromPath = void 0;
 var path = require("path");
 var fs = require("fs");
 var path_1 = require("path");
 var menu_utils_1 = require("../src/app/utils/menu-utils");
+var file_utils_1 = require("../src/app/utils/file-utils");
 var getFileEntityFromPath = function (filePath) {
     var fileInfo = fs.statSync(filePath);
     var isFolder = fileInfo.isDirectory();
@@ -23,17 +24,26 @@ var getFileEntityFromPath = function (filePath) {
         var ext = path.extname(filename || '').split('.');
         return ext[ext.length - 1];
     };
-    var getParentPath = function (filePath) {
-        var lastIdx = filePath.lastIndexOf('/');
-        return filePath.substring(0, lastIdx);
-    };
     var getIcon = function (extension) { return extension + '.svg'; };
     var fileExtension = isFolder ? null : getExtension(filePath);
     var icon = isFolder ? null : getIcon(fileExtension);
-    console.log('isFolder', isFolder);
-    return __assign({ filePath: filePath, parentPath: getParentPath(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
+    return __assign({ filePath: filePath, parentPath: (0, file_utils_1.getDirName)(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
 };
 exports.getFileEntityFromPath = getFileEntityFromPath;
+/**
+ * Since the file entity does not exist after deletion, we can just mock it
+ */
+var getDeletedFileEntityMock = function (filePath) {
+    return {
+        filePath: filePath,
+        parentPath: (0, file_utils_1.getDirName)(filePath),
+        type: 'file',
+        size: 0,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+    };
+};
+exports.getDeletedFileEntityMock = getDeletedFileEntityMock;
 var getMenuItemsFromBaseDirectory = function (baseDir) {
     var treeStructure = (0, exports.getTreeStructureFromBaseDirectory)(baseDir);
     return (0, menu_utils_1.folderStructureToMenuItems)(baseDir, treeStructure);

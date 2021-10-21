@@ -3,34 +3,41 @@ import * as fs from 'fs'
 import { join } from 'path'
 import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
 import { folderStructureToMenuItems } from '../src/app/utils/menu-utils'
+import { getDirName } from '../src/app/utils/file-utils'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)
   const isFolder = fileInfo.isDirectory()
-
   const getExtension = (filename: string) => {
     const ext = path.extname(filename || '').split('.')
     return ext[ext.length - 1]
   }
-
-  const getParentPath = (filePath: string) => {
-    const lastIdx = filePath.lastIndexOf('/')
-    return filePath.substring(0, lastIdx)
-  }
-
   const getIcon = (extension: string) => extension + '.svg'
-
   const fileExtension = isFolder ? null : getExtension(filePath)
   const icon = isFolder ? null : getIcon(fileExtension)
 
   return {
     filePath,
-    parentPath: getParentPath(filePath),
+    parentPath: getDirName(filePath),
     type: isFolder ? 'folder' : 'file',
     size: fileInfo.size,
     createdAt: fileInfo.birthtime,
     modifiedAt: fileInfo.mtime,
     ...(!isFolder && { fileExtension, icon }),
+  }
+}
+
+/**
+ * Since the file entity does not exist after deletion, we can just mock it
+ */
+export const getDeletedFileEntityMock = (filePath: string): FileEntity => {
+  return {
+    filePath,
+    parentPath: getDirName(filePath),
+    type: 'file',
+    size: 0,
+    createdAt: new Date(),
+    modifiedAt: new Date(),
   }
 }
 

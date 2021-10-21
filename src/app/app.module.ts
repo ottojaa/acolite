@@ -22,6 +22,7 @@ import { BaseDirectoryDialogModule } from './components/dialogs/base-directory-d
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { FolderCreationDialogModule } from './components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.module'
 import { RenameFileDialogModule } from './components/dialogs/rename-file-dialog/rename-file-dialog.module'
+import { DeleteFilesDialogModule } from './components/dialogs/delete-files-dialog/delete-files-dialog.module'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -44,6 +45,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     BaseDirectoryDialogModule,
     FolderCreationDialogModule,
     RenameFileDialogModule,
+    DeleteFilesDialogModule,
     MatSnackBarModule,
     TranslateModule.forRoot({
       loader: {

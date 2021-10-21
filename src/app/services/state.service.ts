@@ -62,6 +62,7 @@ export class StateService extends AbstractComponent {
     return this.state$.pipe(
       take(1),
       map((state) => {
+        console.log(update)
         const { key, payload } = update
         const newState = {
           ...state,

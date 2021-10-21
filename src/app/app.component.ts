@@ -7,7 +7,7 @@ import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { StateService } from './services/state.service'
 import { MenuService } from './services/menu.service'
-import { FolderActionResponses, FolderActions } from '../../app/actions'
+import { FileActionResponses, FolderActionResponses, FolderActions } from '../../app/actions'
 
 type IPCEvent = Electron.IpcMessageEvent
 
@@ -59,18 +59,19 @@ export class AppComponent implements OnInit {
       FolderActionResponses.ChooseDirectoryFailure,
       FolderActionResponses.SetDefaultDirFailure,
       FolderActionResponses.SetDefaultDirSuccess,
+      FileActionResponses.CreateFailure,
     ]
 
     actions.forEach((action) => this.startListener(action))
   }
 
-  startListener(action: FolderActionResponses): void {
+  startListener(action: FolderActionResponses | FileActionResponses): void {
     this.electronService.on(action, (_ipcEvent: IPCEvent, arg: any) => {
       this.ipcEventReducer(action, arg)
     })
   }
 
-  ipcEventReducer(action: FolderActionResponses, response: any): void {
+  ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
     switch (action) {
       case FolderActionResponses.ReadDirectorySuccess: {
         this.state.updateState$.next({ key: 'menuItems', payload: response })
@@ -78,6 +79,10 @@ export class AppComponent implements OnInit {
       }
       case FolderActionResponses.MakeDirectorySuccess: {
         this.state.updateState$.next({ key: 'menuItems', payload: response })
+        break
+      }
+      case FileActionResponses.CreateFailure: {
+        this.dialogService.openToast('File creation failed', 'failure')
         break
       }
       default: {

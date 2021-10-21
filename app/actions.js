@@ -30,6 +30,7 @@ var FileActions;
     FileActions["Cut"] = "cut-file";
     FileActions["OpenInFolder"] = "open-file-in-folder";
     FileActions["ModifyTags"] = "modify-tags";
+    FileActions["DeleteFiles"] = "delete-files";
 })(FileActions = exports.FileActions || (exports.FileActions = {}));
 var FileActionResponses;
 (function (FileActionResponses) {
@@ -37,5 +38,8 @@ var FileActionResponses;
     FileActionResponses["CreateFailure"] = "create-file-failure";
     FileActionResponses["RenameSuccess"] = "rename-file-success";
     FileActionResponses["RenameFailure"] = "rename-file-failure";
+    FileActionResponses["DeleteSuccess"] = "delete-files-success";
+    FileActionResponses["DeletePartialSuccess"] = "delete-partial-success";
+    FileActionResponses["DeleteFailure"] = "delete-files-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
 //# sourceMappingURL=actions.js.map

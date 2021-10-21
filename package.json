@@ -61,11 +61,13 @@
     "lodash": "4.17.21",
     "ng-click-outside": "9.0.0",
     "npm": "8.0.0",
+    "path": "0.12.7",
     "primeflex": "3.0.1",
     "primeicons": "4.1.0",
     "primeng": "*",
     "runtypes": "6.4.1",
     "rxjs": "~6.6.0",
+    "stream": "0.0.2",
     "tslib": "^2.1.0",
     "zone.js": "~0.11.4"
   },
