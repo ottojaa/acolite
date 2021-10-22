@@ -1,14 +1,9 @@
-import { app, BrowserWindow, ipcMain, IpcMessageEvent, Menu, screen, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, dialog } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
-import {
-  getDeletedFileEntityMock,
-  getFileEntityFromPath,
-  getMenuItemsFromBaseDirectory,
-  getTreeStructureFromBaseDirectory,
-} from './utils'
+import { getDeletedFileEntityMock, getFileEntityFromPath, getMenuItemsFromBaseDirectory } from './utils'
 import { getTreeNodeFromFolder, getUpdatedMenuItemsRecursive } from '../src/app/utils/menu-utils'
 import {
   CreateFile,
@@ -136,6 +131,7 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
 }
 
 try {
+  require('electron-reloader')(module)
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.

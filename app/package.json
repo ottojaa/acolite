@@ -11,5 +11,8 @@
     "primeicons": "4.1.0",
     "primeng": "*",
     "runtypes": "6.4.1"
+  },
+  "devDependencies": {
+    "electron-reloader": "^1.2.1"
   }
 }

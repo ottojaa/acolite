@@ -1,0 +1,30 @@
+.delete {
+  background-color: #bd133a;
+}
+
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bolder;
+    line-height: 2rem;
+  }
+}
+
+.file-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.display-text {
+  margin-left: 1rem;
+  text-align: start;
+}
+
+.icon {
+  width: 2rem;
+}

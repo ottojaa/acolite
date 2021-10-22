@@ -52,7 +52,7 @@ export const getUpdatedMenuItemsRecursive = (
         updateItemByStrategy(item, updatedItem, strategy, config)
         break
       } else if (item.children?.length) {
-        getUpdatedMenuItemsRecursive(item.children, updatedItems, strategy, config)
+        getUpdatedMenuItemsRecursive(item.children, updatedItemsCopy, strategy, config)
       }
     }
   }
