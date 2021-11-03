@@ -250,7 +250,9 @@ const setDefaultDirectory = (event: IpcMainEvent) => {
 const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: ElectronAction<ReadDirectory>) => {
   try {
     const menuItems = getMenuItemsFromBaseDirectory(action.data.baseDir)
-    event.sender.send(FolderActionResponses.ReadDirectorySuccess, menuItems)
+    const rootEntity = getFileEntityFromPath(action.data.baseDir)
+    const rootDirectory = { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
+    event.sender.send(FolderActionResponses.ReadDirectorySuccess, { menuItems, rootDirectory })
   } catch (err) {
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
@@ -327,7 +329,9 @@ const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
           return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
         })
 
-      moveRecursive(elementsToAdd, elementsToDelete, menuItems)
+      const targetIsRoot = target.data.filePath === baseDir
+      const itemsToUpdate = targetIsRoot ? [target] : menuItems
+      moveRecursive(elementsToAdd, elementsToDelete, itemsToUpdate)
       event.sender.send(FileActionResponses.MoveSuccess, menuItems)
     })
     .catch((err) => {

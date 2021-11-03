@@ -1,6 +1,49 @@
+:host {
+  height: 100%;
+}
+
 :host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-icon {
   color: var(--iconColor);
   font-size: 1.3rem;
+}
+
+:host ::ng-deep .p-tree .p-tree-container .p-treenode {
+  padding: 0;
+  border-radius: 0;
+}
+
+:host ::ng-deep .p-tree .p-treenode-droppoint {
+  height: 0;
+}
+
+:host ::ng-deep .p-treenode-leaf > .p-treenode-content .p-tree-toggler {
+  visibility: hidden;
+  width: 0rem !important;
+  padding: 0.3rem;
+}
+:host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode-leaf {
+  margin-left: 1.4rem;
+}
+
+:host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode:not(.p-treenode-leaf) {
+  margin-left: 1.6rem;
+}
+
+:host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode:not(.p-treenode-leaf) {
+  margin-left: 1.6rem;
+}
+
+/* :host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode {
+  border-left: 1px solid gray;
+} */
+
+.tree-container {
+  height: 100%;
+}
+
+.dropzone {
+  display: block;
+  height: 100%;
 }
 
 .node-row {

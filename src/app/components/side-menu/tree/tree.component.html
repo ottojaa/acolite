@@ -1,34 +1,35 @@
-<p-tree
-  [value]="files"
-  draggableNodes="true"
-  preventContextMenu
-  droppableNodes="true"
-  expanded="true"
-  selectionMode="multiple"
-  [validateDrop]="true"
-  (onNodeDrop)="onDrop($event)"
-  (contextmenu)="$event.preventDefault()"
-  [filter]="true"
-  [styleClass]="'tree'"
-  (clickOutside)="onClickOutside()"
-  [contextMenu]="contextMenu"
-  [(selection)]="selectedFiles"
-  (onNodeSelect)="onSelectFile($event)"
-  (onNodeContextMenuSelect)="onRightClick($event)"
->
-  <ng-template let-node pTemplate="file">
-    <div class="node-row">
-      <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
-      <p>{{ node.label }}</p>
-    </div>
-  </ng-template>
-  <!--   <ng-template let-node pTemplate="folder">
-    <div class="node-row">
-      <mat-icon *ngIf="!node.children.length">{{ node.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-      <p>{{ node.label }}</p>
-    </div>
-  </ng-template> -->
-</p-tree>
+<div class="tree-container">
+  <p-tree
+    [value]="files"
+    droppableNodes="true"
+    draggableNodes="true"
+    expanded="true"
+    selectionMode="multiple"
+    [validateDrop]="true"
+    (onNodeDrop)="onDrop($event)"
+    [filter]="true"
+    [styleClass]="'tree'"
+    (clickOutside)="onClickOutside()"
+    [contextMenu]="contextMenu"
+    [(selection)]="selectedFiles"
+    (onNodeSelect)="onSelectFile($event)"
+    (onNodeContextMenuSelect)="onRightClick($event)"
+  >
+    <ng-template let-node pTemplate="file">
+      <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart(node)">
+        <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
+        <p>{{ node.label }}</p>
+      </span>
+    </ng-template>
+    <ng-template let-node pTemplate="folder">
+      <span class="node-row" (click)="expand(node)" (onDragStart)="dragStart(node)" pDraggable="droppable">
+        <p>{{ node.label }}</p>
+      </span>
+    </ng-template>
+  </p-tree>
+
+  <span class="dropzone" pDroppable="droppable" (drop)="dropOutside($event)"></span>
+</div>
 
 <p-contextMenu
   #contextMenu

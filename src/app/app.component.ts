@@ -75,7 +75,9 @@ export class AppComponent implements OnInit {
   ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
     switch (action) {
       case FolderActionResponses.ReadDirectorySuccess: {
-        this.state.updateState$.next({ key: 'menuItems', payload: response })
+        const { rootDirectory, menuItems } = response
+        this.state.updateState$.next({ key: 'menuItems', payload: menuItems })
+        this.state.updateState$.next({ key: 'rootDirectory', payload: rootDirectory })
         break
       }
       case FolderActionResponses.MakeDirectorySuccess: {

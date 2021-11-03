@@ -6,6 +6,7 @@ import { AbstractComponent } from '../abstract/abstract-component'
 interface State {
   baseDir: string
   menuLoading: boolean
+  rootDirectory: TreeNode
   menuItems: TreeNode[]
 }
 
@@ -27,6 +28,7 @@ export class StateService extends AbstractComponent {
   initialState: State = {
     menuLoading: false,
     baseDir: '',
+    rootDirectory: {},
     menuItems: [],
   }
 

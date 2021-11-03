@@ -22,8 +22,7 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
     return {
       label: getBaseName(data.filePath),
       type: MenuItemTypes.Folder,
-      expandedIcon: 'pi pi-folder-open',
-      collapsedIcon: 'pi pi-folder',
+      leaf: false,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,
     }
@@ -47,7 +46,6 @@ export const getUpdatedMenuItemsRecursive = (
       switch (strategy) {
         case 'delete': {
           menuItems = menuItems.filter((item) => item.data.filePath !== updatedItem.filePath)
-          console.log(menuItems)
           break
         }
         case 'create': {
@@ -186,8 +184,7 @@ export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string)
     return {
       data,
       label: getBaseName(data.filePath),
-      expandedIcon: 'pi pi-folder-open',
-      collapsedIcon: 'pi pi-folder',
+      leaf: false,
       type: MenuItemTypes.Folder,
       children: [],
       ...(styleClass && { styleClass }),
