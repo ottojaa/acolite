@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
 import { FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
-import { FileEntity } from '../../../interfaces/Menu'
+import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 
@@ -17,7 +17,7 @@ export class TreeComponent implements OnInit {
   @Input() files: TreeNode<FileEntity>[]
   @ViewChild('contextMenu') cm: ContextMenu
 
-  selectedFiles: TreeNode<FileEntity>[]
+  selectedFiles: TreeNode<FileEntity>[] = []
   contextMenuItems: MenuItem[]
 
   constructor(
@@ -25,7 +25,8 @@ export class TreeComponent implements OnInit {
     private electronService: ElectronService,
     private dialogService: AppDialogService,
     public cdRef: ChangeDetectorRef,
-    private elRef: ElementRef
+    private elRef: ElementRef,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +48,31 @@ export class TreeComponent implements OnInit {
 
   onUnselectFile(): void {
     this.selectedFiles = []
+  }
+
+  onDrop(event: { dragNode: TreeElement; dropNode: TreeElement }): void {
+    const { dragNode, dropNode } = event
+
+    if (dropNode.data.type !== 'folder') {
+      return
+    }
+    const isNodeInSelectedFiles = this.selectedFiles.find((file) => file.data.filePath === dragNode.data.filePath)
+    if (!isNodeInSelectedFiles) {
+      this.selectedFiles.push(dragNode)
+    }
+
+    const movingToSelf = this.selectedFiles.some((file) => file.data.filePath === dropNode.data.filePath)
+    const movingToCurrentParent = this.selectedFiles.some((file) => file.data.parentPath === dropNode.data.filePath)
+    if (movingToCurrentParent || movingToSelf) {
+      return
+    }
+
+    this.ngZone.run(() => {
+      this.dialogService
+        .openMoveFilesDialog(this.selectedFiles, dropNode)
+        .pipe(take(1))
+        .subscribe((confirmData) => {})
+    })
   }
 
   createNewFolder(filePath: string): void {

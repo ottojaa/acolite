@@ -13,6 +13,8 @@ interface AppConfig {
 export class BaseDirGuard implements CanActivate {
   canActivate() {
     const config: AppConfig = appConfig
+    console.log(config)
+
     if (config?.baseDir) {
       this.router.navigate(['main'])
     }

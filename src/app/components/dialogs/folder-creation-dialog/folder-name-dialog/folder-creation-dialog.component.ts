@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { nameValidationPattern } from '../../../../entities/file/constants'
 
 @Component({
   selector: 'app-folder-creation-dialog',
@@ -8,7 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
   styleUrls: ['./folder-creation-dialog.component.scss'],
 })
 export class FolderCreationDialogComponent {
-  folderName = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$')])
+  folderName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
 
   constructor(
     public dialogRef: MatDialogRef<FolderCreationDialogComponent>,

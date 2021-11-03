@@ -3,6 +3,8 @@ interface FileExtensionIcon {
   acceptedExtensions: string[]
 }
 
+export const nameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$'
+
 export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'image', acceptedExtensions: ['jpg', 'jpeg', 'png', 'img'] },
   { name: 'txt', acceptedExtensions: ['txt', 'text'] },

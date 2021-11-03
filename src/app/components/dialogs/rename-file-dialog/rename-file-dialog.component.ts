@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { TreeNode } from 'primeng/api'
 import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
+import { nameValidationPattern } from '../../../entities/file/constants'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -16,7 +17,7 @@ import { getBaseName, getDirName } from '../../../utils/file-utils'
 })
 export class RenameFileDialogComponent {
   extension: string
-  fileName = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$')])
+  fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
 
   constructor(
     public dialogRef: MatDialogRef<RenameFileDialogComponent>,
@@ -73,5 +74,6 @@ export class RenameFileDialogComponent {
     this.electronService.renameFileRequest(FileActions.Rename, {
       data: { oldPath, newPath, isFolder: !isFile, menuItems },
     })
+    this.dialogRef.close()
   }
 }

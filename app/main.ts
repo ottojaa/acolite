@@ -4,7 +4,12 @@ import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
 import { getDeletedFileEntityMock, getFileEntityFromPath, getMenuItemsFromBaseDirectory } from './utils'
-import { getTreeNodeFromFolder, getUpdatedMenuItemsRecursive } from '../src/app/utils/menu-utils'
+import {
+  getTreeNodeFromFileEntity,
+  getUpdatedFilePathsRecursive,
+  getUpdatedMenuItemsRecursive,
+  moveRecursive,
+} from '../src/app/utils/menu-utils'
 import {
   CreateFile,
   CreateNewDirectory,
@@ -14,9 +19,12 @@ import {
   FileActions,
   FolderActionResponses,
   FolderActions,
+  MoveFiles,
   ReadDirectory,
   RenameFile,
 } from './actions'
+import { getBaseName, getDirName, getJoinedPath } from '../src/app/utils/file-utils'
+import { cloneDeep } from 'lodash'
 
 type IPCChannelAction = FileActions | FolderActions
 // Initialize remote module
@@ -88,6 +96,7 @@ const IPCChannels = [
   FileActions.Delete,
   FileActions.Rename,
   FileActions.DeleteFiles,
+  FileActions.MoveFiles,
 ]
 
 const startIPCChannelListeners = () => {
@@ -122,8 +131,11 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FileActions.DeleteFiles: {
-        console.log(payload)
         deleteFiles(event, <ElectronAction<DeleteFiles>>payload)
+        break
+      }
+      case FileActions.MoveFiles: {
+        moveFiles(event, <ElectronAction<MoveFiles>>payload)
         break
       }
     }
@@ -131,7 +143,6 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
 }
 
 try {
-  require('electron-reloader')(module)
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
@@ -192,7 +203,7 @@ const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateN
       const newDir = getFileEntityFromPath(directoryPath)
       const updatedMenuItems = parentPath
         ? getUpdatedMenuItemsRecursive(menuItems, [newDir], 'create')
-        : [...menuItems, getTreeNodeFromFolder(newDir)]
+        : [...menuItems, getTreeNodeFromFileEntity(newDir)]
 
       event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedMenuItems)
     })
@@ -281,6 +292,50 @@ const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => 
   })
 }
 
+const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
+  const { target, elementsToMove, menuItems, baseDir } = action.data
+  const newParentPath = target.data.filePath
+  const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'folder' ? -1 : 1))
+  const failedToMove = []
+
+  const getNewPath = (currentPath: string, newParentPath: string) => {
+    return getJoinedPath([currentPath.replace(currentPath, newParentPath), getBaseName(currentPath)])
+  }
+
+  const promises: Promise<void>[] = sortedElements.map(
+    (element) =>
+      new Promise((resolve, reject) => {
+        const currentPath = element.data.filePath
+        const newPath = getNewPath(currentPath, newParentPath)
+
+        fs.rename(currentPath, newPath, (err) => {
+          if (err) {
+            failedToMove.push(currentPath)
+            reject(err)
+          }
+          resolve()
+        })
+      })
+  )
+  Promise.all(promises)
+    .then(() => {
+      const elementsToDelete = cloneDeep(sortedElements)
+      const elementsToAdd = cloneDeep(sortedElements)
+        .filter((el) => !failedToMove.includes(el.data.filePath))
+        .map((treeEl) => {
+          const oldPath = getDirName(treeEl.data.filePath)
+          return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
+        })
+
+      moveRecursive(elementsToAdd, elementsToDelete, menuItems)
+      event.sender.send(FileActionResponses.MoveSuccess, menuItems)
+    })
+    .catch((err) => {
+      console.log('Error while moving:', err)
+      event.sender.send(FileActionResponses.MoveFailure)
+    })
+}
+
 const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) => {
   const { directoryPaths, filePaths, baseDir, menuItems } = action.data
   const paths = [...directoryPaths, ...filePaths]
@@ -313,7 +368,6 @@ const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) =
       const files = paths
         .filter((el) => !failedToDelete.includes(el))
         .map((filePath) => getDeletedFileEntityMock(filePath))
-      console.log('MOCKED FILES', files)
 
       const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, files, 'delete', { baseDir })
       const errorMsg = `${failedToDelete.length} out of ${totalCount} files' deletion failed`

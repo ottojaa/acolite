@@ -43,7 +43,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.themeService.setTheme('Light grey')
     if (this.state.getStatePartValue('baseDir')) {
-      console.log('hehe')
       this.readDir()
     }
   }
@@ -60,6 +59,8 @@ export class AppComponent implements OnInit {
       FolderActionResponses.SetDefaultDirFailure,
       FolderActionResponses.SetDefaultDirSuccess,
       FileActionResponses.CreateFailure,
+      FileActionResponses.MoveFailure,
+      FileActionResponses.MoveSuccess,
     ]
 
     actions.forEach((action) => this.startListener(action))
@@ -84,6 +85,13 @@ export class AppComponent implements OnInit {
       case FileActionResponses.CreateFailure: {
         this.dialogService.openToast('File creation failed', 'failure')
         break
+      }
+      case FileActionResponses.MoveSuccess: {
+        this.state.updateState$.next({ key: 'menuItems', payload: response })
+        break
+      }
+      case FileActionResponses.MoveFailure: {
+        this.dialogService.openToast('Something went wrong while moving', 'failure')
       }
       default: {
         console.log({ message: 'default reducer', action, response })

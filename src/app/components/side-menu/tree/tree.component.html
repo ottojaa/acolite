@@ -5,6 +5,8 @@
   droppableNodes="true"
   expanded="true"
   selectionMode="multiple"
+  [validateDrop]="true"
+  (onNodeDrop)="onDrop($event)"
   (contextmenu)="$event.preventDefault()"
   [filter]="true"
   [styleClass]="'tree'"

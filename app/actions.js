@@ -31,6 +31,7 @@ var FileActions;
     FileActions["OpenInFolder"] = "open-file-in-folder";
     FileActions["ModifyTags"] = "modify-tags";
     FileActions["DeleteFiles"] = "delete-files";
+    FileActions["MoveFiles"] = "move-files";
 })(FileActions = exports.FileActions || (exports.FileActions = {}));
 var FileActionResponses;
 (function (FileActionResponses) {
@@ -41,5 +42,7 @@ var FileActionResponses;
     FileActionResponses["DeleteSuccess"] = "delete-files-success";
     FileActionResponses["DeletePartialSuccess"] = "delete-partial-success";
     FileActionResponses["DeleteFailure"] = "delete-files-failure";
+    FileActionResponses["MoveSuccess"] = "move-files-success";
+    FileActionResponses["MoveFailure"] = "move-files-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
 //# sourceMappingURL=actions.js.map

@@ -7,6 +7,7 @@ import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directo
 import { DeleteFilesDialogComponent } from '../components/dialogs/delete-files-dialog/delete-files-dialog.component'
 import { FileCreationComponent } from '../components/dialogs/file-creation/file-creation.component'
 import { FolderCreationDialogComponent } from '../components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.component'
+import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialog/move-files-dialog.component'
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
 import { TreeElement } from '../interfaces/Menu'
 
@@ -38,6 +39,16 @@ export class AppDialogService {
 
   openDeleteFilesDialog(selectedFiles: TreeElement[]): Observable<string> {
     const ref = this.dialog.open(DeleteFilesDialogComponent, { data: selectedFiles, width: '20%', minWidth: '300px' })
+    return ref.afterClosed().pipe(take(1))
+  }
+
+  openMoveFilesDialog(selectedFiles: TreeElement[], target: TreeElement): Observable<any> {
+    const ref = this.dialog.open(MoveFilesDialogComponent, {
+      data: { selectedFiles, target },
+      width: '20%',
+      minWidth: '300px',
+    })
+    console.log(selectedFiles)
     return ref.afterClosed().pipe(take(1))
   }
 

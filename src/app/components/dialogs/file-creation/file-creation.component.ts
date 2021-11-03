@@ -4,10 +4,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { TreeNode } from 'primeng/api'
 import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
+import { nameValidationPattern } from '../../../entities/file/constants'
 import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
-import { getBaseName, getDirName, getJoinedPath } from '../../../utils/file-utils'
+import { getBaseName, getJoinedPath } from '../../../utils/file-utils'
 
 @Component({
   selector: 'app-file-creation',
@@ -15,7 +16,7 @@ import { getBaseName, getDirName, getJoinedPath } from '../../../utils/file-util
   styleUrls: ['./file-creation.component.scss'],
 })
 export class FileCreationComponent {
-  fileName = new FormControl('', [Validators.required, Validators.pattern('^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$')])
+  fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
   extension = new FormControl('txt', [Validators.required])
   openFileAfterCreation = true
   options = [

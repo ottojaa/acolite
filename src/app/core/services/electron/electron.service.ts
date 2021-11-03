@@ -12,6 +12,7 @@ import {
   DeleteFiles,
   ElectronAction,
   FolderActions,
+  MoveFiles,
   ReadDirectory,
   RenameFile,
 } from '../../../../../app/actions'
@@ -92,6 +93,10 @@ export class ElectronService {
   }
 
   deleteFilesRequest(channel: string, payload: ElectronAction<DeleteFiles>): void {
+    this.send(channel, payload)
+  }
+
+  moveFilesRequest(channel: string, payload: ElectronAction<MoveFiles>): void {
     this.send(channel, payload)
   }
 }

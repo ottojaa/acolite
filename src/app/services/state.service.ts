@@ -5,6 +5,7 @@ import { map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 interface State {
   baseDir: string
+  menuLoading: boolean
   menuItems: TreeNode[]
 }
 
@@ -24,6 +25,7 @@ type StateUpdate<T> = {
 })
 export class StateService extends AbstractComponent {
   initialState: State = {
+    menuLoading: false,
     baseDir: '',
     menuItems: [],
   }

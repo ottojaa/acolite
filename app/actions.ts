@@ -30,6 +30,13 @@ export interface DeleteFiles {
   filePaths: string[]
 }
 
+export interface MoveFiles {
+  target: TreeElement
+  elementsToMove: TreeElement[]
+  baseDir: string
+  menuItems: TreeElement[]
+}
+
 export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {
@@ -65,6 +72,7 @@ export enum FileActions {
   OpenInFolder = 'open-file-in-folder',
   ModifyTags = 'modify-tags',
   DeleteFiles = 'delete-files',
+  MoveFiles = 'move-files',
 }
 
 export enum FileActionResponses {
@@ -75,4 +83,6 @@ export enum FileActionResponses {
   DeleteSuccess = 'delete-files-success',
   DeletePartialSuccess = 'delete-partial-success',
   DeleteFailure = 'delete-files-failure',
+  MoveSuccess = 'move-files-success',
+  MoveFailure = 'move-files-failure',
 }
