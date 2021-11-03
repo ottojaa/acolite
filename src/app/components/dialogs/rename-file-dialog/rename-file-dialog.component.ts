@@ -28,19 +28,6 @@ export class RenameFileDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: string
   ) {
     this.initFileNameAndExtension(data)
-
-    this.electronService.on(
-      FileActionResponses.RenameSuccess,
-      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
-        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
-        this.ngZone.run(() => {
-          this.dialogRef.close()
-        })
-      }
-    )
-    this.electronService.on(FileActionResponses.CreateFailure, (_event: Electron.IpcMessageEvent, args: any) => {
-      this.dialogService.openToast('File creation failed', 'failure')
-    })
   }
 
   onCancelClick(): void {
@@ -63,7 +50,7 @@ export class RenameFileDialogComponent {
   }
 
   onRenameClick(): void {
-    const { menuItems } = this.state.state$.value
+    const { rootDirectory } = this.state.state$.value
     const oldPathParent = getDirName(this.data)
     const oldPath = this.data
     const isFile = !!this.extension
@@ -72,7 +59,7 @@ export class RenameFileDialogComponent {
       : `${oldPathParent}${this.fileName.value}`
 
     this.electronService.renameFileRequest(FileActions.Rename, {
-      data: { oldPath, newPath, isFolder: !isFile, menuItems },
+      data: { oldPath, newPath, isFolder: !isFile, rootDirectory },
     })
     this.dialogRef.close()
   }

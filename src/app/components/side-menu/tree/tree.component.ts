@@ -22,13 +22,14 @@ export class TreeComponent implements OnInit {
   selectedFiles: TreeElement[] = []
   selection: TreeElement[] = [] // Used for shift-key multi selection, as primeng tree does not support it for some reason.
   contextMenuItems: MenuItem[]
-  draggedElement: TreeElement
+  draggedElements: TreeElement[]
+  isHovering = false
 
   constructor(
     private state: StateService,
     private electronService: ElectronService,
     private dialogService: AppDialogService,
-    public cdRef: ChangeDetectorRef,
+    private cdRef: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
 
@@ -46,8 +47,7 @@ export class TreeComponent implements OnInit {
   }
 
   /**
-   *
-   * @param target
+   * Gets the index range of the click target and the latest selected item, and selects everything in between.
    */
   handleShiftClickSelection(target: TreeNode): void {
     const flattenedTreeItems = this.flattenTree(this.files, [])
@@ -72,7 +72,10 @@ export class TreeComponent implements OnInit {
     return flattened
   }
 
-  expand(node: TreeNode): void {
+  expand(event: MouseEvent, node: TreeNode): void {
+    if (event.shiftKey || event.metaKey) {
+      return
+    }
     node.expanded = !node.expanded
   }
 
@@ -121,25 +124,38 @@ export class TreeComponent implements OnInit {
       .pipe(take(1))
       .subscribe((name: string) => {
         if (name) {
-          const menuItems = this.state.getStatePartValue('menuItems')
+          const rootDirectory = this.state.getStatePartValue('rootDirectory')
           this.electronService.createNewFolderRequest({
-            data: { directoryName: name, baseDir, menuItems, parentPath: filePath },
+            data: { directoryName: name, baseDir, rootDirectory, parentPath: filePath },
           })
         }
       })
   }
 
-  dragStart(node: TreeNode): void {
-    this.draggedElement = node
+  dragStart(): void {
+    this.draggedElements = this.selectedFiles
   }
 
-  dragEnd(node: TreeNode): void {
-    console.log(node)
+  dragEnd(): void {}
+
+  onDragEnter(event: Event): void {
+    console.log('isis')
+    this.isHovering = true
+    event.preventDefault()
+  }
+
+  onDragLeave(event: Event): void {
+    this.isHovering = false
+    event.preventDefault()
   }
 
   dropOutside(_event: DragEvent): void {
+    this.isHovering = false
     const rootDir = this.state.getStatePartValue('rootDirectory')
-    this.dialogService.openMoveFilesDialog([this.draggedElement], rootDir).pipe(take(1)).subscribe()
+    this.dialogService
+      .openMoveFilesDialog(this.draggedElements, rootDir)
+      .pipe(take(1))
+      .subscribe(() => (this.draggedElements = null))
   }
 
   openNewFileDialog(): void {

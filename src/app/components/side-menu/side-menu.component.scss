@@ -7,9 +7,7 @@
 :host ::ng-deep .p-tree {
   padding: 0;
 }
-:host ::ng-deep .p-tree-wrapper {
-  min-width: 40rem;
-}
+
 :host ::ng-deep .p-inputtext:enabled:focus {
   border-color: var(--contrast);
 }
@@ -32,6 +30,7 @@
 
 .side-menu-topbar {
   display: flex;
+  height: 4%;
   flex-direction: column;
   .button-container {
     display: flex;

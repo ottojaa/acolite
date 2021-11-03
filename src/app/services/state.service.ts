@@ -3,11 +3,11 @@ import { TreeNode } from 'primeng/api'
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs'
 import { map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
+import { TreeElement } from '../interfaces/Menu'
 interface State {
   baseDir: string
   menuLoading: boolean
-  rootDirectory: TreeNode
-  menuItems: TreeNode[]
+  rootDirectory: TreeElement
 }
 
 /**
@@ -29,7 +29,6 @@ export class StateService extends AbstractComponent {
     menuLoading: false,
     baseDir: '',
     rootDirectory: {},
-    menuItems: [],
   }
 
   get value(): State {
@@ -81,5 +80,9 @@ export class StateService extends AbstractComponent {
 
   getStatePartValue<K extends keyof State>(key: K): State[K] {
     return this.state$.value[key]
+  }
+
+  getMenuItemsValue(): TreeElement[] {
+    return this.state$.value['rootDirectory'].children
   }
 }

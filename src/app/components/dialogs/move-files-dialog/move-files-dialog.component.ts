@@ -68,7 +68,7 @@ export class MoveFilesDialogComponent implements OnInit {
   onMoveClick(): void {
     const { selectedFiles, target } = this.data
     const baseDir = this.state.getStatePartValue('baseDir')
-    const menuItems = this.state.getStatePartValue('menuItems')
+    const rootDirectory = this.state.getStatePartValue('rootDirectory')
     const filePaths = selectedFiles.map((file) => file.data.filePath)
     const filesToBeMoved = selectedFiles.filter(
       (file) => !filePaths.some((path) => path.includes(file.data.filePath) && path !== file.data.filePath)
@@ -76,8 +76,8 @@ export class MoveFilesDialogComponent implements OnInit {
 
     this.electronService.moveFilesRequest(FileActions.MoveFiles, {
       data: {
-        menuItems,
         target,
+        rootDirectory,
         baseDir,
         elementsToMove: filesToBeMoved,
       },

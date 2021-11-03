@@ -26,28 +26,6 @@ export class DeleteFilesDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: TreeElement[]
   ) {
     this.displayTexts = this.getDisplayTexts()
-
-    // Electron
-    this.electronService.on(
-      FileActionResponses.DeleteSuccess,
-      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeElement[]) => {
-        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
-        this.dialogService.openToast('Delete success', 'success')
-        this.ngZone.run(() => {
-          this.dialogRef.close()
-        })
-      }
-    )
-    this.electronService.on(FileActionResponses.DeleteFailure, (_event: Electron.IpcMessageEvent, args: any) => {
-      this.dialogService.openToast('Something went wrong while deleting', 'failure')
-    })
-    this.electronService.on(
-      FileActionResponses.DeletePartialSuccess,
-      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeElement[], message: string) => {
-        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
-        this.dialogService.openToast(message, 'info')
-      }
-    )
   }
 
   getDisplayTexts(): any {
@@ -84,14 +62,15 @@ export class DeleteFilesDialogComponent {
 
   onDeleteClick(): void {
     const baseDir = this.state.getStatePartValue('baseDir')
-    const menuItems = this.state.getStatePartValue('menuItems')
+    const rootDirectory = this.state.getStatePartValue('rootDirectory')
     this.electronService.deleteFilesRequest(FileActions.DeleteFiles, {
       data: {
         baseDir,
-        menuItems,
+        rootDirectory,
         directoryPaths: this.data.filter((el) => el.data.type === 'folder').map((el) => el.data.filePath),
         filePaths: this.data.filter((el) => el.data.type === 'file').map((el) => el.data.filePath),
       },
     })
+    this.dialogRef.close()
   }
 }

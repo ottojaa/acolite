@@ -16,19 +16,34 @@
     (onNodeContextMenuSelect)="onRightClick($event)"
   >
     <ng-template let-node pTemplate="file">
-      <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart(node)">
+      <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart()" (onDragEnd)="dragEnd()">
         <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
         <p>{{ node.label }}</p>
       </span>
     </ng-template>
+
     <ng-template let-node pTemplate="folder">
-      <span class="node-row" (click)="expand(node)" (onDragStart)="dragStart(node)" pDraggable="droppable">
+      <span
+        class="node-row"
+        (click)="expand($event, node)"
+        (onDragStart)="dragStart(node)"
+        (onDragEnd)="dragEnd()"
+        pDraggable="droppable"
+      >
         <p>{{ node.label }}</p>
       </span>
     </ng-template>
   </p-tree>
 
-  <span class="dropzone" pDroppable="droppable" (drop)="dropOutside($event)"></span>
+  <span
+    class="dropzone"
+    [ngClass]="{ dragging: isHovering }"
+    (dragenter)="onDragEnter($event)"
+    (dragleave)="onDragLeave($event)"
+    pDroppable="droppable"
+    (drop)="dropOutside($event)"
+  >
+  </span>
 </div>
 
 <p-contextMenu

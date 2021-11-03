@@ -59,8 +59,12 @@ export class AppComponent implements OnInit {
       FolderActionResponses.SetDefaultDirFailure,
       FolderActionResponses.SetDefaultDirSuccess,
       FileActionResponses.CreateFailure,
+      FileActionResponses.RenameSuccess,
+      FileActionResponses.RenameFailure,
       FileActionResponses.MoveFailure,
       FileActionResponses.MoveSuccess,
+      FileActionResponses.DeleteSuccess,
+      FileActionResponses.DeleteFailure,
     ]
 
     actions.forEach((action) => this.startListener(action))
@@ -75,13 +79,11 @@ export class AppComponent implements OnInit {
   ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
     switch (action) {
       case FolderActionResponses.ReadDirectorySuccess: {
-        const { rootDirectory, menuItems } = response
-        this.state.updateState$.next({ key: 'menuItems', payload: menuItems })
-        this.state.updateState$.next({ key: 'rootDirectory', payload: rootDirectory })
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
         break
       }
       case FolderActionResponses.MakeDirectorySuccess: {
-        this.state.updateState$.next({ key: 'menuItems', payload: response })
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
         break
       }
       case FileActionResponses.CreateFailure: {
@@ -89,11 +91,28 @@ export class AppComponent implements OnInit {
         break
       }
       case FileActionResponses.MoveSuccess: {
-        this.state.updateState$.next({ key: 'menuItems', payload: response })
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
         break
       }
       case FileActionResponses.MoveFailure: {
         this.dialogService.openToast('Something went wrong while moving', 'failure')
+        break
+      }
+      case FileActionResponses.RenameFailure: {
+        this.dialogService.openToast('Something went wrong while renaming', 'failure')
+        break
+      }
+      case FileActionResponses.RenameSuccess: {
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+        break
+      }
+      case FileActionResponses.DeleteFailure: {
+        this.dialogService.openToast('Something went wrong while deleting', 'failure')
+        break
+      }
+      case FileActionResponses.DeleteSuccess: {
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+        break
       }
       default: {
         console.log({ message: 'default reducer', action, response })

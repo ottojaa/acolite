@@ -195,17 +195,17 @@ export const writeToFile = <T extends { key: string; payload: any }>(filePath: s
 }
 
 const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateNewDirectory>) => {
-  const { directoryName, baseDir, menuItems, parentPath } = payload.data
+  const { directoryName, baseDir, rootDirectory, parentPath } = payload.data
   const directoryPath = path.join(parentPath ? parentPath : baseDir, directoryName)
   fs.promises
     .mkdir(directoryPath, { recursive: true })
     .then(() => {
       const newDir = getFileEntityFromPath(directoryPath)
-      const updatedMenuItems = parentPath
-        ? getUpdatedMenuItemsRecursive(menuItems, [newDir], 'create')
-        : [...menuItems, getTreeNodeFromFileEntity(newDir)]
+      const updatedRootDirectory = parentPath
+        ? getUpdatedMenuItemsRecursive([rootDirectory], [newDir], 'create', { baseDir: rootDirectory.data.filePath })
+        : { ...rootDirectory, children: rootDirectory.children, ...getTreeNodeFromFileEntity(newDir) }
 
-      event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedMenuItems)
+      event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedRootDirectory)
     })
     .catch((err) => {
       event.sender.send(FolderActionResponses.MakeDirectoryFailure, err)
@@ -252,7 +252,7 @@ const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: Elec
     const menuItems = getMenuItemsFromBaseDirectory(action.data.baseDir)
     const rootEntity = getFileEntityFromPath(action.data.baseDir)
     const rootDirectory = { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
-    event.sender.send(FolderActionResponses.ReadDirectorySuccess, { menuItems, rootDirectory })
+    event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
   } catch (err) {
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
@@ -260,7 +260,7 @@ const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: Elec
 }
 
 const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => {
-  const { path, menuItems } = action.data
+  const { path, rootDirectory } = action.data
 
   fs.writeFile(path, '', (err) => {
     if (err) {
@@ -268,8 +268,11 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
       return
     }
     const file = getFileEntityFromPath(path)
-    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, [file], 'create')
-    event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
+    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
+      baseDir: rootDirectory.data.filePath,
+    })
+
+    event.sender.send(FileActionResponses.CreateSuccess, updatedRootDirectory)
     /* writeToFile(defaultConfigFilePath, { key: 'menuItems', payload: updatedMenuItems }).then(
       () => {
         event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
@@ -282,20 +285,25 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
 }
 
 const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
-  const { oldPath, newPath, isFolder, menuItems } = action.data
+  const { oldPath, newPath, isFolder, rootDirectory } = action.data
   fs.rename(oldPath, newPath, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.RenameFailure)
       return
     }
     const file = getFileEntityFromPath(newPath)
-    const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, [file], 'rename', { oldPath, newPath, isFolder })
-    event.sender.send(FileActionResponses.RenameSuccess, updatedMenuItems)
+    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'rename', {
+      oldPath,
+      newPath,
+      isFolder,
+      baseDir: rootDirectory.data.filePath,
+    })
+    event.sender.send(FileActionResponses.RenameSuccess, updatedRootDirectory)
   })
 }
 
 const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
-  const { target, elementsToMove, menuItems, baseDir } = action.data
+  const { target, elementsToMove, rootDirectory, baseDir } = action.data
   const newParentPath = target.data.filePath
   const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'folder' ? -1 : 1))
   const failedToMove = []
@@ -329,10 +337,8 @@ const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
           return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
         })
 
-      const targetIsRoot = target.data.filePath === baseDir
-      const itemsToUpdate = targetIsRoot ? [target] : menuItems
-      moveRecursive(elementsToAdd, elementsToDelete, itemsToUpdate)
-      event.sender.send(FileActionResponses.MoveSuccess, menuItems)
+      moveRecursive(elementsToAdd, elementsToDelete, [rootDirectory], { baseDir: rootDirectory.data.filePath })
+      event.sender.send(FileActionResponses.MoveSuccess, rootDirectory)
     })
     .catch((err) => {
       console.log('Error while moving:', err)
@@ -341,7 +347,7 @@ const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
 }
 
 const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) => {
-  const { directoryPaths, filePaths, baseDir, menuItems } = action.data
+  const { directoryPaths, filePaths, baseDir, rootDirectory } = action.data
   const paths = [...directoryPaths, ...filePaths]
   const totalCount = paths.length
   let failedToDelete = []
@@ -360,23 +366,12 @@ const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) =
   )
   Promise.all(promises).then(
     () => {
-      const getReply = () => {
-        if (failedToDelete.length === 0) {
-          return FileActionResponses.DeleteSuccess
-        } else if (failedToDelete.length > 0 && failedToDelete.length < totalCount) {
-          return FileActionResponses.DeletePartialSuccess
-        } else {
-          return FileActionResponses.DeleteFailure
-        }
-      }
       const files = paths
         .filter((el) => !failedToDelete.includes(el))
         .map((filePath) => getDeletedFileEntityMock(filePath))
 
-      const updatedMenuItems = getUpdatedMenuItemsRecursive(menuItems, files, 'delete', { baseDir })
-      const errorMsg = `${failedToDelete.length} out of ${totalCount} files' deletion failed`
-
-      event.sender.send(getReply(), updatedMenuItems, errorMsg)
+      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
+      event.sender.send(FileActionResponses.DeleteSuccess, updatedRootDirectory)
     },
     (err) => {
       console.error(err)

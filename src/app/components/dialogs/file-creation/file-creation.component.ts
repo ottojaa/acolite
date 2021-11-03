@@ -57,22 +57,7 @@ export class FileCreationComponent {
     public state: StateService,
     public ngZone: NgZone,
     public fb: FormBuilder
-  ) {
-    this.startListener()
-  }
-
-  startListener(): void {
-    this.electronService.once(
-      FileActionResponses.CreateSuccess,
-      (_event: Electron.IpcMessageEvent, updatedMenuItems: TreeNode<FileEntity>[]) => {
-        console.log('multiple??')
-        this.state.updateState$.next({ key: 'menuItems', payload: updatedMenuItems })
-        this.ngZone.run(() => {
-          this.dialogRef.close()
-        })
-      }
-    )
-  }
+  ) {}
 
   onNoClick(): void {
     this.dialogRef.close()
@@ -92,7 +77,8 @@ export class FileCreationComponent {
 
   onCreateClick(): void {
     const path = getJoinedPath([this.data, this.result])
-    const { menuItems } = this.state.state$.value
-    this.electronService.createNewFileRequest(FileActions.Create, { data: { path, menuItems } })
+    const { rootDirectory } = this.state.state$.value
+    this.electronService.createNewFileRequest(FileActions.Create, { data: { path, rootDirectory } })
+    this.dialogRef.close()
   }
 }

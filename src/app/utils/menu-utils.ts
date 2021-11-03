@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
 import { FileEntity, MenuItemTypes, TreeElement } from '../interfaces/Menu'
-import { getBaseName, getDirName } from './file-utils'
+import { getBaseName, getDirName, getPathSeparator } from './file-utils'
 
 export type UpdateStrategy = 'create' | 'rename' | 'delete'
 export interface Config {
@@ -19,15 +19,21 @@ export const folderStructureToMenuItems = (
 const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
   if (isFolder(element) && element.data.type === 'folder') {
     const { data, children } = element
-    return {
+    const treeNode = {
       label: getBaseName(data.filePath),
       type: MenuItemTypes.Folder,
       leaf: false,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,
     }
+    treeNode.data.indents = calculateIndents(treeNode, baseDir)
+
+    return treeNode
   } else if (isFile(element)) {
-    return getTreeNodeFromFileEntity(element)
+    const treeNode = getTreeNodeFromFileEntity(element)
+    treeNode.data.indents = calculateIndents(treeNode, baseDir)
+
+    return treeNode
   }
   throw new Error('createMenuItemsRecursive failed, invalid element')
 }
@@ -51,6 +57,7 @@ export const getUpdatedMenuItemsRecursive = (
         case 'create': {
           const treeNode = getTreeNodeFromFileEntity(updatedItem, 'new-file')
 
+          addIndents([treeNode], config.baseDir)
           menuItems.push(treeNode)
           break
         }
@@ -88,6 +95,8 @@ const updateItemByStrategy = (
       // PrimeNG tree sorts folders to the top
       item.children = isFolder ? [treeNode, ...item.children] : [...item.children, treeNode]
       item.expanded = true
+      addIndents(item.children, config.baseDir)
+
       break
     }
     case 'rename': {
@@ -104,7 +113,8 @@ const updateItemByStrategy = (
 export const moveRecursive = (
   elementsToAdd: TreeElement[],
   elementsToDelete: TreeElement[],
-  menuItems: TreeElement[]
+  menuItems: TreeElement[],
+  config?: Config
 ): void => {
   for (let menuItem of menuItems) {
     const toBeAdded = elementsToAdd.filter((el) => el.data.parentPath === menuItem.data.filePath)
@@ -116,33 +126,32 @@ export const moveRecursive = (
       if (toBeAdded.length) {
         menuItem.children = [...menuItem.children, ...toBeAdded].sort((a, _b) => (a.data.type === 'folder' ? -1 : 1))
         menuItem.expanded = true
+        addIndents(menuItem.children, config.baseDir)
       }
       if (toBeDeleted.length) {
         menuItem.children = menuItem.children.filter((child) => !toBeDeleted.includes(child.data.filePath))
       }
     }
     if (menuItem.children?.length) {
-      moveRecursive(elementsToAdd, elementsToDelete, menuItem.children)
+      moveRecursive(elementsToAdd, elementsToDelete, menuItem.children, config)
     }
   }
 }
+export const calculateIndents = (el: TreeElement, baseDir: string) => {
+  const pathDiff = el.data.filePath.replace(baseDir, '')
+  const separators = pathDiff.split(getPathSeparator())
 
-/* export const deleteRecursive = (elementsToDelete: TreeElement[], menuItems: TreeElement[]) => {
-  for (let menuItem of menuItems) {
-    const items = elementsToDelete
-      .filter((el) => el.data.parentPath === menuItem.data.filePath)
-      .map((x) => x.data.filePath)
+  return separators.length - 2 // Do not show indent for rootDir, nor the first menuItems
+}
 
-    if (items?.length) {
-      menuItem.children = menuItem.children.filter((child) => !items.includes(child.data.filePath))
-      break
+export const addIndents = (items: TreeElement[], baseDir: string): void => {
+  items.forEach((item) => {
+    item.data.indents = calculateIndents(item, baseDir)
+    if (item.children?.length) {
+      addIndents(item.children, baseDir)
     }
-    if (menuItem.children?.length) {
-      deleteRecursive(elementsToDelete, menuItem.children)
-    }
-  }
-  return menuItems
-} */
+  })
+}
 
 /**
  * Updates the menuitem and its (possible) descendants by replacing the old filePaths / parentPaths with the new one

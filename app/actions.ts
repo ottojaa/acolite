@@ -3,7 +3,7 @@ import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
 
 export interface CreateFile {
   path: string
-  menuItems: TreeNode<FileEntity>[]
+  rootDirectory: TreeElement
 }
 export interface ReadDirectory {
   baseDir: string
@@ -12,7 +12,7 @@ export interface ReadDirectory {
 export interface CreateNewDirectory {
   directoryName: string
   baseDir: string
-  menuItems: TreeNode<FileEntity>[]
+  rootDirectory: TreeElement
   parentPath?: string
 }
 
@@ -20,21 +20,21 @@ export interface RenameFile {
   oldPath: string
   newPath: string
   isFolder: boolean
-  menuItems: TreeElement[]
+  rootDirectory: TreeElement
 }
 
 export interface DeleteFiles {
   baseDir: string
-  menuItems: TreeElement[]
+  rootDirectory: TreeElement
   directoryPaths: string[]
   filePaths: string[]
 }
 
 export interface MoveFiles {
   target: TreeElement
+  rootDirectory: TreeElement
   elementsToMove: TreeElement[]
   baseDir: string
-  menuItems: TreeElement[]
 }
 
 export interface SetDefaultDir {}

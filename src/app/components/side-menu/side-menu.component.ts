@@ -31,11 +31,12 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   ngOnInit(): void {
     this.menuLoading = true
     this.state
-      .getStatePart('menuItems')
+      .getStatePart('rootDirectory')
       .pipe(takeUntil(this.destroy$))
-      .subscribe((files) => {
-        console.log(files)
-        this.files = [...files].slice(0)
+      .subscribe((rootDir) => {
+        if (rootDir.children) {
+          this.files = rootDir.children.slice(0)
+        }
         this.menuLoading = false // TODO: add to state
         this.cdRef.detectChanges()
 
@@ -55,22 +56,22 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       .pipe(take(1))
       .subscribe((name: string) => {
         if (name && baseDir) {
-          const menuItems = this.state.getStatePartValue('menuItems')
+          const rootDirectory = this.state.getStatePartValue('rootDirectory')
           this.electronService.createNewFolderRequest({
-            data: { directoryName: name, baseDir, menuItems },
+            data: { directoryName: name, baseDir, rootDirectory },
           })
         }
       })
   }
 
   expandAll() {
-    this.state.value.menuItems.forEach((node) => {
+    this.state.value.rootDirectory.children.forEach((node) => {
       this.expandRecursive(node, true)
     })
   }
 
   collapseAll() {
-    this.state.value.menuItems.forEach((node) => {
+    this.state.value.rootDirectory.children.forEach((node) => {
       this.expandRecursive(node, false)
     })
   }
