@@ -45,36 +45,14 @@ export const getUpdatedMenuItemsRecursive = (
   config?: Config
 ): TreeElement[] => {
   for (let updatedItem of updatedItems) {
-    // The workspace root directory is not included in the menuItems, so we have to handle the special case where we need to
-    // update the top-level menuItem instead of its children (e.g deleting a top level directory)
-    const isRootFolderMatch = updatedItem.parentPath === config?.baseDir
-    if (isRootFolderMatch) {
-      switch (strategy) {
-        case 'delete': {
-          menuItems = menuItems.filter((item) => item.data.filePath !== updatedItem.filePath)
-          break
-        }
-        case 'create': {
-          const treeNode = getTreeNodeFromFileEntity(updatedItem, 'new-file')
-
-          addIndents([treeNode], config.baseDir)
-          menuItems.push(treeNode)
-          break
-        }
-        default: {
-          continue
-        }
-      }
-    }
     for (let item of menuItems) {
       // Find the updated item's parent, and update it
       if (item.data.filePath === updatedItem.parentPath) {
         updateItemByStrategy(item, updatedItem, strategy, config)
       }
-      if (!item.children?.length) {
-        break
+      if (item.children) {
+        getUpdatedMenuItemsRecursive(item.children, updatedItems, strategy, config)
       }
-      getUpdatedMenuItemsRecursive(item.children, updatedItems, strategy, config)
     }
   }
 
@@ -144,6 +122,9 @@ export const calculateIndents = (el: TreeElement, baseDir: string) => {
   return separators.length - 2 // Do not show indent for rootDir, nor the first menuItems
 }
 
+/**
+ * Indents are used to clarify which of the tree-elements belong to which parent-folder
+ */
 export const addIndents = (items: TreeElement[], baseDir: string): void => {
   items.forEach((item) => {
     item.data.indents = calculateIndents(item, baseDir)
@@ -157,11 +138,11 @@ export const addIndents = (items: TreeElement[], baseDir: string): void => {
  * Updates the menuitem and its (possible) descendants by replacing the old filePaths / parentPaths with the new one
  */
 export const getUpdatedFilePathsRecursive = (item: TreeElement, newPath: string, oldPath: string): TreeElement => {
-  const itemCopy = { ...item.data }
-  console.log('ITEMCOPY path', itemCopy)
+  if (item.data.filePath.includes(oldPath)) {
+    console.log(item)
+  }
   item.data.filePath = item.data.filePath.replace(oldPath, newPath)
   item.data.parentPath = item.data.parentPath.replace(oldPath, newPath)
-  console.log('UPDATED FILEPATH', item.data)
 
   if (item.data.filePath === newPath) {
     item.label = getBaseName(newPath)

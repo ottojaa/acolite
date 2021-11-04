@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs'
 import { map, mergeMap, take, takeUntil } from 'rxjs/operators'
@@ -67,10 +68,10 @@ export class StateService extends AbstractComponent {
       map((state) => {
         console.log(update)
         const { key, payload } = update
-        const newState = {
+        const newState = cloneDeep({
           ...state,
           [key]: payload,
-        }
+        })
 
         console.log({ oldState: state, newState })
         return newState
@@ -84,5 +85,9 @@ export class StateService extends AbstractComponent {
 
   getMenuItemsValue(): TreeElement[] {
     return this.state$.value['rootDirectory'].children
+  }
+
+  getMenuItems(): Observable<TreeElement[]> {
+    return this.state$.asObservable().pipe(map((state) => state.rootDirectory.children))
   }
 }

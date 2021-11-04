@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
       FolderActionResponses.ChooseDirectoryFailure,
       FolderActionResponses.SetDefaultDirFailure,
       FolderActionResponses.SetDefaultDirSuccess,
+      FileActionResponses.CreateSuccess,
       FileActionResponses.CreateFailure,
       FileActionResponses.RenameSuccess,
       FileActionResponses.RenameFailure,
@@ -103,6 +104,10 @@ export class AppComponent implements OnInit {
         break
       }
       case FileActionResponses.RenameSuccess: {
+        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+        break
+      }
+      case FileActionResponses.CreateSuccess: {
         this.state.updateState$.next({ key: 'rootDirectory', payload: response })
         break
       }

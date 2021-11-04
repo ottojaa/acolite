@@ -34,6 +34,7 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       .getStatePart('rootDirectory')
       .pipe(takeUntil(this.destroy$))
       .subscribe((rootDir) => {
+        console.log('HEHE')
         if (rootDir.children) {
           this.files = rootDir.children.slice(0)
         }

@@ -49,7 +49,6 @@ export class RenameFileDialogComponent {
 
   onRenameClick(): void {
     const { rootDirectory } = this.state.state$.value
-    const isFile = !!this.extension
     this.electronService.renameFileRequest(FileActions.Rename, {
       data: { path: this.data, newName: this.fileName.value, rootDirectory },
     })

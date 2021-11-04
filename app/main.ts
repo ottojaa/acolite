@@ -23,8 +23,8 @@ import {
   ReadDirectory,
   RenameFile,
 } from './actions'
-import { getBaseName, getDirName, getJoinedPath } from '../src/app/utils/file-utils'
-import { cloneDeep } from 'lodash'
+import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
+import { cloneDeep, first } from 'lodash'
 
 type IPCChannelAction = FileActions | FolderActions
 // Initialize remote module
@@ -201,11 +201,13 @@ const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateN
     .mkdir(directoryPath, { recursive: true })
     .then(() => {
       const newDir = getFileEntityFromPath(directoryPath)
-      const updatedRootDirectory = parentPath
-        ? getUpdatedMenuItemsRecursive([rootDirectory], [newDir], 'create', { baseDir: rootDirectory.data.filePath })
-        : { ...rootDirectory, children: rootDirectory.children, ...getTreeNodeFromFileEntity(newDir) }
+      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [newDir], 'create', {
+        baseDir: rootDirectory.data.filePath,
+      })
 
-      event.sender.send(FolderActionResponses.MakeDirectorySuccess, updatedRootDirectory)
+      const rootDir = first(updatedRootDirectory)
+
+      event.sender.send(FolderActionResponses.MakeDirectorySuccess, rootDir)
     })
     .catch((err) => {
       event.sender.send(FolderActionResponses.MakeDirectoryFailure, err)
@@ -272,7 +274,9 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
       baseDir: rootDirectory.data.filePath,
     })
 
-    event.sender.send(FileActionResponses.CreateSuccess, updatedRootDirectory)
+    const rootDir = first(updatedRootDirectory)
+
+    event.sender.send(FileActionResponses.CreateSuccess, rootDir)
     /* writeToFile(defaultConfigFilePath, { key: 'menuItems', payload: updatedMenuItems }).then(
       () => {
         event.sender.send(FileActionResponses.CreateSuccess, updatedMenuItems)
@@ -287,7 +291,8 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
 const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
   const { path, newName, rootDirectory } = action.data
   const parentDirectory = getDirName(path)
-  const newPath = getJoinedPath([parentDirectory, newName])
+  const extension = getExtension(path)
+  const newPath = getJoinedPath([parentDirectory, newName]) + extension
   const oldPath = path
 
   fs.rename(path, newPath, (err) => {
@@ -305,7 +310,8 @@ const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => 
       isFolder,
       baseDir: rootDirectory.data.filePath,
     })
-    event.sender.send(FileActionResponses.RenameSuccess, updatedRootDirectory)
+    const rootDir = first(updatedRootDirectory)
+    event.sender.send(FileActionResponses.RenameSuccess, rootDir)
   })
 }
 
@@ -378,7 +384,8 @@ const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) =
         .map((filePath) => getDeletedFileEntityMock(filePath))
 
       const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
-      event.sender.send(FileActionResponses.DeleteSuccess, updatedRootDirectory)
+      const rootDir = first(updatedRootDirectory)
+      event.sender.send(FileActionResponses.DeleteSuccess, rootDir)
     },
     (err) => {
       console.error(err)
