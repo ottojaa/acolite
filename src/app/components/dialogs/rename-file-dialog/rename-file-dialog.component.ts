@@ -1,11 +1,9 @@
-import { Component, Inject, NgZone, OnInit } from '@angular/core'
+import { Component, Inject, NgZone } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { TreeNode } from 'primeng/api'
-import { FileActionResponses, FileActions } from '../../../../../app/actions'
+import { FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
 import { nameValidationPattern } from '../../../entities/file/constants'
-import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { getBaseName, getDirName } from '../../../utils/file-utils'
@@ -51,15 +49,9 @@ export class RenameFileDialogComponent {
 
   onRenameClick(): void {
     const { rootDirectory } = this.state.state$.value
-    const oldPathParent = getDirName(this.data)
-    const oldPath = this.data
     const isFile = !!this.extension
-    const newPath = isFile
-      ? `${oldPathParent}${this.fileName.value}.${this.extension}`
-      : `${oldPathParent}${this.fileName.value}`
-
     this.electronService.renameFileRequest(FileActions.Rename, {
-      data: { oldPath, newPath, isFolder: !isFile, rootDirectory },
+      data: { path: this.data, newName: this.fileName.value, rootDirectory },
     })
     this.dialogRef.close()
   }

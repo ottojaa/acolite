@@ -17,9 +17,8 @@ export interface CreateNewDirectory {
 }
 
 export interface RenameFile {
-  oldPath: string
-  newPath: string
-  isFolder: boolean
+  path: string
+  newName: string
   rootDirectory: TreeElement
 }
 

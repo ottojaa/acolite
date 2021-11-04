@@ -1,9 +1,6 @@
 import { Component } from '@angular/core'
 import { MatDialogRef } from '@angular/material/dialog'
-import { FolderActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
-
-type IPCEvent = Electron.IpcMessageEvent
 
 @Component({
   selector: 'app-base-directory-dialog',

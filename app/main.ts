@@ -285,13 +285,20 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
 }
 
 const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
-  const { oldPath, newPath, isFolder, rootDirectory } = action.data
-  fs.rename(oldPath, newPath, (err) => {
+  const { path, newName, rootDirectory } = action.data
+  const parentDirectory = getDirName(path)
+  const newPath = getJoinedPath([parentDirectory, newName])
+  const oldPath = path
+
+  fs.rename(path, newPath, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.RenameFailure)
       return
     }
     const file = getFileEntityFromPath(newPath)
+    const fileInfo = fs.statSync(newPath)
+    const isFolder = fileInfo.isDirectory()
+
     const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'rename', {
       oldPath,
       newPath,
