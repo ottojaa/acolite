@@ -16,3 +16,8 @@ export interface FileEntity {
   modifiedDate: string
   highlightContentText?: string | undefined
 }
+
+export interface FilePathContainer {
+  folders: string[]
+  files: string[]
+}

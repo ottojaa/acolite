@@ -1,11 +1,18 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
 import { uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
 import { FileActions } from '../../../../../app/actions'
+import {
+  filterDirPathsWithNoParentSelected,
+  filePathsWithNoParentDirectorySelected,
+  getPathsToBeMoved,
+  pathContainerIsEmpty,
+} from '../../../../../app/directory-utils'
 import { getFileEntityFromPath } from '../../../../../app/utils'
 import { ElectronService } from '../../../core/services'
+import { FilePathContainer } from '../../../interfaces/File'
 import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -37,21 +44,39 @@ export class TreeComponent implements OnInit {
     this.contextMenuItems = this.getMenuItems()
   }
 
-  onSelectFile(event: { node: TreeNode; originalEvent: MouseEvent }): void {
+  onSelectFile(event: { node: TreeElement; originalEvent: MouseEvent }): void {
     const { node, originalEvent } = event
-    if (originalEvent.shiftKey) {
+    const { shiftKey, metaKey } = originalEvent
+    if (shiftKey) {
       this.handleShiftClickSelection(node)
     }
+    const modifierKeyPressed = shiftKey || metaKey
+
+    if (!modifierKeyPressed) {
+      if (node.data.type === 'file') {
+        const currentTabs = this.state.getStatePartValue('tabs')
+        const tabIdx = currentTabs.findIndex((tab) => tab.path === node.data.filePath)
+
+        if (tabIdx > -1) {
+          this.state.updateState$.next({ key: 'selectedTab', payload: tabIdx })
+        } else if (tabIdx === -1) {
+          this.electronService.readFileRequest(FileActions.ReadFile, { data: { node } })
+        }
+      }
+    }
     this.selection = this.selectedFiles
-    this.contextMenuItems = this.getMenuItems()
   }
 
   /**
    * Gets the index range of the click target and the latest selected item, and selects everything in between.
    */
   handleShiftClickSelection(target: TreeNode): void {
-    const flattenedTreeItems = this.flattenTree(this.files, [])
+    if (!this.selection.length) {
+      return
+    }
     const lastSelectedItem = this.selection.pop()
+    const flattenedTreeItems = this.flattenTree(this.files, [])
+
     const start = flattenedTreeItems.findIndex((el) => el.data.filePath === lastSelectedItem.data.filePath)
     const end = flattenedTreeItems.findIndex((el) => el.data.filePath === target.data.filePath)
     const validSelection = start > -1 && end > -1 && start !== end
@@ -65,7 +90,7 @@ export class TreeComponent implements OnInit {
   flattenTree(menuItems: TreeElement[], flattened: TreeElement[]): TreeElement[] {
     menuItems.forEach((item) => {
       flattened.push(item)
-      if (item.children && item.expanded) {
+      if (item.children?.length && item.expanded) {
         this.flattenTree(item.children, flattened)
       }
     })
@@ -105,14 +130,19 @@ export class TreeComponent implements OnInit {
       this.selectedFiles.push(dragNode)
     }
 
-    const movingToSelf = this.selectedFiles.some((file) => file.data.filePath === dropNode.data.filePath)
+    /* const movingToSelf = this.selectedFiles.some((file) => file.data.filePath === dropNode.data.filePath)
     const movingToCurrentParent = this.selectedFiles.some((file) => file.data.parentPath === dropNode.data.filePath)
     if (movingToCurrentParent || movingToSelf) {
+      return
+    } */
+    const pathContainer = getPathsToBeMoved(this.selectedFiles, dropNode)
+
+    if (pathContainerIsEmpty(pathContainer)) {
       return
     }
 
     this.ngZone.run(() => {
-      this.dialogService.openMoveFilesDialog(this.selectedFiles, dropNode).pipe(take(1)).subscribe()
+      this.dialogService.openMoveFilesDialog(pathContainer, this.selectedFiles, dropNode).pipe(take(1)).subscribe()
     })
   }
 
@@ -132,14 +162,18 @@ export class TreeComponent implements OnInit {
       })
   }
 
-  dragStart(): void {
+  dragStart(node: TreeElement): void {
+    const nodeIdx = this.selectedFiles.findIndex((file) => file.data.filePath === node.data.filePath)
+    if (nodeIdx === -1) {
+      this.selectedFiles.push(node)
+    }
+
     this.draggedElements = this.selectedFiles
   }
 
   dragEnd(): void {}
 
   onDragEnter(event: Event): void {
-    console.log('isis')
     this.isHovering = true
     event.preventDefault()
   }
@@ -152,24 +186,36 @@ export class TreeComponent implements OnInit {
   dropOutside(_event: DragEvent): void {
     this.isHovering = false
     const rootDir = this.state.getStatePartValue('rootDirectory')
+    const pathContainer = getPathsToBeMoved(this.selectedFiles, rootDir)
+
+    if (pathContainerIsEmpty(pathContainer)) {
+      return
+    }
+
     this.dialogService
-      .openMoveFilesDialog(this.draggedElements, rootDir)
+      .openMoveFilesDialog(pathContainer, this.draggedElements, rootDir)
       .pipe(take(1))
       .subscribe(() => (this.draggedElements = null))
   }
 
   openNewFileDialog(): void {
     const { filePath } = this.selectedFiles[0].data
-    this.dialogService.openNewFileCreationDialog(filePath).pipe(take(1)).subscribe()
+    this.ngZone.run(() => {
+      this.dialogService.openNewFileCreationDialog(filePath).pipe(take(1)).subscribe()
+    })
   }
 
   openRenameFileDialog(): void {
     const { filePath } = this.selectedFiles[0].data
-    this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
+    this.ngZone.run(() => {
+      this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
+    })
   }
 
   openDeleteFilesDialog(): void {
-    this.dialogService.openDeleteFilesDialog(this.selectedFiles).pipe(take(1)).subscribe()
+    this.ngZone.run(() => {
+      this.dialogService.openDeleteFilesDialog(this.selectedFiles).pipe(take(1)).subscribe()
+    })
   }
 
   /**

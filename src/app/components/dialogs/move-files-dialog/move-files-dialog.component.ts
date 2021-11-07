@@ -1,7 +1,9 @@
 import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { FileActionResponses, FileActions } from '../../../../../app/actions'
+import { FileActions } from '../../../../../app/actions'
+import { getPathsToBeMoved } from '../../../../../app/directory-utils'
 import { ElectronService } from '../../../core/services'
+import { FilePathContainer } from '../../../interfaces/File'
 import { TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -16,14 +18,17 @@ import { RenameFileDialogComponent } from '../rename-file-dialog/rename-file-dia
 export class MoveFilesDialogComponent implements OnInit {
   toMoveCount: number
   moveText: string
-  displayTexts: { folders: string[]; files: string[] }
+  displayTexts: FilePathContainer
+  pathsToBeMoved: FilePathContainer = { folders: [], files: [] }
+
   constructor(
     public dialogRef: MatDialogRef<RenameFileDialogComponent>,
     public electronService: ElectronService,
     public dialogService: AppDialogService,
     public state: StateService,
     public ngZone: NgZone,
-    @Inject(MAT_DIALOG_DATA) public data: { selectedFiles: TreeElement[]; target: TreeElement }
+    @Inject(MAT_DIALOG_DATA)
+    public data: { pathContainer: FilePathContainer; selectedFiles: TreeElement[]; target: TreeElement }
   ) {}
 
   ngOnInit(): void {
@@ -31,22 +36,20 @@ export class MoveFilesDialogComponent implements OnInit {
   }
 
   getDisplayTexts(): any {
-    const { selectedFiles, target } = this.data
-    const folders = selectedFiles.filter((el) => el.data.type === 'folder')
-    const folderPaths = folders.map((folder) => folder.data.filePath)
-    const files = selectedFiles.filter(
-      (el) => el.data.type === 'file' && !folderPaths.some((path) => path.includes(el.data.parentPath))
-    )
+    const { pathContainer, target } = this.data
+    const { folders, files } = pathContainer
+    this.pathsToBeMoved = pathContainer
+
     this.toMoveCount = folders.length + files.length
     this.moveText = this.getMoveText(folders, files, target)
 
     return {
-      folders: [...folders.map((folder) => getBaseName(folder.data.filePath))],
-      files: files.map((file) => getBaseName(file.data.filePath)),
+      folders: [...folders.map((path) => getBaseName(path))],
+      files: files.map((path) => getBaseName(path)),
     }
   }
 
-  getMoveText(folders: TreeElement[], files: TreeElement[], target: TreeElement): string {
+  getMoveText(folders: string[], files: string[], target: TreeElement): string {
     const hasFolders = folders.length
     const hasFiles = files.length
     if (this.toMoveCount === 1) {
@@ -69,10 +72,9 @@ export class MoveFilesDialogComponent implements OnInit {
     const { selectedFiles, target } = this.data
     const baseDir = this.state.getStatePartValue('baseDir')
     const rootDirectory = this.state.getStatePartValue('rootDirectory')
-    const filePaths = selectedFiles.map((file) => file.data.filePath)
-    const filesToBeMoved = selectedFiles.filter(
-      (file) => !filePaths.some((path) => path.includes(file.data.filePath) && path !== file.data.filePath)
-    )
+    const paths = Object.values(this.pathsToBeMoved).reduce((acc, curr) => acc.concat(curr), [])
+    const filesToBeMoved = selectedFiles.filter((el) => paths.includes(el.data.filePath))
+    console.log(filesToBeMoved)
 
     this.electronService.moveFilesRequest(FileActions.MoveFiles, {
       data: {

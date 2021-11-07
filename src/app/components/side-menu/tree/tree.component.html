@@ -21,7 +21,7 @@
           <div class="indent"></div>
         </ng-container>
 
-        <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart()" (onDragEnd)="dragEnd()">
+        <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()">
           <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
           <p>{{ node.label }}</p>
         </span>
@@ -33,7 +33,9 @@
         <ng-container *ngFor="let e of [].constructor(node.data.indents)">
           <div class="indent"></div>
         </ng-container>
-        <mat-icon> {{ node.expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}</mat-icon>
+        <mat-icon [ngClass]="{ empty: !node.children.length }">
+          {{ node.expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}</mat-icon
+        >
 
         <span class="node-row" (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()" pDraggable="droppable">
           <p>{{ node.label }}</p>

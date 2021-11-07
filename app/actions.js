@@ -32,6 +32,7 @@ var FileActions;
     FileActions["ModifyTags"] = "modify-tags";
     FileActions["DeleteFiles"] = "delete-files";
     FileActions["MoveFiles"] = "move-files";
+    FileActions["ReadFile"] = "read-file";
 })(FileActions = exports.FileActions || (exports.FileActions = {}));
 var FileActionResponses;
 (function (FileActionResponses) {
@@ -44,5 +45,7 @@ var FileActionResponses;
     FileActionResponses["DeleteFailure"] = "delete-files-failure";
     FileActionResponses["MoveSuccess"] = "move-files-success";
     FileActionResponses["MoveFailure"] = "move-files-failure";
+    FileActionResponses["ReadSuccess"] = "read-file-success";
+    FileActionResponses["ReadFailure"] = "read-file-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
 //# sourceMappingURL=actions.js.map

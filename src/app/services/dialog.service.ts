@@ -9,6 +9,7 @@ import { FileCreationComponent } from '../components/dialogs/file-creation/file-
 import { FolderCreationDialogComponent } from '../components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.component'
 import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialog/move-files-dialog.component'
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
+import { FilePathContainer } from '../interfaces/File'
 import { TreeElement } from '../interfaces/Menu'
 
 @Injectable({
@@ -28,7 +29,7 @@ export class AppDialogService {
   }
 
   openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
-    const ref = this.dialog.open(FileCreationComponent, { data: filePath, width: '40%', minWidth: '500px' })
+    const ref = this.dialog.open(FileCreationComponent, { data: filePath, minWidth: '400px', maxWidth: '600px' })
     return ref.afterClosed().pipe(take(1))
   }
 
@@ -38,17 +39,24 @@ export class AppDialogService {
   }
 
   openDeleteFilesDialog(selectedFiles: TreeElement[]): Observable<string> {
-    const ref = this.dialog.open(DeleteFilesDialogComponent, { data: selectedFiles, width: '20%', minWidth: '300px' })
+    const ref = this.dialog.open(DeleteFilesDialogComponent, {
+      data: selectedFiles,
+      minWidth: '300px',
+      maxWidth: '400px',
+    })
     return ref.afterClosed().pipe(take(1))
   }
 
-  openMoveFilesDialog(selectedFiles: TreeElement[], target: TreeElement): Observable<any> {
+  openMoveFilesDialog(
+    pathContainer: FilePathContainer,
+    selectedFiles: TreeElement[],
+    target: TreeElement
+  ): Observable<any> {
     const ref = this.dialog.open(MoveFilesDialogComponent, {
-      data: { selectedFiles, target },
+      data: { pathContainer, selectedFiles, target },
       width: '20%',
       minWidth: '300px',
     })
-    console.log(selectedFiles)
     return ref.afterClosed().pipe(take(1))
   }
 

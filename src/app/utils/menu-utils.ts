@@ -22,6 +22,7 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
     const treeNode = {
       label: getBaseName(data.filePath),
       type: MenuItemTypes.Folder,
+      key: data.filePath,
       leaf: false,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,
@@ -158,15 +159,19 @@ export const getUpdatedFilePathsRecursive = (item: TreeElement, newPath: string,
   }
 }
 
+// PrimeNG styleClasses get applied back on each rerender, so in order to do enter animations that don't happen on each rerender
+// we have to remove the styleClass properties from the menuItems after the animation is done.
 export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
-  menuItems.forEach((item) => {
-    if (item.styleClass) {
-      delete item.styleClass
-    }
-    if (item.children?.length) {
-      removeExistingStyleClasses(item.children)
-    }
-  })
+  setTimeout(() => {
+    menuItems.forEach((item) => {
+      if (item.styleClass) {
+        delete item.styleClass
+      }
+      if (item.children?.length) {
+        removeExistingStyleClasses(item.children)
+      }
+    })
+  }, 2000)
 }
 
 export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string): TreeNode<FileEntity> => {
@@ -175,6 +180,7 @@ export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string)
       data,
       label: getBaseName(data.filePath),
       leaf: false,
+      key: data.filePath,
       type: MenuItemTypes.Folder,
       children: [],
       ...(styleClass && { styleClass }),
@@ -183,6 +189,7 @@ export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string)
     return {
       label: getBaseName(data.filePath),
       type: MenuItemTypes.File,
+      key: data.filePath,
       data,
       ...(styleClass && { styleClass }),
     }

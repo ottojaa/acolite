@@ -1,31 +1,33 @@
-<span class="side-menu-topbar">
-  <div class="button-container">
-    <app-rounded-icon-button
-      [icon]="'folder_open'"
-      [tooltip]="'Expand all'"
-      (onClick)="expandAll()"
-    ></app-rounded-icon-button>
-    <app-rounded-icon-button
-      [icon]="'folder'"
-      [tooltip]="'Collapse all'"
-      (onClick)="collapseAll()"
-    ></app-rounded-icon-button>
-    <app-rounded-icon-button
-      [icon]="'create_new_folder'"
-      [tooltip]="'Create new folder'"
-      (onClick)="createNewFolder()"
-    ></app-rounded-icon-button>
-    <app-rounded-icon-button
-      [icon]="'done'"
-      [tooltip]="'Directory selection'"
-      (onClick)="navigateToDirectorySelection()"
-    ></app-rounded-icon-button>
-  </div>
-  <div class="loader">
-    <ng-container *ngIf="menuLoading && !treeNodes">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    </ng-container>
-  </div>
-</span>
+<span class="side-menu-container">
+  <span class="side-menu-topbar">
+    <div class="button-container">
+      <app-rounded-icon-button
+        [icon]="'folder_open'"
+        [tooltip]="'Expand all'"
+        (onClick)="expandAll()"
+      ></app-rounded-icon-button>
+      <app-rounded-icon-button
+        [icon]="'folder'"
+        [tooltip]="'Collapse all'"
+        (onClick)="collapseAll()"
+      ></app-rounded-icon-button>
+      <app-rounded-icon-button
+        [icon]="'create_new_folder'"
+        [tooltip]="'Create new folder'"
+        (onClick)="createNewFolder()"
+      ></app-rounded-icon-button>
+      <app-rounded-icon-button
+        [icon]="'done'"
+        [tooltip]="'Directory selection'"
+        (onClick)="navigateToDirectorySelection()"
+      ></app-rounded-icon-button>
+    </div>
+    <div class="loader">
+      <ng-container *ngIf="menuLoading && !treeNodes">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </ng-container>
+    </div>
+  </span>
 
-<app-tree [files]="files"></app-tree>
+  <app-tree [files]="files$ | async"></app-tree>
+</span>

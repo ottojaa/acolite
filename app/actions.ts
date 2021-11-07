@@ -36,6 +36,10 @@ export interface MoveFiles {
   baseDir: string
 }
 
+export interface ReadFile {
+  node: TreeElement
+}
+
 export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {
@@ -72,6 +76,7 @@ export enum FileActions {
   ModifyTags = 'modify-tags',
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
+  ReadFile = 'read-file',
 }
 
 export enum FileActionResponses {
@@ -84,4 +89,6 @@ export enum FileActionResponses {
   DeleteFailure = 'delete-files-failure',
   MoveSuccess = 'move-files-success',
   MoveFailure = 'move-files-failure',
+  ReadSuccess = 'read-file-success',
+  ReadFailure = 'read-file-failure',
 }

@@ -14,6 +14,7 @@ import {
   FolderActions,
   MoveFiles,
   ReadDirectory,
+  ReadFile,
   RenameFile,
 } from '../../../../../app/actions'
 
@@ -97,6 +98,10 @@ export class ElectronService {
   }
 
   moveFilesRequest(channel: string, payload: ElectronAction<MoveFiles>): void {
+    this.send(channel, payload)
+  }
+
+  readFileRequest(channel: string, payload: ElectronAction<ReadFile>): void {
     this.send(channel, payload)
   }
 }

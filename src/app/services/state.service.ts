@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core'
 import { cloneDeep } from 'lodash'
 import { TreeNode } from 'primeng/api'
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs'
-import { map, mergeMap, take, takeUntil } from 'rxjs/operators'
+import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
-import { TreeElement } from '../interfaces/Menu'
+import { Tab, TreeElement } from '../interfaces/Menu'
+
 interface State {
   baseDir: string
   menuLoading: boolean
+  selectedTab: number
+  tabs: Tab[]
   rootDirectory: TreeElement
 }
 
@@ -29,6 +32,8 @@ export class StateService extends AbstractComponent {
   initialState: State = {
     menuLoading: false,
     baseDir: '',
+    selectedTab: 0,
+    tabs: [],
     rootDirectory: {},
   }
 
@@ -56,6 +61,7 @@ export class StateService extends AbstractComponent {
 
   getStatePart<K extends keyof State>(key: K): Observable<State[K]> {
     return this.state$.asObservable().pipe(
+      distinctUntilKeyChanged(key),
       map((state) => {
         return state[key]
       })
@@ -66,7 +72,6 @@ export class StateService extends AbstractComponent {
     return this.state$.pipe(
       take(1),
       map((state) => {
-        console.log(update)
         const { key, payload } = update
         const newState = cloneDeep({
           ...state,

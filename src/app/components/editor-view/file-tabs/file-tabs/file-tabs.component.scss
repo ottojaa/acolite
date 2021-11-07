@@ -1,21 +1,74 @@
 :host ::ng-deep .mat-tab-label {
   opacity: 1;
+  height: 3rem;
 }
 
-.tab-label-container {
+:host ::ng-deep .mat-tab-header-pagination {
+  display: none !important;
+}
+
+:host ::ng-deep .mat-tab-header {
+  border-bottom: none;
+  overflow-x: scroll !important;
+}
+
+:host ::ng-deep .mat-tab-label-container {
+  overflow: visible !important;
+}
+
+:host ::ng-deep .mat-tab-header:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+:host ::ng-deep ::-webkit-scrollbar {
+  width: 10px;
+  height: 5px;
+  border-radius: 5px;
+}
+
+:host ::ng-deep ::-webkit-scrollbar-thumb {
+  background: #252525d6;
+  visibility: hidden;
+  transition: 0.5s all linear;
+}
+
+:host ::ng-deep .tab-label-container {
   width: 100%;
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
 
+:host ::ng-deep .mat-tab-label {
+  border-right: 1px solid #0c0c0c38;
+  background-color: var(--secondary);
+  &.mat-tab-label-active {
+    background-color: var(--buttonColor);
+  }
+}
+
 ::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
 .mat-tab-nav-bar.mat-primary .mat-ink-bar {
   background-color: var(--buttonColor);
+  display: none;
+}
+
+:host ::ng-deep .mat-tab-body-wrapper,
+.mat-tab-group {
+  height: 100%;
+}
+
+.border {
+  border-right: 1px solid #0c0c0c38;
 }
 
 .tab-name {
   color: var(--contrast);
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
 }
 
 .close-button {

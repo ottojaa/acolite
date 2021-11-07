@@ -22,6 +22,10 @@
   height: 0 !important;
   padding: 0;
 }
+:host ::ng-deep .p-tree-wrapper {
+  overflow: auto;
+}
+
 :host ::ng-deep .p-treenode-content {
   padding: 0 !important;
   border-radius: 0 !important;
@@ -42,14 +46,15 @@
   margin-left: 0;
 }
 
-/* :host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode {
-  border-left: 1px solid gray;
-} */
+.empty {
+  color: rgb(146 142 142 / 92%);
+}
 
 .tree-container {
   height: 96%;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 
   .row-container {
     display: flex;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, NgZone, OnInit } from '@angular/core'
 import { ElectronService } from './core/services'
 import { TranslateService } from '@ngx-translate/core'
 import { APP_CONFIG } from '../environments/environment'
@@ -23,7 +23,8 @@ export class AppComponent implements OnInit {
     private themeService: ThemeService,
     public menuService: MenuService,
     public state: StateService,
-    public dialogService: AppDialogService
+    public dialogService: AppDialogService,
+    public zone: NgZone
   ) {
     this.state.updateState$.next({ key: 'baseDir', payload: appConfig.baseDir })
     this.translate.setDefaultLang('en')
@@ -66,6 +67,8 @@ export class AppComponent implements OnInit {
       FileActionResponses.MoveSuccess,
       FileActionResponses.DeleteSuccess,
       FileActionResponses.DeleteFailure,
+      FileActionResponses.ReadSuccess,
+      FileActionResponses.ReadFailure,
     ]
 
     actions.forEach((action) => this.startListener(action))
@@ -78,52 +81,65 @@ export class AppComponent implements OnInit {
   }
 
   ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
-    switch (action) {
-      case FolderActionResponses.ReadDirectorySuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
+    this.zone.run(() => {
+      switch (action) {
+        case FolderActionResponses.ReadDirectorySuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FolderActionResponses.MakeDirectorySuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FileActionResponses.CreateFailure: {
+          this.dialogService.openToast('File creation failed', 'failure')
+          break
+        }
+        case FileActionResponses.MoveSuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FileActionResponses.MoveFailure: {
+          this.dialogService.openToast('Something went wrong while moving', 'failure')
+          break
+        }
+        case FileActionResponses.RenameFailure: {
+          this.dialogService.openToast('Something went wrong while renaming', 'failure')
+          break
+        }
+        case FileActionResponses.RenameSuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FileActionResponses.CreateSuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FileActionResponses.DeleteFailure: {
+          this.dialogService.openToast('Something went wrong while deleting', 'failure')
+          break
+        }
+        case FileActionResponses.DeleteSuccess: {
+          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          break
+        }
+        case FileActionResponses.ReadSuccess: {
+          const tabs = this.state.getStatePartValue('tabs')
+          const tabIdx = tabs.findIndex((tab) => tab.path === response.path)
+          if (tabIdx === -1) {
+            tabs.push(response)
+          }
+          const selectedTab = tabIdx === -1 ? tabs.length - 1 : tabIdx
+          this.state.updateState$.next({ key: 'tabs', payload: tabs })
+          this.state.updateState$.next({ key: 'selectedTab', payload: selectedTab })
+          break
+        }
+        default: {
+          console.log({ message: 'default reducer', action, response })
+          break
+        }
       }
-      case FolderActionResponses.MakeDirectorySuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
-      }
-      case FileActionResponses.CreateFailure: {
-        this.dialogService.openToast('File creation failed', 'failure')
-        break
-      }
-      case FileActionResponses.MoveSuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
-      }
-      case FileActionResponses.MoveFailure: {
-        this.dialogService.openToast('Something went wrong while moving', 'failure')
-        break
-      }
-      case FileActionResponses.RenameFailure: {
-        this.dialogService.openToast('Something went wrong while renaming', 'failure')
-        break
-      }
-      case FileActionResponses.RenameSuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
-      }
-      case FileActionResponses.CreateSuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
-      }
-      case FileActionResponses.DeleteFailure: {
-        this.dialogService.openToast('Something went wrong while deleting', 'failure')
-        break
-      }
-      case FileActionResponses.DeleteSuccess: {
-        this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-        break
-      }
-      default: {
-        console.log({ message: 'default reducer', action, response })
-        break
-      }
-    }
+    })
   }
 
   readDir(): void {

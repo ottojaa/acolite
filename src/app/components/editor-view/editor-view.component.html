@@ -1,15 +1,17 @@
 <div class="editor-view">
-  <div class="file-cards">
-    <ng-container *ngIf="tabs?.length === 3; else showTabs">
-      <ng-container *ngFor="let file of files">
-        <span class="file-card-container">
-          <app-file-card [file]="file"></app-file-card>
-        </span>
-      </ng-container>
+  <ng-container *ngIf="tabs$ | async as tabs">
+    <ng-container *ngIf="tabs?.length === 0; else showTabs">
+      <div class="file-cards">
+        <ng-container *ngFor="let file of files">
+          <span class="file-card-container">
+            <app-file-card [file]="file"></app-file-card>
+          </span>
+        </ng-container>
+      </div>
     </ng-container>
-  </div>
 
-  <ng-template #showTabs>
-    <app-file-tabs [tabs]="tabs" (closeTab)="onCloseTab($event)"></app-file-tabs>
-  </ng-template>
+    <ng-template #showTabs>
+      <app-file-tabs [tabs]="tabs$ | async" (closeTab)="onCloseTab($event)"></app-file-tabs>
+    </ng-template>
+  </ng-container>
 </div>

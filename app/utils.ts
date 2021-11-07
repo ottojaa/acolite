@@ -3,7 +3,9 @@ import * as fs from 'fs'
 import { join } from 'path'
 import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
 import { folderStructureToMenuItems } from '../src/app/utils/menu-utils'
-import { getDirName } from '../src/app/utils/file-utils'
+import { getDirName, getPathSeparator } from '../src/app/utils/file-utils'
+import { cloneDeep } from 'lodash'
+import { FilePathContainer } from '../src/app/interfaces/File'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)

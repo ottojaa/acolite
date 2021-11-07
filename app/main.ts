@@ -21,10 +21,12 @@ import {
   FolderActions,
   MoveFiles,
   ReadDirectory,
+  ReadFile,
   RenameFile,
 } from './actions'
 import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
 import { cloneDeep, first } from 'lodash'
+import { Tab } from '../src/app/interfaces/Menu'
 
 type IPCChannelAction = FileActions | FolderActions
 // Initialize remote module
@@ -97,6 +99,7 @@ const IPCChannels = [
   FileActions.Rename,
   FileActions.DeleteFiles,
   FileActions.MoveFiles,
+  FileActions.ReadFile,
 ]
 
 const startIPCChannelListeners = () => {
@@ -136,6 +139,10 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
       }
       case FileActions.MoveFiles: {
         moveFiles(event, <ElectronAction<MoveFiles>>payload)
+        break
+      }
+      case FileActions.ReadFile: {
+        readAndSendFileData(event, <ElectronAction<ReadFile>>payload)
         break
       }
     }
@@ -259,6 +266,23 @@ const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: Elec
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
   }
+}
+
+const readAndSendFileData = (event: IpcMainEvent, action: ElectronAction<ReadFile>) => {
+  const { filePath } = action.data.node.data
+  fs.readFile(filePath, 'utf-8', (err, content) => {
+    if (err) {
+      event.sender.send(FileActionResponses.ReadFailure)
+      return
+    }
+    const tabData: Tab = {
+      fileName: getBaseName(filePath),
+      extension: getExtension(filePath),
+      path: filePath,
+      textContent: content,
+    }
+    event.sender.send(FileActionResponses.ReadSuccess, tabData)
+  })
 }
 
 const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => {

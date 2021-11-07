@@ -18,3 +18,16 @@ export interface FileEntity {
 }
 
 export type TreeElement = TreeNode<FileEntity>
+
+export interface TabState {
+  selectedTab: number
+  tabs: Tab[]
+}
+
+export interface Tab {
+  path: string
+  fileName: string
+  extension: string
+  textContent: string
+  data?: any
+}

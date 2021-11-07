@@ -1,21 +1,29 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, NgZone, OnInit } from '@angular/core'
+import { Observable } from 'rxjs'
+import { map, takeUntil } from 'rxjs/operators'
+import { AbstractComponent } from '../../abstract/abstract-component'
 import { FileEntity } from '../../interfaces/File'
+import { Tab } from '../../interfaces/Menu'
+import { StateService } from '../../services/state.service'
+import { filterClosedTab } from '../../utils/tab-utils'
 
 @Component({
   selector: 'app-editor-view',
   templateUrl: './editor-view.component.html',
   styleUrls: ['./editor-view.component.scss'],
 })
-export class EditorViewComponent implements OnInit {
+export class EditorViewComponent extends AbstractComponent implements OnInit {
   files: FileEntity[]
-  tabs: any[]
+  tabs$: Observable<Tab[]>
   contrastColor: string
 
-  constructor() {}
+  constructor(private state: StateService, public zone: NgZone) {
+    super()
+  }
 
   ngOnInit(): void {
     this.files = this.getMockFiles()
-    this.tabs = this.getMockTabs()
+    this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
   }
 
   getMockFiles(): FileEntity[] {
@@ -54,24 +62,13 @@ export class EditorViewComponent implements OnInit {
     return [file1, ...secondaryFiles]
   }
 
-  onCloseTab(event: { tabName: string; index: number }): void {
-    this.tabs = [...this.tabs.filter((tab) => tab.name !== event.tabName)]
-  }
+  onCloseTab(event: { filePath: string }): void {
+    const selectedTab = this.state.getStatePartValue('selectedTab')
+    const currentTabs = this.state.getStatePartValue('tabs')
+    const newTabs = filterClosedTab(currentTabs, event.filePath)
+    const newIndex = selectedTab - 1 >= 0 ? selectedTab - 1 : 0
 
-  getMockTabs(): any {
-    return [
-      {
-        tabType: 0,
-        name: 'Main',
-      },
-      {
-        tabType: 1,
-        name: 'Dashboard',
-      },
-      {
-        tabType: 2,
-        name: 'Tests',
-      },
-    ]
+    this.state.updateState$.next({ key: 'selectedTab', payload: newIndex })
+    this.state.updateState$.next({ key: 'tabs', payload: newTabs })
   }
 }
