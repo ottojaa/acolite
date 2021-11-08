@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
+import { ChangeDirectoryDialogComponent } from '../components/dialogs/change-directory-dialog/change-directory-dialog.component'
 import { DeleteFilesDialogComponent } from '../components/dialogs/delete-files-dialog/delete-files-dialog.component'
 import { FileCreationComponent } from '../components/dialogs/file-creation/file-creation.component'
 import { FolderCreationDialogComponent } from '../components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.component'
@@ -20,6 +21,11 @@ export class AppDialogService {
 
   openWorkspaceDirectoryDialog(): Observable<string | undefined> {
     const ref = this.dialog.open(BaseDirectoryDialogComponent)
+    return ref.afterClosed().pipe(take(1))
+  }
+
+  openChangeWorkspaceDialog(): Observable<undefined> {
+    const ref = this.dialog.open(ChangeDirectoryDialogComponent)
     return ref.afterClosed().pipe(take(1))
   }
 

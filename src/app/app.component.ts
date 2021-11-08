@@ -5,10 +5,16 @@ import { APP_CONFIG } from '../environments/environment'
 import appConfig from '../../app/acolite.config.json'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
-import { StateService } from './services/state.service'
+import { State, StateService, StateUpdate } from './services/state.service'
 import { MenuService } from './services/menu.service'
 import { FileActionResponses, FolderActionResponses, FolderActions } from '../../app/actions'
+import { Tab } from './interfaces/Menu'
+import { Router } from '@angular/router'
 
+interface AppConfig {
+  baseDir?: string
+  tabs?: Tab[]
+}
 type IPCEvent = Electron.IpcMessageEvent
 
 @Component({
@@ -17,16 +23,19 @@ type IPCEvent = Electron.IpcMessageEvent
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  _appConfig: AppConfig
+
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
     private themeService: ThemeService,
     public menuService: MenuService,
     public state: StateService,
+    public router: Router,
     public dialogService: AppDialogService,
     public zone: NgZone
   ) {
-    this.state.updateState$.next({ key: 'baseDir', payload: appConfig.baseDir })
+    this._appConfig = appConfig
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
 
@@ -39,6 +48,24 @@ export class AppComponent implements OnInit {
       console.log('Run in browser')
     }
     this.initIPCMainListeners()
+    this.initAppPreferences()
+  }
+
+  initAppPreferences(): void {
+    const { baseDir, tabs } = this._appConfig
+
+    let updateArr: StateUpdate<State>[] = []
+    if (baseDir) {
+      updateArr.push({ key: 'baseDir', payload: baseDir })
+    } else {
+      this.router.navigate(['base-dir'])
+    }
+    if (tabs && tabs.length) {
+      updateArr.push({ key: 'tabs', payload: tabs })
+    }
+    if (updateArr.length) {
+      this.state.updateMulti$.next(updateArr)
+    }
   }
 
   ngOnInit(): void {
@@ -84,6 +111,7 @@ export class AppComponent implements OnInit {
     this.zone.run(() => {
       switch (action) {
         case FolderActionResponses.ReadDirectorySuccess: {
+          console.log(response)
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
           break
         }
@@ -123,15 +151,30 @@ export class AppComponent implements OnInit {
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
           break
         }
+        case FolderActionResponses.ChooseDirectorySuccess: {
+          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          this.readDir()
+          break
+        }
+        case FolderActionResponses.SetDefaultDirSuccess: {
+          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          this.readDir()
+          break
+        }
         case FileActionResponses.ReadSuccess: {
           const tabs = this.state.getStatePartValue('tabs')
           const tabIdx = tabs.findIndex((tab) => tab.path === response.path)
           if (tabIdx === -1) {
             tabs.push(response)
           }
+
           const selectedTab = tabIdx === -1 ? tabs.length - 1 : tabIdx
-          this.state.updateState$.next({ key: 'tabs', payload: tabs })
-          this.state.updateState$.next({ key: 'selectedTab', payload: selectedTab })
+          const payload: StateUpdate<State>[] = [
+            { key: 'tabs', payload: tabs },
+            { key: 'selectedTab', payload: selectedTab },
+          ]
+
+          this.state.updateMulti$.next(payload)
           break
         }
         default: {

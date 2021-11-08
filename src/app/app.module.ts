@@ -24,6 +24,7 @@ import { FolderCreationDialogModule } from './components/dialogs/folder-creation
 import { RenameFileDialogModule } from './components/dialogs/rename-file-dialog/rename-file-dialog.module'
 import { DeleteFilesDialogModule } from './components/dialogs/delete-files-dialog/delete-files-dialog.module'
 import { MoveFilesDialogModule } from './components/dialogs/move-files-dialog/move-files-dialog.module'
+import { ChangeDirectoryDialogModule } from './components/dialogs/change-directory-dialog/change-directory-dialog.module'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -44,6 +45,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatDialogModule,
     ReactiveFormsModule,
     BaseDirectoryDialogModule,
+    ChangeDirectoryDialogModule,
     FolderCreationDialogModule,
     RenameFileDialogModule,
     DeleteFilesDialogModule,

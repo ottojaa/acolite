@@ -8,10 +8,9 @@ import { AppDialogService } from '../services/dialog.service'
   styleUrls: ['./base-directory.component.scss'],
 })
 export class BaseDirectoryComponent implements OnInit {
-  constructor(private dialogService: AppDialogService) {}
+  constructor(private dialogService: AppDialogService, private router: Router) {}
 
   ngOnInit(): void {
-    this.dialogService.openWorkspaceDirectoryDialog().subscribe((data) => console.log(data))
-    console.log('HomeComponent INIT')
+    this.dialogService.openWorkspaceDirectoryDialog().subscribe(() => this.router.navigate(['main']))
   }
 }

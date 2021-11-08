@@ -3,6 +3,10 @@
   height: 3rem;
 }
 
+:host ::ng-deep .mat-tab-labels {
+  padding: 0 1rem;
+}
+
 :host ::ng-deep .mat-tab-header-pagination {
   display: none !important;
 }

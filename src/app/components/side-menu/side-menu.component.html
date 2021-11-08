@@ -17,17 +17,15 @@
         (onClick)="createNewFolder()"
       ></app-rounded-icon-button>
       <app-rounded-icon-button
-        [icon]="'done'"
-        [tooltip]="'Directory selection'"
-        (onClick)="navigateToDirectorySelection()"
+        [icon]="'swap_horiz'"
+        [tooltip]="'Change workspace'"
+        (onClick)="openChangeWorkspaceDialog()"
       ></app-rounded-icon-button>
     </div>
     <div class="loader">
-      <ng-container *ngIf="menuLoading && !treeNodes">
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      </ng-container>
+      <mat-progress-bar mode="indeterminate" [ngClass]="{ visible: menuLoading && !treeNodes }"></mat-progress-bar>
     </div>
   </span>
 
-  <app-tree [files]="files$ | async"></app-tree>
+  <app-tree [files]="files$ | async" [workspace]="workspaceName"></app-tree>
 </span>

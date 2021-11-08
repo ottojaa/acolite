@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core'
 import { cloneDeep } from 'lodash'
-import { TreeNode } from 'primeng/api'
-import { BehaviorSubject, merge, Observable, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 import { Tab, TreeElement } from '../interfaces/Menu'
 
-interface State {
+export interface State {
   baseDir: string
   menuLoading: boolean
   selectedTab: number
@@ -18,7 +17,7 @@ interface State {
  * Used to infer correct payload value type given a generic keyof State, e.g 'menuItems' -> 'TreeNode[]'.
  * original: https://stackoverflow.com/questions/57691618/generic-interface-with-index-type-property-and-method
  */
-type StateUpdate<T> = {
+export type StateUpdate<T> = {
   [P in keyof T]: {
     key: P
     payload: T[P]
@@ -42,6 +41,7 @@ export class StateService extends AbstractComponent {
   }
 
   public updateState$ = new Subject<StateUpdate<State>>()
+  public updateMulti$ = new Subject<StateUpdate<State>[]>()
   public state$ = new BehaviorSubject<State>(this.initialState)
 
   constructor() {
@@ -50,13 +50,21 @@ export class StateService extends AbstractComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.state$.next(data)
-        console.log('State updated: ', data)
+      })
+
+    this.handleStateUpdateMulti()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        this.state$.next(data)
       })
   }
 
   handleStateUpdate(): Observable<State> {
-    const observables = [this.updateState$]
-    return merge(...observables).pipe(mergeMap((value) => this.updateStatePart(value)))
+    return this.updateState$.pipe(mergeMap((value) => this.updateStatePart(value)))
+  }
+
+  handleStateUpdateMulti(): Observable<State> {
+    return this.updateMulti$.pipe(mergeMap((value) => this.updateStateMulti(value)))
   }
 
   getStatePart<K extends keyof State>(key: K): Observable<State[K]> {
@@ -84,8 +92,29 @@ export class StateService extends AbstractComponent {
     )
   }
 
+  updateStateMulti(updateStateParts: StateUpdate<State>[]): Observable<State> {
+    return this.state$.pipe(
+      take(1),
+      map((state) => {
+        return updateStateParts.reduce((acc: State, curr: StateUpdate<State>) => {
+          const { key, payload } = curr
+          const newState = {
+            ...acc,
+            [key]: payload,
+          }
+          return newState
+        }, state)
+      })
+    )
+  }
+
   getStatePartValue<K extends keyof State>(key: K): State[K] {
     return this.state$.value[key]
+  }
+
+  getStateParts<K extends keyof State>(keys: K[]): Partial<State> {
+    const getStateValue = (key: string) => this.state$.value[key]
+    return keys.reduce((acc, curr) => (acc[curr] = getStateValue(curr)), <State>{})
   }
 
   getMenuItemsValue(): TreeElement[] {

@@ -1,4 +1,7 @@
 <div class="tree-container">
+  <div class="workspace-title" *ngIf="workspace">
+    <h4>{{ workspace }}</h4>
+  </div>
   <p-tree
     [value]="files"
     droppableNodes="true"

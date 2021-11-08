@@ -8,6 +8,7 @@ import { ElectronService } from '../../core/services'
 import { TreeElement } from '../../interfaces/Menu'
 import { AppDialogService } from '../../services/dialog.service'
 import { StateService } from '../../services/state.service'
+import { getBaseName } from '../../utils/file-utils'
 import { removeExistingStyleClasses } from '../../utils/menu-utils'
 
 @Component({
@@ -18,6 +19,7 @@ import { removeExistingStyleClasses } from '../../utils/menu-utils'
 export class SideMenuComponent extends AbstractComponent implements OnInit {
   menuLoading: boolean = true
   files: TreeElement[]
+  workspaceName: string
   files$: Observable<TreeElement[]>
 
   constructor(
@@ -34,13 +36,24 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
     this.menuLoading = true
     this.files$ = this.state.getStatePart('rootDirectory').pipe(
       takeUntil(this.destroy$),
+      tap((rootDir) => {
+        if (rootDir && rootDir.data) {
+          this.workspaceName = getBaseName(rootDir.data.filePath)
+        }
+      }),
       map((rootDir) => rootDir.children),
-      filter((menuItems) => menuItems && !!menuItems.length),
       tap((menuItems) => {
-        removeExistingStyleClasses(menuItems)
+        if (menuItems && menuItems.length) {
+          removeExistingStyleClasses(menuItems)
+        }
         this.menuLoading = false
+        this.cdRef.detectChanges()
       })
     )
+  }
+
+  openChangeWorkspaceDialog(): void {
+    this.dialogService.openChangeWorkspaceDialog().subscribe()
   }
 
   createNewFolder(): void {
@@ -81,6 +94,6 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   }
 
   navigateToDirectorySelection(): void {
-    this.router.navigate(['/'])
+    this.router.navigate(['base-dir'])
   }
 }

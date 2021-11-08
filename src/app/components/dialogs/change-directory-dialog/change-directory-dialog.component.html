@@ -1,0 +1,11 @@
+<h3 mat-dialog-title>Change workspace?</h3>
+<mat-dialog-content class="mat-typography">
+  <p>Do you want to change your workspace directory? It's currently set to:</p>
+  <h4 style="font-weight: bolder">{{ rootDir }}</h4>
+  <p>No changes will be made to existing files upon changing the workspace.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button (click)="onChooseDirectory()" cdkFocusInitial>Choose workspace</button>
+</mat-dialog-actions>

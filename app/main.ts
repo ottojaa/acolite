@@ -142,7 +142,7 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FileActions.ReadFile: {
-        readAndSendFileData(event, <ElectronAction<ReadFile>>payload)
+        readAndSendTabData(event, <ElectronAction<ReadFile>>payload)
         break
       }
     }
@@ -249,7 +249,7 @@ const chooseDirectory = (event: IpcMainEvent) => {
 const setDefaultDirectory = (event: IpcMainEvent) => {
   writeToFile(defaultConfigFilePath, { key: 'baseDir', payload: __dirname })
     .then(() => {
-      event.sender.send(FolderActionResponses.SetDefaultDirSuccess)
+      event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
     })
     .catch((err) => {
       event.sender.send(FolderActionResponses.SetDefaultDirFailure, err)
@@ -268,7 +268,7 @@ const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: Elec
   }
 }
 
-const readAndSendFileData = (event: IpcMainEvent, action: ElectronAction<ReadFile>) => {
+const readAndSendTabData = (event: IpcMainEvent, action: ElectronAction<ReadFile>) => {
   const { filePath } = action.data.node.data
   fs.readFile(filePath, 'utf-8', (err, content) => {
     if (err) {

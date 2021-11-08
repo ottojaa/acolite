@@ -4,15 +4,8 @@ import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
 import { FileActions } from '../../../../../app/actions'
-import {
-  filterDirPathsWithNoParentSelected,
-  filePathsWithNoParentDirectorySelected,
-  getPathsToBeMoved,
-  pathContainerIsEmpty,
-} from '../../../../../app/directory-utils'
-import { getFileEntityFromPath } from '../../../../../app/utils'
+import { getPathsToBeMoved, pathContainerIsEmpty } from '../../../../../app/directory-utils'
 import { ElectronService } from '../../../core/services'
-import { FilePathContainer } from '../../../interfaces/File'
 import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -24,6 +17,7 @@ import { StateService } from '../../../services/state.service'
 })
 export class TreeComponent implements OnInit {
   @Input() files: TreeElement[]
+  @Input() workspace: string | undefined
   @ViewChild('contextMenu') cm: ContextMenu
 
   selectedFiles: TreeElement[] = []
@@ -54,10 +48,10 @@ export class TreeComponent implements OnInit {
 
     if (!modifierKeyPressed) {
       if (node.data.type === 'file') {
-        const currentTabs = this.state.getStatePartValue('tabs')
-        const tabIdx = currentTabs.findIndex((tab) => tab.path === node.data.filePath)
+        const { tabs, selectedTab } = this.state.getStateParts(['tabs', 'selectedTab'])
+        const tabIdx = tabs.findIndex((tab) => tab.path === node.data.filePath)
 
-        if (tabIdx > -1) {
+        if (tabIdx > -1 && tabIdx !== selectedTab) {
           this.state.updateState$.next({ key: 'selectedTab', payload: tabIdx })
         } else if (tabIdx === -1) {
           this.electronService.readFileRequest(FileActions.ReadFile, { data: { node } })
@@ -130,11 +124,6 @@ export class TreeComponent implements OnInit {
       this.selectedFiles.push(dragNode)
     }
 
-    /* const movingToSelf = this.selectedFiles.some((file) => file.data.filePath === dropNode.data.filePath)
-    const movingToCurrentParent = this.selectedFiles.some((file) => file.data.parentPath === dropNode.data.filePath)
-    if (movingToCurrentParent || movingToSelf) {
-      return
-    } */
     const pathContainer = getPathsToBeMoved(this.selectedFiles, dropNode)
 
     if (pathContainerIsEmpty(pathContainer)) {

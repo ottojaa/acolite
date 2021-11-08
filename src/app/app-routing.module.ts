@@ -8,7 +8,7 @@ import { MainRoutingModule } from './main/main-routing.module'
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'base-dir',
+    redirectTo: 'main',
     pathMatch: 'full',
   },
   {

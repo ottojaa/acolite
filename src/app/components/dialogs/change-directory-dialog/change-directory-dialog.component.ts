@@ -5,23 +5,21 @@ import { ElectronService } from '../../../core/services'
 import { StateService } from '../../../services/state.service'
 
 @Component({
-  selector: 'app-base-directory-dialog',
-  templateUrl: './base-directory-dialog.component.html',
-  styleUrls: ['./base-directory-dialog.component.scss'],
+  selector: 'app-change-directory-dialog',
+  templateUrl: './change-directory-dialog.component.html',
+  styleUrls: ['./change-directory-dialog.component.scss'],
 })
-export class BaseDirectoryDialogComponent implements OnInit {
+export class ChangeDirectoryDialogComponent implements OnInit {
   rootDir: string
-
   constructor(
-    public dialogRef: MatDialogRef<BaseDirectoryDialogComponent>,
-    private electronService: ElectronService,
     private state: StateService,
+    private electronService: ElectronService,
+    private dialogRef: MatDialogRef<ChangeDirectoryDialogComponent>,
     private zone: NgZone
   ) {
     this.zone.run(() => {
       const callBack = () => this.dialogRef.close()
       this.electronService.on(FolderActionResponses.ChooseDirectorySuccess, () => callBack())
-      this.electronService.on(FolderActionResponses.SetDefaultDirSuccess, () => callBack())
     })
   }
 
@@ -33,7 +31,7 @@ export class BaseDirectoryDialogComponent implements OnInit {
     this.electronService.chooseDirectory()
   }
 
-  onSetDefaultDirectory(): void {
-    this.electronService.setDefaultDir()
+  onCancel(): void {
+    this.dialogRef.close()
   }
 }

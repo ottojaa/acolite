@@ -4,7 +4,7 @@ import { map, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { FileEntity } from '../../interfaces/File'
 import { Tab } from '../../interfaces/Menu'
-import { StateService } from '../../services/state.service'
+import { State, StateService, StateUpdate } from '../../services/state.service'
 import { filterClosedTab } from '../../utils/tab-utils'
 
 @Component({
@@ -68,7 +68,10 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
     const newTabs = filterClosedTab(currentTabs, event.filePath)
     const newIndex = selectedTab - 1 >= 0 ? selectedTab - 1 : 0
 
-    this.state.updateState$.next({ key: 'selectedTab', payload: newIndex })
-    this.state.updateState$.next({ key: 'tabs', payload: newTabs })
+    const payload: StateUpdate<State>[] = [
+      { key: 'selectedTab', payload: newIndex },
+      { key: 'tabs', payload: newTabs },
+    ]
+    this.state.updateMulti$.next(payload)
   }
 }

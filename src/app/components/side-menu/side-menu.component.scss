@@ -32,6 +32,14 @@
   overflow: hidden;
 }
 
+.mat-progress-bar {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
 .side-menu-topbar {
   display: flex;
   height: 4%;
