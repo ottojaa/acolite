@@ -28,6 +28,7 @@ var FileActions;
     FileActions["Paste"] = "paste-file";
     FileActions["Copy"] = "copy-file";
     FileActions["Cut"] = "cut-file";
+    FileActions["Update"] = "update-file";
     FileActions["OpenInFolder"] = "open-file-in-folder";
     FileActions["ModifyTags"] = "modify-tags";
     FileActions["DeleteFiles"] = "delete-files";
@@ -47,5 +48,7 @@ var FileActionResponses;
     FileActionResponses["MoveFailure"] = "move-files-failure";
     FileActionResponses["ReadSuccess"] = "read-file-success";
     FileActionResponses["ReadFailure"] = "read-file-failure";
+    FileActionResponses["UpdateSuccess"] = "update-success";
+    FileActionResponses["UpdateFailure"] = "update-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
 //# sourceMappingURL=actions.js.map

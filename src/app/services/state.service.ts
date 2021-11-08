@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, merge } from 'lodash'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
@@ -114,14 +114,9 @@ export class StateService extends AbstractComponent {
 
   getStateParts<K extends keyof State>(keys: K[]): Partial<State> {
     const getStateValue = (key: string) => this.state$.value[key]
-    return keys.reduce((acc, curr) => (acc[curr] = getStateValue(curr)), <State>{})
-  }
-
-  getMenuItemsValue(): TreeElement[] {
-    return this.state$.value['rootDirectory'].children
-  }
-
-  getMenuItems(): Observable<TreeElement[]> {
-    return this.state$.asObservable().pipe(map((state) => state.rootDirectory.children))
+    return keys.reduce((acc, curr) => {
+      acc[curr] = getStateValue(curr)
+      return acc
+    }, <State>{})
   }
 }

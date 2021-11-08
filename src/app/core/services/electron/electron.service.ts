@@ -16,6 +16,7 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  UpdateFileContent,
 } from '../../../../../app/actions'
 
 @Injectable({
@@ -102,6 +103,10 @@ export class ElectronService {
   }
 
   readFileRequest(channel: string, payload: ElectronAction<ReadFile>): void {
+    this.send(channel, payload)
+  }
+
+  updateFileContent(channel: string, payload: ElectronAction<UpdateFileContent>): void {
     this.send(channel, payload)
   }
 }

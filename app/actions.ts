@@ -1,5 +1,4 @@
-import { TreeNode } from 'primeng/api'
-import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
+import { Tab, TreeElement } from '../src/app/interfaces/Menu'
 
 export interface CreateFile {
   path: string
@@ -39,7 +38,11 @@ export interface MoveFiles {
 export interface ReadFile {
   node: TreeElement
 }
-
+export interface UpdateFileContent {
+  content: string
+  path: string
+  tabs: Tab[]
+}
 export interface SetDefaultDir {}
 
 export interface ElectronAction<T = any> {
@@ -72,6 +75,7 @@ export enum FileActions {
   Paste = 'paste-file',
   Copy = 'copy-file',
   Cut = 'cut-file',
+  Update = 'update-file',
   OpenInFolder = 'open-file-in-folder',
   ModifyTags = 'modify-tags',
   DeleteFiles = 'delete-files',
@@ -91,4 +95,6 @@ export enum FileActionResponses {
   MoveFailure = 'move-files-failure',
   ReadSuccess = 'read-file-success',
   ReadFailure = 'read-file-failure',
+  UpdateSuccess = 'update-success',
+  UpdateFailure = 'update-failure',
 }

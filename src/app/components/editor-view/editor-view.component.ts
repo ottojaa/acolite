@@ -57,7 +57,6 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
       modifiedDate: '06.06.2021',
     }
     const secondaryFiles = Array.from(Array(5)).map(() => file2)
-    console.log(secondaryFiles)
 
     return [file1, ...secondaryFiles]
   }

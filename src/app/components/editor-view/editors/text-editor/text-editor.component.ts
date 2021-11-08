@@ -1,7 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { Subject } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, switchMap, take } from 'rxjs/operators'
+import { ElectronAction, FileActions, UpdateFileContent } from '../../../../../../app/actions'
+import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
+import { StateService } from '../../../../services/state.service'
 
 @Component({
   selector: 'app-text-editor',
@@ -14,11 +17,30 @@ export class TextEditorComponent implements OnInit {
   fontSize = '16px'
   autoSave$ = new Subject()
 
-  constructor() {}
+  constructor(private electronService: ElectronService, private state: StateService) {}
 
   ngOnInit(): void {
+    console.log('called')
     this.textContent = this.tab.textContent
-    this.autoSave$.pipe(debounceTime(2000)).subscribe((data) => {})
+    this.autoSave$
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
+      )
+      .subscribe((tabs) => {
+        console.log('hurraa')
+        this.updateContent(tabs, this.tab.path, this.textContent)
+      })
+  }
+
+  updateContent(tabs: Tab[], path: string, content: string): void {
+    const payload = { data: { tabs, path, content } }
+    this.electronService.updateFileContent(FileActions.Update, payload)
+  }
+
+  onInputChange(): void {
+    this.autoSave$.next(this.textContent)
   }
 
   handleKeydown(event: any) {

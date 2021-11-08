@@ -59,6 +59,8 @@ export class AppComponent implements OnInit {
       updateArr.push({ key: 'baseDir', payload: baseDir })
     } else {
       this.router.navigate(['base-dir'])
+
+      return
     }
     if (tabs && tabs.length) {
       updateArr.push({ key: 'tabs', payload: tabs })
@@ -96,6 +98,8 @@ export class AppComponent implements OnInit {
       FileActionResponses.DeleteFailure,
       FileActionResponses.ReadSuccess,
       FileActionResponses.ReadFailure,
+      FileActionResponses.UpdateSuccess,
+      FileActionResponses.UpdateFailure,
     ]
 
     actions.forEach((action) => this.startListener(action))
@@ -110,8 +114,9 @@ export class AppComponent implements OnInit {
   ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
     this.zone.run(() => {
       switch (action) {
+        // Folder actions
+
         case FolderActionResponses.ReadDirectorySuccess: {
-          console.log(response)
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
           break
         }
@@ -119,6 +124,19 @@ export class AppComponent implements OnInit {
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
           break
         }
+        case FolderActionResponses.ChooseDirectorySuccess: {
+          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          this.readDir()
+          break
+        }
+        case FolderActionResponses.SetDefaultDirSuccess: {
+          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          this.readDir()
+          break
+        }
+
+        // File actions
+
         case FileActionResponses.CreateFailure: {
           this.dialogService.openToast('File creation failed', 'failure')
           break
@@ -151,14 +169,12 @@ export class AppComponent implements OnInit {
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
           break
         }
-        case FolderActionResponses.ChooseDirectorySuccess: {
-          this.state.updateState$.next({ key: 'baseDir', payload: response })
-          this.readDir()
+        case FileActionResponses.UpdateFailure: {
+          this.dialogService.openToast('Something went wrong while updating', 'failure')
           break
         }
-        case FolderActionResponses.SetDefaultDirSuccess: {
-          this.state.updateState$.next({ key: 'baseDir', payload: response })
-          this.readDir()
+        case FileActionResponses.UpdateSuccess: {
+          this.state.updateState$.next({ key: 'tabs', payload: response })
           break
         }
         case FileActionResponses.ReadSuccess: {

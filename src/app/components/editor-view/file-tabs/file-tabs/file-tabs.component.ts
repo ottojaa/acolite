@@ -45,7 +45,7 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
     })
   }
 
-  onCloseTab(filePath: string, index: number) {
+  onCloseTab(filePath: string) {
     event.stopPropagation()
     this.closeTab.emit({ filePath })
   }

@@ -23,6 +23,7 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  UpdateFileContent,
 } from './actions'
 import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
 import { cloneDeep, first } from 'lodash'
@@ -100,6 +101,7 @@ const IPCChannels = [
   FileActions.DeleteFiles,
   FileActions.MoveFiles,
   FileActions.ReadFile,
+  FileActions.Update,
 ]
 
 const startIPCChannelListeners = () => {
@@ -139,6 +141,11 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
       }
       case FileActions.MoveFiles: {
         moveFiles(event, <ElectronAction<MoveFiles>>payload)
+        break
+      }
+      case FileActions.Update: {
+        console.log(payload)
+        updateFileContent(event, <ElectronAction<UpdateFileContent>>payload)
         break
       }
       case FileActions.ReadFile: {
@@ -282,6 +289,24 @@ const readAndSendTabData = (event: IpcMainEvent, action: ElectronAction<ReadFile
       textContent: content,
     }
     event.sender.send(FileActionResponses.ReadSuccess, tabData)
+  })
+}
+
+const updateFileContent = (event: IpcMainEvent, action: ElectronAction<UpdateFileContent>) => {
+  const { path, content } = action.data
+
+  fs.writeFile(path, content, (err) => {
+    if (err) {
+      event.sender.send(FileActionResponses.UpdateFailure)
+      return
+    }
+
+    const tabs = action.data.tabs
+    const tabIdx = tabs.findIndex((tab) => tab.path === path)
+    if (tabIdx > -1) {
+      tabs[tabIdx].textContent = content
+    }
+    event.sender.send(FileActionResponses.UpdateSuccess, tabs)
   })
 }
 
