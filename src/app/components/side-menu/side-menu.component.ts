@@ -65,9 +65,7 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       .subscribe((name: string) => {
         if (name && baseDir) {
           const rootDirectory = this.state.getStatePartValue('rootDirectory')
-          this.electronService.createNewFolderRequest({
-            data: { directoryName: name, baseDir, rootDirectory },
-          })
+          this.electronService.createNewFolderRequest({ directoryName: name, baseDir, rootDirectory })
         }
       })
   }

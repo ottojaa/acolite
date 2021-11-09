@@ -14,7 +14,6 @@ import {
   CreateFile,
   CreateNewDirectory,
   DeleteFiles,
-  ElectronAction,
   FileActionResponses,
   FileActions,
   FolderActionResponses,
@@ -23,6 +22,7 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  UpdateActionPayload,
   UpdateFileContent,
 } from './actions'
 import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
@@ -96,7 +96,6 @@ const IPCChannels = [
   FolderActions.MkDir,
   FolderActions.SetDefaultDir,
   FileActions.Create,
-  FileActions.Delete,
   FileActions.Rename,
   FileActions.DeleteFiles,
   FileActions.MoveFiles,
@@ -109,10 +108,10 @@ const startIPCChannelListeners = () => {
 }
 
 const IPCChannelReducer = (action: IPCChannelAction) => {
-  ipcMain.on(action, (event: IpcMainEvent, payload: ElectronAction<unknown>) => {
-    switch (action) {
+  ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
+    switch (payload.type) {
       case FolderActions.MkDir: {
-        createNewDirectory(event, <ElectronAction<CreateNewDirectory>>payload)
+        createNewDirectory(event, payload)
         break
       }
       case FolderActions.ChooseDir: {
@@ -124,32 +123,32 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FolderActions.ReadDir: {
-        readAndSendMenuItemsFromBaseDirectory(event, <ElectronAction<ReadDirectory>>payload)
+        readAndSendMenuItemsFromBaseDirectory(event, payload)
         break
       }
       case FileActions.Create: {
-        createFile(event, <ElectronAction<CreateFile>>payload)
+        createFile(event, payload)
         break
       }
       case FileActions.Rename: {
-        renameFile(event, <ElectronAction<RenameFile>>payload)
+        renameFile(event, payload)
         break
       }
       case FileActions.DeleteFiles: {
-        deleteFiles(event, <ElectronAction<DeleteFiles>>payload)
+        deleteFiles(event, payload)
         break
       }
       case FileActions.MoveFiles: {
-        moveFiles(event, <ElectronAction<MoveFiles>>payload)
+        moveFiles(event, payload)
         break
       }
       case FileActions.Update: {
         console.log(payload)
-        updateFileContent(event, <ElectronAction<UpdateFileContent>>payload)
+        updateFileContent(event, payload)
         break
       }
       case FileActions.ReadFile: {
-        readAndSendTabData(event, <ElectronAction<ReadFile>>payload)
+        readAndSendTabData(event, payload)
         break
       }
     }
@@ -208,8 +207,8 @@ export const writeToFile = <T extends { key: string; payload: any }>(filePath: s
   })
 }
 
-const createNewDirectory = (event: IpcMainEvent, payload: ElectronAction<CreateNewDirectory>) => {
-  const { directoryName, baseDir, rootDirectory, parentPath } = payload.data
+const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
+  const { directoryName, baseDir, rootDirectory, parentPath } = payload
   const directoryPath = path.join(parentPath ? parentPath : baseDir, directoryName)
   fs.promises
     .mkdir(directoryPath, { recursive: true })
@@ -263,10 +262,10 @@ const setDefaultDirectory = (event: IpcMainEvent) => {
     })
 }
 
-const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: ElectronAction<ReadDirectory>) => {
+const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: ReadDirectory) => {
   try {
-    const menuItems = getMenuItemsFromBaseDirectory(action.data.baseDir)
-    const rootEntity = getFileEntityFromPath(action.data.baseDir)
+    const menuItems = getMenuItemsFromBaseDirectory(action.baseDir)
+    const rootEntity = getFileEntityFromPath(action.baseDir)
     const rootDirectory = { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
   } catch (err) {
@@ -275,8 +274,8 @@ const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: Elec
   }
 }
 
-const readAndSendTabData = (event: IpcMainEvent, action: ElectronAction<ReadFile>) => {
-  const { filePath } = action.data.node.data
+const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
+  const { filePath } = action.node.data
   fs.readFile(filePath, 'utf-8', (err, content) => {
     if (err) {
       event.sender.send(FileActionResponses.ReadFailure)
@@ -292,8 +291,8 @@ const readAndSendTabData = (event: IpcMainEvent, action: ElectronAction<ReadFile
   })
 }
 
-const updateFileContent = (event: IpcMainEvent, action: ElectronAction<UpdateFileContent>) => {
-  const { path, content } = action.data
+const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent) => {
+  const { path, content } = action
 
   fs.writeFile(path, content, (err) => {
     if (err) {
@@ -301,7 +300,7 @@ const updateFileContent = (event: IpcMainEvent, action: ElectronAction<UpdateFil
       return
     }
 
-    const tabs = action.data.tabs
+    const tabs = action.tabs
     const tabIdx = tabs.findIndex((tab) => tab.path === path)
     if (tabIdx > -1) {
       tabs[tabIdx].textContent = content
@@ -310,8 +309,8 @@ const updateFileContent = (event: IpcMainEvent, action: ElectronAction<UpdateFil
   })
 }
 
-const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => {
-  const { path, rootDirectory } = action.data
+const createFile = (event: IpcMainEvent, action: CreateFile) => {
+  const { path, rootDirectory } = action
 
   fs.writeFile(path, '', (err) => {
     if (err) {
@@ -337,8 +336,8 @@ const createFile = (event: IpcMainEvent, action: ElectronAction<CreateFile>) => 
   })
 }
 
-const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => {
-  const { path, newName, rootDirectory } = action.data
+const renameFile = (event: IpcMainEvent, action: RenameFile) => {
+  const { path, newName, rootDirectory } = action
   const parentDirectory = getDirName(path)
   const extension = getExtension(path)
   const newPath = getJoinedPath([parentDirectory, newName]) + extension
@@ -364,8 +363,8 @@ const renameFile = (event: IpcMainEvent, action: ElectronAction<RenameFile>) => 
   })
 }
 
-const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
-  const { target, elementsToMove, rootDirectory, baseDir } = action.data
+const moveFiles = (event: IpcMainEvent, action: MoveFiles) => {
+  const { target, elementsToMove, rootDirectory } = action
   const newParentPath = target.data.filePath
   const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'folder' ? -1 : 1))
   const failedToMove = []
@@ -408,8 +407,8 @@ const moveFiles = (event: IpcMainEvent, action: ElectronAction<MoveFiles>) => {
     })
 }
 
-const deleteFiles = (event: IpcMainEvent, action: ElectronAction<DeleteFiles>) => {
-  const { directoryPaths, filePaths, baseDir, rootDirectory } = action.data
+const deleteFiles = (event: IpcMainEvent, action: DeleteFiles) => {
+  const { directoryPaths, filePaths, baseDir, rootDirectory } = action
   const paths = [...directoryPaths, ...filePaths]
   const totalCount = paths.length
   let failedToDelete = []

@@ -204,7 +204,7 @@ export class AppComponent implements OnInit {
   readDir(): void {
     const baseDir = this.state.getStatePartValue('baseDir')
     if (baseDir) {
-      this.electronService.readDirectoryRequest({ data: { baseDir } })
+      this.electronService.readDirectoryRequest({ baseDir })
     }
   }
 }

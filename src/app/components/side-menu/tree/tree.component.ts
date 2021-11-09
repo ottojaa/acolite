@@ -54,7 +54,7 @@ export class TreeComponent implements OnInit {
         if (tabIdx > -1 && tabIdx !== selectedTab) {
           this.state.updateState$.next({ key: 'selectedTab', payload: tabIdx })
         } else if (tabIdx === -1) {
-          this.electronService.readFileRequest(FileActions.ReadFile, { data: { node } })
+          this.electronService.readFileRequest({ node })
         }
       }
     }
@@ -145,7 +145,10 @@ export class TreeComponent implements OnInit {
         if (name) {
           const rootDirectory = this.state.getStatePartValue('rootDirectory')
           this.electronService.createNewFolderRequest({
-            data: { directoryName: name, baseDir, rootDirectory, parentPath: filePath },
+            directoryName: name,
+            baseDir,
+            rootDirectory,
+            parentPath: filePath,
           })
         }
       })
@@ -215,17 +218,12 @@ export class TreeComponent implements OnInit {
       {
         label: 'Reveal in finder',
         icon: 'pi pi-search',
-        command: (event) => this.electronService.send(FileActions.OpenInFolder, event),
+        command: (event) => this.electronService.send(event),
       },
       {
         label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
         icon: 'pi pi-times',
         command: (_event) => this.openDeleteFilesDialog(),
-      },
-      {
-        label: 'Modify tags',
-        icon: 'pi pi-tags',
-        command: (event) => this.electronService.send(FileActions.ModifyTags, event),
       },
     ]
 

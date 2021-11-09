@@ -7,18 +7,21 @@ import * as remote from '@electron/remote'
 import * as childProcess from 'child_process'
 import * as fs from 'fs'
 import {
+  ActionType,
   CreateFile,
   CreateNewDirectory,
   DeleteFiles,
-  ElectronAction,
+  FileActions,
   FolderActions,
   MoveFiles,
   ReadDirectory,
   ReadFile,
   RenameFile,
+  UpdateActionPayload,
   UpdateFileContent,
 } from '../../../../../app/actions'
 
+type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({
   providedIn: 'root',
 })
@@ -52,11 +55,12 @@ export class ElectronService {
     this.ipcRenderer.on(channel, listener)
   }
 
-  public send(channel: string, ...args): void {
+  public send<T>(channel: ActionType, payload?: T): void {
     if (!this.ipcRenderer) {
       return
     }
-    this.ipcRenderer.send(channel, ...args)
+    const action = this.addActionType(channel, payload)
+    this.ipcRenderer.send(channel, action)
   }
 
   public once(channel: string, listener: any): void {
@@ -68,11 +72,11 @@ export class ElectronService {
 
   // Folder actions
 
-  readDirectoryRequest(payload: ElectronAction<ReadDirectory>): void {
+  readDirectoryRequest(payload: OmitActionType<ReadDirectory>): void {
     this.send(FolderActions.ReadDir, payload)
   }
 
-  createNewFolderRequest(payload: ElectronAction<CreateNewDirectory>): void {
+  createNewFolderRequest(payload: OmitActionType<CreateNewDirectory>): void {
     this.send(FolderActions.MkDir, payload)
   }
 
@@ -86,27 +90,34 @@ export class ElectronService {
 
   // File actions
 
-  createNewFileRequest(channel: string, payload: ElectronAction<CreateFile>): void {
-    this.send(channel, payload)
+  createNewFileRequest(payload: OmitActionType<CreateFile>): void {
+    this.send(FileActions.Create, payload)
   }
 
-  renameFileRequest(channel: string, payload: ElectronAction<RenameFile>): void {
-    this.send(channel, payload)
+  renameFileRequest(payload: OmitActionType<RenameFile>): void {
+    this.send(FileActions.Rename, payload)
   }
 
-  deleteFilesRequest(channel: string, payload: ElectronAction<DeleteFiles>): void {
-    this.send(channel, payload)
+  deleteFilesRequest(payload: OmitActionType<DeleteFiles>): void {
+    this.send(FileActions.DeleteFiles, payload)
   }
 
-  moveFilesRequest(channel: string, payload: ElectronAction<MoveFiles>): void {
-    this.send(channel, payload)
+  moveFilesRequest(payload: OmitActionType<MoveFiles>): void {
+    this.send(FileActions.MoveFiles, payload)
   }
 
-  readFileRequest(channel: string, payload: ElectronAction<ReadFile>): void {
-    this.send(channel, payload)
+  readFileRequest(payload: OmitActionType<ReadFile>): void {
+    this.send(FileActions.ReadFile, payload)
   }
 
-  updateFileContent(channel: string, payload: ElectronAction<UpdateFileContent>): void {
-    this.send(channel, payload)
+  updateFileContent(payload: OmitActionType<UpdateFileContent>): void {
+    this.send(FileActions.Update, payload)
+  }
+
+  addActionType<T extends OmitActionType<UpdateActionPayload>>(
+    channel: ActionType,
+    payload: T
+  ): T & { type: ActionType } {
+    return { ...payload, type: channel }
   }
 }

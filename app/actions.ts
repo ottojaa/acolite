@@ -1,14 +1,31 @@
 import { Tab, TreeElement } from '../src/app/interfaces/Menu'
 
+export type UpdateActionPayload =
+  | ReadDirectory
+  | CreateNewDirectory
+  | ChooseDir
+  | SetDefaultDir
+  | CreateFile
+  | RenameFile
+  | DeleteFiles
+  | MoveFiles
+  | ReadFile
+  | UpdateFileContent
+
+export type ActionType = FileActions | FolderActions
+
 export interface CreateFile {
+  type: FileActions.Create
   path: string
   rootDirectory: TreeElement
 }
 export interface ReadDirectory {
+  type: FolderActions.ReadDir
   baseDir: string
 }
 
 export interface CreateNewDirectory {
+  type: FolderActions.MkDir
   directoryName: string
   baseDir: string
   rootDirectory: TreeElement
@@ -16,12 +33,14 @@ export interface CreateNewDirectory {
 }
 
 export interface RenameFile {
+  type: FileActions.Rename
   path: string
   newName: string
   rootDirectory: TreeElement
 }
 
 export interface DeleteFiles {
+  type: FileActions.DeleteFiles
   baseDir: string
   rootDirectory: TreeElement
   directoryPaths: string[]
@@ -29,6 +48,7 @@ export interface DeleteFiles {
 }
 
 export interface MoveFiles {
+  type: FileActions.MoveFiles
   target: TreeElement
   rootDirectory: TreeElement
   elementsToMove: TreeElement[]
@@ -36,17 +56,21 @@ export interface MoveFiles {
 }
 
 export interface ReadFile {
+  type: FileActions.ReadFile
   node: TreeElement
 }
 export interface UpdateFileContent {
+  type: FileActions.Update
   content: string
   path: string
   tabs: Tab[]
 }
-export interface SetDefaultDir {}
+export interface SetDefaultDir {
+  type: FolderActions.SetDefaultDir
+}
 
-export interface ElectronAction<T = any> {
-  data: T
+export interface ChooseDir {
+  type: FolderActions.ChooseDir
 }
 
 export enum FolderActions {
@@ -71,13 +95,7 @@ export enum FolderActionResponses {
 export enum FileActions {
   Create = 'create-file',
   Rename = 'rename-file',
-  Delete = 'delete',
-  Paste = 'paste-file',
-  Copy = 'copy-file',
-  Cut = 'cut-file',
   Update = 'update-file',
-  OpenInFolder = 'open-file-in-folder',
-  ModifyTags = 'modify-tags',
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
   ReadFile = 'read-file',

@@ -76,13 +76,11 @@ export class MoveFilesDialogComponent implements OnInit {
     const filesToBeMoved = selectedFiles.filter((el) => paths.includes(el.data.filePath))
     console.log(filesToBeMoved)
 
-    this.electronService.moveFilesRequest(FileActions.MoveFiles, {
-      data: {
-        target,
-        rootDirectory,
-        baseDir,
-        elementsToMove: filesToBeMoved,
-      },
+    this.electronService.moveFilesRequest({
+      target,
+      rootDirectory,
+      baseDir,
+      elementsToMove: filesToBeMoved,
     })
     this.dialogRef.close()
   }

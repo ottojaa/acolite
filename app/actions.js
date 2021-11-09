@@ -24,13 +24,7 @@ var FileActions;
 (function (FileActions) {
     FileActions["Create"] = "create-file";
     FileActions["Rename"] = "rename-file";
-    FileActions["Delete"] = "delete";
-    FileActions["Paste"] = "paste-file";
-    FileActions["Copy"] = "copy-file";
-    FileActions["Cut"] = "cut-file";
     FileActions["Update"] = "update-file";
-    FileActions["OpenInFolder"] = "open-file-in-folder";
-    FileActions["ModifyTags"] = "modify-tags";
     FileActions["DeleteFiles"] = "delete-files";
     FileActions["MoveFiles"] = "move-files";
     FileActions["ReadFile"] = "read-file";

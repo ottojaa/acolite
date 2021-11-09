@@ -2,6 +2,7 @@ import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
+import { FilePathContainer } from '../../../interfaces/File'
 import { TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -28,7 +29,7 @@ export class DeleteFilesDialogComponent {
     this.displayTexts = this.getDisplayTexts()
   }
 
-  getDisplayTexts(): any {
+  getDisplayTexts(): FilePathContainer {
     const folders = this.data.filter((el) => el.data.type === 'folder')
     const folderPaths = folders.map((folder) => folder.data.filePath)
     const files = this.data.filter((el) => el.data.type === 'file' && !folderPaths.includes(el.data.parentPath))
@@ -63,13 +64,12 @@ export class DeleteFilesDialogComponent {
   onDeleteClick(): void {
     const baseDir = this.state.getStatePartValue('baseDir')
     const rootDirectory = this.state.getStatePartValue('rootDirectory')
-    this.electronService.deleteFilesRequest(FileActions.DeleteFiles, {
-      data: {
-        baseDir,
-        rootDirectory,
-        directoryPaths: this.data.filter((el) => el.data.type === 'folder').map((el) => el.data.filePath),
-        filePaths: this.data.filter((el) => el.data.type === 'file').map((el) => el.data.filePath),
-      },
+
+    this.electronService.deleteFilesRequest({
+      baseDir,
+      rootDirectory,
+      directoryPaths: this.data.filter((el) => el.data.type === 'folder').map((el) => el.data.filePath),
+      filePaths: this.data.filter((el) => el.data.type === 'file').map((el) => el.data.filePath),
     })
     this.dialogRef.close()
   }

@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap, take } from 'rxjs/operators'
-import { ElectronAction, FileActions, UpdateFileContent } from '../../../../../../app/actions'
 import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
@@ -35,8 +34,8 @@ export class TextEditorComponent implements OnInit {
   }
 
   updateContent(tabs: Tab[], path: string, content: string): void {
-    const payload = { data: { tabs, path, content } }
-    this.electronService.updateFileContent(FileActions.Update, payload)
+    const payload = { tabs, path, content }
+    this.electronService.updateFileContent(payload)
   }
 
   onInputChange(): void {
