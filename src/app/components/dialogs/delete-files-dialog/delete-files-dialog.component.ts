@@ -24,25 +24,23 @@ export class DeleteFilesDialogComponent {
     public dialogService: AppDialogService,
     public state: StateService,
     public ngZone: NgZone,
-    @Inject(MAT_DIALOG_DATA) public data: TreeElement[]
+    @Inject(MAT_DIALOG_DATA) public data: FilePathContainer
   ) {
     this.displayTexts = this.getDisplayTexts()
   }
 
   getDisplayTexts(): FilePathContainer {
-    const folders = this.data.filter((el) => el.data.type === 'folder')
-    const folderPaths = folders.map((folder) => folder.data.filePath)
-    const files = this.data.filter((el) => el.data.type === 'file' && !folderPaths.includes(el.data.parentPath))
+    const { folders, files } = this.data
     this.toDeleteCount = folders.length + files.length
     this.deleteText = this.getDeleteText(folders, files)
 
     return {
-      folders: [...folders.map((folder) => getBaseName(folder.data.filePath))],
-      files: files.map((file) => getBaseName(file.data.filePath)),
+      folders: [...folders.map((folder) => getBaseName(folder))],
+      files: files.map((file) => getBaseName(file)),
     }
   }
 
-  getDeleteText(folders: TreeElement[], files: TreeElement[]): string {
+  getDeleteText(folders: string[], files: string[]): string {
     const hasFolders = folders.length
     const hasFiles = files.length
     if (this.toDeleteCount === 1) {
@@ -68,8 +66,8 @@ export class DeleteFilesDialogComponent {
     this.electronService.deleteFilesRequest({
       baseDir,
       rootDirectory,
-      directoryPaths: this.data.filter((el) => el.data.type === 'folder').map((el) => el.data.filePath),
-      filePaths: this.data.filter((el) => el.data.type === 'file').map((el) => el.data.filePath),
+      directoryPaths: this.data.folders,
+      filePaths: this.data.files,
     })
     this.dialogRef.close()
   }

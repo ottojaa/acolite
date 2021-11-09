@@ -44,9 +44,9 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openDeleteFilesDialog(selectedFiles: TreeElement[]): Observable<string> {
+  openDeleteFilesDialog(pathContainer: FilePathContainer): Observable<string> {
     const ref = this.dialog.open(DeleteFilesDialogComponent, {
-      data: selectedFiles,
+      data: pathContainer,
       minWidth: '300px',
       maxWidth: '400px',
     })
@@ -66,11 +66,11 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openToast(message: string, type: 'success' | 'failure' | 'info'): void {
+  openToast(message: string, type: 'success' | 'failure' | 'info', duration = 5000): void {
     this.zone.run(() => {
       const panelClass = `snackbar-${type}`
       const snackBar = this._snackBar.open(message, 'Close', {
-        duration: 500000,
+        duration,
         panelClass,
         verticalPosition: 'bottom',
         horizontalPosition: 'center',

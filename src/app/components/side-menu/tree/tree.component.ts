@@ -4,7 +4,7 @@ import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
 import { FileActions } from '../../../../../app/actions'
-import { getPathsToBeMoved, pathContainerIsEmpty } from '../../../../../app/directory-utils'
+import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/directory-utils'
 import { ElectronService } from '../../../core/services'
 import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
@@ -124,7 +124,7 @@ export class TreeComponent implements OnInit {
       this.selectedFiles.push(dragNode)
     }
 
-    const pathContainer = getPathsToBeMoved(this.selectedFiles, dropNode)
+    const pathContainer = getPathsToBeModified(this.selectedFiles, dropNode)
 
     if (pathContainerIsEmpty(pathContainer)) {
       return
@@ -178,7 +178,7 @@ export class TreeComponent implements OnInit {
   dropOutside(_event: DragEvent): void {
     this.isHovering = false
     const rootDir = this.state.getStatePartValue('rootDirectory')
-    const pathContainer = getPathsToBeMoved(this.selectedFiles, rootDir)
+    const pathContainer = getPathsToBeModified(this.selectedFiles, rootDir)
 
     if (pathContainerIsEmpty(pathContainer)) {
       return
@@ -205,8 +205,14 @@ export class TreeComponent implements OnInit {
   }
 
   openDeleteFilesDialog(): void {
+    const pathContainer = getPathsToBeModified(this.selectedFiles)
+
+    if (pathContainerIsEmpty(pathContainer)) {
+      return
+    }
+
     this.ngZone.run(() => {
-      this.dialogService.openDeleteFilesDialog(this.selectedFiles).pipe(take(1)).subscribe()
+      this.dialogService.openDeleteFilesDialog(pathContainer).pipe(take(1)).subscribe()
     })
   }
 

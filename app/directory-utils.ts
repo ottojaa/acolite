@@ -1,26 +1,32 @@
 import { cloneDeep } from 'lodash'
 import { FilePathContainer } from '../src/app/interfaces/File'
 import { TreeElement } from '../src/app/interfaces/Menu'
-import { getDirName, getPathSeparator } from '../src/app/utils/file-utils'
+import { getBaseName, getDirName, getPathSeparator } from '../src/app/utils/file-utils'
 
-export const getPathsToBeMoved = (selectedFiles: TreeElement[], target: TreeElement): FilePathContainer => {
+export const getPathsToBeModified = (selectedFiles: TreeElement[], target?: TreeElement): FilePathContainer => {
   const folders = selectedFiles.filter((el) => el.data.type === 'folder')
   const files = selectedFiles.filter((el) => el.data.type === 'file')
   const dirPaths = folders.map((folder) => folder.data.filePath)
   const filteredDirPaths = filterDirPathsWithNoParentSelected(dirPaths, target)
-  const filteredFilePaths = filePathsWithNoParentDirectorySelected(dirPaths, files)
+  const filteredFilePaths = filePathsWithNoParentDirectorySelected(dirPaths, files, target)
 
   return { folders: filteredDirPaths, files: filteredFilePaths }
 }
 
-export const filePathsWithNoParentDirectorySelected = (dirPaths: string[], files: TreeElement[]): string[] => {
+export const filePathsWithNoParentDirectorySelected = (
+  dirPaths: string[],
+  files: TreeElement[],
+  target?: TreeElement
+): string[] => {
   const fileHasNoParentInDirPaths = (file: TreeElement, paths: string[]) =>
     !paths.some((path) => file.data.filePath.includes(path))
 
-  return files.filter((file) => fileHasNoParentInDirPaths(file, dirPaths)).map((el) => el.data.filePath)
+  return files
+    .filter((file) => fileHasNoParentInDirPaths(file, dirPaths) && targetIsNotCurrentParent(file.data.filePath, target))
+    .map((el) => el.data.filePath)
 }
 
-export const filterDirPathsWithNoParentSelected = (dirPaths: string[], target: TreeElement): string[] => {
+export const filterDirPathsWithNoParentSelected = (dirPaths: string[], target?: TreeElement): string[] => {
   const getPathDepth = (path: string) => path.split(getPathSeparator()).length
   const dirsGroupedByDepth = dirPaths.reduce((acc, curr) => {
     const currentDepth = getPathDepth(curr)
@@ -49,9 +55,9 @@ export const filterDirPathsWithNoParentSelected = (dirPaths: string[], target: T
       }
     }
   }
-
-  const targetIsNotCurrentParent = (filePath: string, target: TreeElement) =>
-    target.data.filePath !== getDirName(filePath)
+  if (!target) {
+    return Object.values(dirsGroupedByDepth).reduce((acc, curr) => acc.concat(curr), [])
+  }
 
   return Object.values(dirsGroupedByDepth)
     .reduce((acc, curr) => acc.concat(curr), [])
@@ -60,4 +66,12 @@ export const filterDirPathsWithNoParentSelected = (dirPaths: string[], target: T
 
 export const pathContainerIsEmpty = (payload: FilePathContainer): boolean => {
   return payload['folders']?.length === 0 && payload['files']?.length === 0
+}
+
+const targetIsNotCurrentParent = (filePath: string, target: TreeElement) => {
+  if (!target) {
+    return true
+  }
+
+  return getDirName(filePath) !== target.data.filePath
 }

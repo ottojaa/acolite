@@ -167,6 +167,7 @@ export class AppComponent implements OnInit {
         }
         case FileActionResponses.DeleteSuccess: {
           this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          this.dialogService.openToast('Delete success', 'success')
           break
         }
         case FileActionResponses.UpdateFailure: {
