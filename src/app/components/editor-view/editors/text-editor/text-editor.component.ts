@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
+import { MenuItem } from 'primeng/api'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap, take } from 'rxjs/operators'
 import { ElectronService } from '../../../../core/services'
@@ -13,14 +14,16 @@ import { StateService } from '../../../../services/state.service'
 export class TextEditorComponent implements OnInit {
   @Input() tab: Tab
   textContent: string
-  fontSize = '16px'
+  rand = new Date()
   autoSave$ = new Subject()
+  currentSelection: any
+  menuItems: MenuItem[]
 
   constructor(private electronService: ElectronService, private state: StateService) {}
 
   ngOnInit(): void {
-    console.log('called')
     this.textContent = this.tab.textContent
+    this.menuItems = this.getMenuItems()
     this.autoSave$
       .pipe(
         debounceTime(1000),
@@ -28,7 +31,6 @@ export class TextEditorComponent implements OnInit {
         switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
       )
       .subscribe((tabs) => {
-        console.log('hurraa')
         this.updateContent(tabs, this.tab.path, this.textContent)
       })
   }
@@ -58,5 +60,71 @@ export class TextEditorComponent implements OnInit {
         event.target.selectionStart = event.target.selectionEnd = start + 1
       }
     }
+  }
+
+  getMenuItems(): any {
+    return [
+      {
+        label: 'Copy',
+        icon: 'pi pi-copy',
+        command: () => this.eventHandler('copy'),
+      },
+      {
+        label: 'Paste',
+        icon: 'pi pi-file-o',
+        command: () => this.eventHandler('paste'),
+      },
+      {
+        label: 'Cut',
+        icon: 'pi pi-pencil',
+        command: () => this.eventHandler('cut'),
+      },
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => this.eventHandler('delete'),
+      },
+    ]
+  }
+
+  onRightClickTextArea(): void {
+    this.currentSelection = document.activeElement
+  }
+
+  async eventHandler(type: 'copy' | 'paste' | 'cut' | 'delete'): Promise<void> {
+    const actElem: any = this.currentSelection
+    const actTagName = actElem.tagName
+    if (actTagName != 'TEXTAREA') {
+      return
+    }
+
+    navigator.clipboard.readText().then((paste) => {
+      switch (type) {
+        case 'copy':
+          const selection = this.currentSelection.toString()
+          navigator.clipboard.writeText(selection).then(() => {})
+          break
+        case 'paste': {
+          const actText = actElem.value
+          actElem.value = actText.slice(0, actElem.selectionStart) + paste + actText.slice(actElem.selectionEnd)
+          break
+        }
+
+        case 'cut': {
+          const actText = actElem.value
+          const cutText = actText.slice(actElem.selectionStart, actElem.selectionEnd)
+          navigator.clipboard.writeText(cutText).then(() => {
+            actElem.value = actText.slice(0, actElem.selectionStart) + actText.slice(actElem.selectionEnd)
+          })
+          break
+        }
+
+        case 'delete': {
+          const actText = actElem.value
+          actElem.value = actText.slice(0, actElem.selectionStart) + actText.slice(actElem.selectionEnd)
+          break
+        }
+      }
+    })
   }
 }

@@ -143,7 +143,6 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FileActions.Update: {
-        console.log(payload)
         updateFileContent(event, payload)
         break
       }
@@ -281,11 +280,15 @@ const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
       event.sender.send(FileActionResponses.ReadFailure)
       return
     }
+    const fileStats = fs.statSync(filePath)
     const tabData: Tab = {
       fileName: getBaseName(filePath),
       extension: getExtension(filePath),
       path: filePath,
       textContent: content,
+      data: {
+        lastUpdated: fileStats.mtime,
+      },
     }
     event.sender.send(FileActionResponses.ReadSuccess, tabData)
   })
@@ -303,6 +306,15 @@ const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent) => {
     const tabs = action.tabs
     const tabIdx = tabs.findIndex((tab) => tab.path === path)
     if (tabIdx > -1) {
+      const fileStats = fs.statSync(path)
+      tabs[tabIdx] = {
+        ...tabs[tabIdx],
+        textContent: content,
+        data: {
+          ...tabs[tabIdx].data,
+          lastUpdated: fileStats.mtime,
+        },
+      }
       tabs[tabIdx].textContent = content
     }
     event.sender.send(FileActionResponses.UpdateSuccess, tabs)

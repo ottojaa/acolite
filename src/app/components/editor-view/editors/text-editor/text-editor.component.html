@@ -1,3 +1,20 @@
 <div class="editor-container">
-  <textarea (keydown)="handleKeydown($event)" [(ngModel)]="textContent" (ngModelChange)="onInputChange()"></textarea>
+  <span class="top-bar"
+    ><p *ngIf="tab.data?.lastUpdated">
+      <span style="opacity: 0.7">Last updated</span> {{ tab.data?.lastUpdated | date: 'medium' }}
+    </p>
+  </span>
+  <p-contextMenu [target]="editor" appendTo="body" [model]="menuItems"></p-contextMenu>
+
+  <div class="area-container">
+    <textarea
+      #editor
+      (keydown)="handleKeydown($event)"
+      (contextmenu)="onRightClickTextArea($event)"
+      [(ngModel)]="textContent"
+      (ngModelChange)="onInputChange()"
+      contentEditable
+      spellcheck="false"
+    ></textarea>
+  </div>
 </div>

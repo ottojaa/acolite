@@ -29,5 +29,7 @@ export interface Tab {
   fileName: string
   extension: string
   textContent: string
-  data?: any
+  data?: {
+    lastUpdated?: Date
+  }
 }

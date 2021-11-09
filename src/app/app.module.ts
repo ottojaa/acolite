@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser'
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, LOCALE_ID, NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { HttpClientModule, HttpClient } from '@angular/common/http'
 import { CoreModule } from './core/core.module'
@@ -25,6 +25,8 @@ import { RenameFileDialogModule } from './components/dialogs/rename-file-dialog/
 import { DeleteFilesDialogModule } from './components/dialogs/delete-files-dialog/delete-files-dialog.module'
 import { MoveFilesDialogModule } from './components/dialogs/move-files-dialog/move-files-dialog.module'
 import { ChangeDirectoryDialogModule } from './components/dialogs/change-directory-dialog/change-directory-dialog.module'
+import { SettingsService } from './services/settings.service'
+import '@angular/common/locales/global/en-GB'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -59,7 +61,15 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       },
     }),
   ],
-  providers: [AppDialogService, MatDialog],
+  providers: [
+    AppDialogService,
+    MatDialog,
+    {
+      provide: LOCALE_ID,
+      deps: [SettingsService],
+      useFactory: (settingsService: SettingsService) => settingsService.getLanguage(),
+    },
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent],
 })

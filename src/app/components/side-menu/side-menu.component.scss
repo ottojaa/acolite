@@ -71,24 +71,4 @@
   ::ng-deep .new-file {
     animation: slide 0.3s ease-in-out;
   }
-  ::ng-deep .p-contextmenu {
-    background-color: var(--secondary);
-    .p-menuitem > .p-menuitem-link {
-      .p-submenu-icon,
-      .p-menuitem-icon,
-      .p-menuitem-text {
-        color: var(--contrast);
-      }
-    }
-    .p-menuitem-link .p-menuitem-icon {
-      color: var(--contrast);
-    }
-    .p-menuitem.p-menuitem-active > .p-menuitem-link {
-      background: var(--buttonColor);
-      color: var(--contrast);
-    }
-    .p-submenu-list {
-      background-color: var(--secondary);
-    }
-  }
 }

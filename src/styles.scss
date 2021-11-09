@@ -46,6 +46,28 @@ body .mat-dialog-container {
   }
 }
 
+body .p-contextmenu {
+  background-color: var(--secondary);
+  opacity: 0.8;
+  .p-menuitem > .p-menuitem-link {
+    .p-submenu-icon,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+      color: var(--contrast);
+    }
+  }
+  .p-menuitem-link .p-menuitem-icon {
+    color: var(--contrast);
+  }
+  .p-menuitem.p-menuitem-active > .p-menuitem-link {
+    background: var(--buttonColor);
+    color: var(--contrast);
+  }
+  .p-submenu-list {
+    background-color: var(--secondary);
+  }
+}
+
 body .mat-option {
   background: var(--primary);
   color: var(--contrast);
