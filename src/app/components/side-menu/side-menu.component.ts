@@ -33,7 +33,6 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.menuLoading = true
     this.files$ = this.state.getStatePart('rootDirectory').pipe(
       takeUntil(this.destroy$),
       tap((rootDir) => {

@@ -33,3 +33,9 @@ export interface Tab {
     lastUpdated?: Date
   }
 }
+
+export interface AppConfig {
+  baseDir?: string
+  tabs?: Tab[]
+  sideMenuWidth?: number
+}

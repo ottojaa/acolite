@@ -22,8 +22,8 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.files = this.getMockFiles()
     this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
+    this.files = this.getMockFiles()
   }
 
   getMockFiles(): FileEntity[] {

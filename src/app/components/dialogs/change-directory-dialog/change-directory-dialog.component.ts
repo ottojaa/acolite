@@ -24,6 +24,7 @@ export class ChangeDirectoryDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.state.state$.value)
     this.rootDir = this.state.getStatePartValue('baseDir')
   }
 

@@ -9,4 +9,6 @@ export class SettingsService {
   getLanguage(): any {
     return 'en-GB'
   }
+
+  getStoreData(): any {}
 }

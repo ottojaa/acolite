@@ -70,8 +70,7 @@ export class MoveFilesDialogComponent implements OnInit {
 
   onMoveClick(): void {
     const { selectedFiles, target } = this.data
-    const baseDir = this.state.getStatePartValue('baseDir')
-    const rootDirectory = this.state.getStatePartValue('rootDirectory')
+    const { baseDir, rootDirectory, tabs } = this.state.getStateParts(['baseDir', 'rootDirectory', 'tabs'])
     const paths = Object.values(this.pathsToBeMoved).reduce((acc, curr) => acc.concat(curr), [])
     const filesToBeMoved = selectedFiles.filter((el) => paths.includes(el.data.filePath))
     console.log(filesToBeMoved)
@@ -81,6 +80,7 @@ export class MoveFilesDialogComponent implements OnInit {
       rootDirectory,
       baseDir,
       elementsToMove: filesToBeMoved,
+      tabs,
     })
     this.dialogRef.close()
   }

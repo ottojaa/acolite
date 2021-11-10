@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core'
-import { cloneDeep, merge } from 'lodash'
+import { cloneDeep, isArray, merge } from 'lodash'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
+import { ElectronService } from '../core/services'
 import { Tab, TreeElement } from '../interfaces/Menu'
+import { SettingsService } from './settings.service'
 
+interface UpdatePayload {
+  state: State
+  updateStore: boolean
+}
 export interface State {
   baseDir: string
-  menuLoading: boolean
+  initialized: boolean
   selectedTab: number
   tabs: Tab[]
   rootDirectory: TreeElement
@@ -29,7 +35,7 @@ export type StateUpdate<T> = {
 })
 export class StateService extends AbstractComponent {
   initialState: State = {
-    menuLoading: false,
+    initialized: false,
     baseDir: '',
     selectedTab: 0,
     tabs: [],
@@ -44,26 +50,36 @@ export class StateService extends AbstractComponent {
   public updateMulti$ = new Subject<StateUpdate<State>[]>()
   public state$ = new BehaviorSubject<State>(this.initialState)
 
-  constructor() {
+  constructor(public settings: SettingsService, public electronService: ElectronService) {
     super()
     this.handleStateUpdate()
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.state$.next(data)
+        this.updateStateAndStore(data)
       })
 
     this.handleStateUpdateMulti()
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.state$.next(data)
+        this.updateStateAndStore(data)
       })
   }
 
-  handleStateUpdate(): Observable<State> {
+  updateStateAndStore(payload: UpdatePayload): void {
+    const { state, updateStore } = payload
+    this.state$.next(state)
+
+    if (updateStore) {
+      console.log('Triggered store update')
+      this.electronService.updateStore(state)
+    }
+  }
+
+  handleStateUpdate(): Observable<UpdatePayload> {
     return this.updateState$.pipe(mergeMap((value) => this.updateStatePart(value)))
   }
 
-  handleStateUpdateMulti(): Observable<State> {
+  handleStateUpdateMulti(): Observable<UpdatePayload> {
     return this.updateMulti$.pipe(mergeMap((value) => this.updateStateMulti(value)))
   }
 
@@ -76,27 +92,29 @@ export class StateService extends AbstractComponent {
     )
   }
 
-  updateStatePart(update: StateUpdate<State>): Observable<State> {
+  updateStatePart(update: StateUpdate<State>): Observable<UpdatePayload> {
     return this.state$.pipe(
       take(1),
       map((state) => {
         const { key, payload } = update
+
         const newState = cloneDeep({
           ...state,
           [key]: payload,
         })
 
         console.log({ oldState: state, newState })
-        return newState
+        return { state: newState, updateStore: this.shouldTriggerStoreUpdate([key]) }
       })
     )
   }
 
-  updateStateMulti(updateStateParts: StateUpdate<State>[]): Observable<State> {
+  updateStateMulti(updateStateParts: StateUpdate<State>[]): Observable<UpdatePayload> {
     return this.state$.pipe(
       take(1),
       map((state) => {
-        return updateStateParts.reduce((acc: State, curr: StateUpdate<State>) => {
+        const allKeys = updateStateParts.map((el) => el.key)
+        const newState = updateStateParts.reduce((acc: State, curr: StateUpdate<State>) => {
           const { key, payload } = curr
           const newState = {
             ...acc,
@@ -104,6 +122,9 @@ export class StateService extends AbstractComponent {
           }
           return newState
         }, state)
+
+        console.log({ oldState: state, newState })
+        return { state: newState, updateStore: this.shouldTriggerStoreUpdate(allKeys) }
       })
     )
   }
@@ -118,5 +139,10 @@ export class StateService extends AbstractComponent {
       acc[curr] = getStateValue(curr)
       return acc
     }, <State>{})
+  }
+
+  shouldTriggerStoreUpdate(keys: string[]): boolean {
+    const triggers = ['baseDir', 'tabs', 'sideMenuWidth']
+    return keys.some((key) => triggers.includes(key))
   }
 }

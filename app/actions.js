@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileActionResponses = exports.FileActions = exports.FolderActionResponses = exports.FolderActions = void 0;
+exports.StoreResponses = exports.FileActionResponses = exports.StoreActions = exports.FileActions = exports.FolderActionResponses = exports.FolderActions = void 0;
 var FolderActions;
 (function (FolderActions) {
     FolderActions["ChooseDir"] = "choose-directory";
@@ -29,6 +29,12 @@ var FileActions;
     FileActions["MoveFiles"] = "move-files";
     FileActions["ReadFile"] = "read-file";
 })(FileActions = exports.FileActions || (exports.FileActions = {}));
+var StoreActions;
+(function (StoreActions) {
+    StoreActions["InitApp"] = "init-app";
+    StoreActions["GetStore"] = "read-store";
+    StoreActions["UpdateStore"] = "update-store";
+})(StoreActions = exports.StoreActions || (exports.StoreActions = {}));
 var FileActionResponses;
 (function (FileActionResponses) {
     FileActionResponses["CreateSuccess"] = "create-file-success";
@@ -45,4 +51,15 @@ var FileActionResponses;
     FileActionResponses["UpdateSuccess"] = "update-success";
     FileActionResponses["UpdateFailure"] = "update-failure";
 })(FileActionResponses = exports.FileActionResponses || (exports.FileActionResponses = {}));
+var StoreResponses;
+(function (StoreResponses) {
+    StoreResponses["ReadStoreSuccess"] = "read-store-success";
+    StoreResponses["ReadStoreFailure"] = "read-store-failure";
+    StoreResponses["CreateStoreSuccess"] = "create-store-success";
+    StoreResponses["CreateStoreFailure"] = "create-store-failure";
+    StoreResponses["UpdateStoreSuccess"] = "update-store-success";
+    StoreResponses["UpdateStoreFailure"] = "update-store-failure";
+    StoreResponses["InitAppSuccess"] = "init-app-success";
+    StoreResponses["InitAppFailure"] = "init-app-failure";
+})(StoreResponses = exports.StoreResponses || (exports.StoreResponses = {}));
 //# sourceMappingURL=actions.js.map

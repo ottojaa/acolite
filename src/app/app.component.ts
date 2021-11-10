@@ -6,8 +6,7 @@ import appConfig from '../../app/acolite.config.json'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { State, StateService, StateUpdate } from './services/state.service'
-import { MenuService } from './services/menu.service'
-import { FileActionResponses, FolderActionResponses, FolderActions } from '../../app/actions'
+import { FileActionResponses, FolderActionResponses, StoreResponses } from '../../app/actions'
 import { Tab } from './interfaces/Menu'
 import { Router } from '@angular/router'
 
@@ -16,6 +15,7 @@ interface AppConfig {
   tabs?: Tab[]
 }
 type IPCEvent = Electron.IpcMessageEvent
+type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses
 
 @Component({
   selector: 'app-root',
@@ -23,19 +23,18 @@ type IPCEvent = Electron.IpcMessageEvent
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  _appConfig: AppConfig
+  initialized = false
 
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
     private themeService: ThemeService,
-    public menuService: MenuService,
     public state: StateService,
     public router: Router,
     public dialogService: AppDialogService,
     public zone: NgZone
   ) {
-    this._appConfig = appConfig
+    this.electronService.initApp()
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
 
@@ -48,33 +47,13 @@ export class AppComponent implements OnInit {
       console.log('Run in browser')
     }
     this.initIPCMainListeners()
-    this.initAppPreferences()
-  }
-
-  initAppPreferences(): void {
-    const { baseDir, tabs } = this._appConfig
-
-    let updateArr: StateUpdate<State>[] = []
-    if (baseDir) {
-      updateArr.push({ key: 'baseDir', payload: baseDir })
-    } else {
-      this.router.navigate(['base-dir'])
-
-      return
-    }
-    if (tabs && tabs.length) {
-      updateArr.push({ key: 'tabs', payload: tabs })
-    }
-    if (updateArr.length) {
-      this.state.updateMulti$.next(updateArr)
-    }
   }
 
   ngOnInit(): void {
     this.themeService.setTheme('Light grey')
-    if (this.state.getStatePartValue('baseDir')) {
+    /*   if (this.state.getStatePartValue('baseDir')) {
       this.readDir()
-    }
+    } */
   }
 
   initIPCMainListeners(): void {
@@ -100,20 +79,35 @@ export class AppComponent implements OnInit {
       FileActionResponses.ReadFailure,
       FileActionResponses.UpdateSuccess,
       FileActionResponses.UpdateFailure,
+      StoreResponses.ReadStoreSuccess,
+      StoreResponses.ReadStoreFailure,
+      StoreResponses.InitAppSuccess,
+      StoreResponses.InitAppFailure,
+      StoreResponses.UpdateStoreFailure,
     ]
 
     actions.forEach((action) => this.startListener(action))
   }
 
-  startListener(action: FolderActionResponses | FileActionResponses): void {
+  startListener(action: IPCResponse): void {
     this.electronService.on(action, (_ipcEvent: IPCEvent, arg: any) => {
       this.ipcEventReducer(action, arg)
     })
   }
 
-  ipcEventReducer(action: FolderActionResponses | FileActionResponses, response: any): void {
+  ipcEventReducer(action: IPCResponse, response: any): void {
     this.zone.run(() => {
       switch (action) {
+        // Store actions
+
+        case StoreResponses.InitAppSuccess: {
+          this.initialiseApp(response)
+          break
+        }
+        case StoreResponses.InitAppFailure: {
+          console.error(response)
+          break
+        }
         // Folder actions
 
         case FolderActionResponses.ReadDirectorySuccess: {
@@ -142,7 +136,12 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.MoveSuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          const { rootDirectory, tabs } = response
+          const payload: StateUpdate<State>[] = [
+            { key: 'rootDirectory', payload: rootDirectory },
+            { key: 'tabs', payload: tabs },
+          ]
+          this.state.updateMulti$.next(payload)
           break
         }
         case FileActionResponses.MoveFailure: {
@@ -194,12 +193,25 @@ export class AppComponent implements OnInit {
           this.state.updateMulti$.next(payload)
           break
         }
+        case StoreResponses.UpdateStoreFailure: {
+          this.dialogService.openToast('Updating configuration file failed', 'failure')
+        }
         default: {
           console.log({ message: 'default reducer', action, response })
           break
         }
       }
     })
+  }
+
+  initialiseApp(response: Partial<State>): void {
+    const initialState = this.state.initialState
+    this.state.state$.next({ ...initialState, ...response })
+    this.state.updateState$.next({ key: 'initialized', payload: true })
+
+    if (!this.state.getStatePartValue('baseDir')) {
+      this.router.navigate(['base-dir'])
+    }
   }
 
   readDir(): void {

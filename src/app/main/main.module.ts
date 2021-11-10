@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-
-import { MainRoutingModule } from './main-routing.module'
-
 import { SharedModule } from '../shared/shared.module'
 import { MainComponent } from './main.component'
 import { SideMenuModule } from '../components/side-menu/side-menu.module'
@@ -18,7 +15,6 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner'
   imports: [
     CommonModule,
     SharedModule,
-    MainRoutingModule,
     SideMenuModule,
     TopBarModule,
     EditorViewModule,

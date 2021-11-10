@@ -17,9 +17,12 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  StoreActions,
   UpdateActionPayload,
   UpdateFileContent,
 } from '../../../../../app/actions'
+import { AppConfig } from '../../../interfaces/Menu'
+import { omit, pick } from 'lodash'
 
 type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({
@@ -81,11 +84,11 @@ export class ElectronService {
   }
 
   setDefaultDir(): void {
-    this.send(FolderActions.SetDefaultDir)
+    this.send(FolderActions.SetDefaultDir, {})
   }
 
   chooseDirectory(): void {
-    this.send(FolderActions.ChooseDir)
+    this.send(FolderActions.ChooseDir, {})
   }
 
   // File actions
@@ -112,6 +115,19 @@ export class ElectronService {
 
   updateFileContent(payload: OmitActionType<UpdateFileContent>): void {
     this.send(FileActions.Update, payload)
+  }
+
+  readStore(): void {
+    this.send(StoreActions.GetStore, {})
+  }
+
+  updateStore(payload: OmitActionType<AppConfig>): void {
+    const filtered = pick(payload, ['tabs', 'baseDir', 'sideMenuWidth'])
+    this.send(StoreActions.UpdateStore, filtered)
+  }
+
+  initApp(): void {
+    this.send(StoreActions.InitApp, {})
   }
 
   addActionType<T extends OmitActionType<UpdateActionPayload>>(

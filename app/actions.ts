@@ -11,8 +11,11 @@ export type UpdateActionPayload =
   | MoveFiles
   | ReadFile
   | UpdateFileContent
+  | GetStore
+  | UpdateStore
+  | InitApp
 
-export type ActionType = FileActions | FolderActions
+export type ActionType = FileActions | FolderActions | StoreActions
 
 export interface CreateFile {
   type: FileActions.Create
@@ -52,6 +55,7 @@ export interface MoveFiles {
   target: TreeElement
   rootDirectory: TreeElement
   elementsToMove: TreeElement[]
+  tabs: Tab[]
   baseDir: string
 }
 
@@ -71,6 +75,22 @@ export interface SetDefaultDir {
 
 export interface ChooseDir {
   type: FolderActions.ChooseDir
+}
+
+export interface GetStore {
+  type: StoreActions.GetStore
+}
+
+export interface InitApp {
+  type: StoreActions.InitApp
+}
+
+export interface UpdateStore {
+  type: StoreActions.UpdateStore
+  baseDir?: string
+  tabs?: Tab[]
+  fontSize?: string
+  sideMenuWidth?: number
 }
 
 export enum FolderActions {
@@ -101,6 +121,12 @@ export enum FileActions {
   ReadFile = 'read-file',
 }
 
+export enum StoreActions {
+  InitApp = 'init-app',
+  GetStore = 'read-store',
+  UpdateStore = 'update-store',
+}
+
 export enum FileActionResponses {
   CreateSuccess = 'create-file-success',
   CreateFailure = 'create-file-failure',
@@ -115,4 +141,15 @@ export enum FileActionResponses {
   ReadFailure = 'read-file-failure',
   UpdateSuccess = 'update-success',
   UpdateFailure = 'update-failure',
+}
+
+export enum StoreResponses {
+  ReadStoreSuccess = 'read-store-success',
+  ReadStoreFailure = 'read-store-failure',
+  CreateStoreSuccess = 'create-store-success',
+  CreateStoreFailure = 'create-store-failure',
+  UpdateStoreSuccess = 'update-store-success',
+  UpdateStoreFailure = 'update-store-failure',
+  InitAppSuccess = 'init-app-success',
+  InitAppFailure = 'init-app-failure',
 }
