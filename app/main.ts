@@ -168,7 +168,6 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case StoreActions.UpdateStore: {
-        console.log(payload)
         updateStore(event, payload)
         break
       }
@@ -243,6 +242,7 @@ const initAppState = (event: IpcMainEvent) => {
       if (!isPlainObject(config)) {
         fs.writeFileSync(configPath, defaultConfig)
       }
+
       const updatedConfig = validateAndUpdateConfig(config)
       const updatedConfigJSON = JSON.stringify(updatedConfig, null, 2)
       fs.writeFileSync(configPath, updatedConfigJSON)
@@ -571,6 +571,8 @@ const deleteFiles = (event: IpcMainEvent, action: DeleteFiles) => {
   )
 }
 
+const loop = () => {}
+
 //////////// App data store /////////////
 
 const getStoreData = (event: IpcMainEvent) => {
@@ -587,82 +589,4 @@ const getStoreData = (event: IpcMainEvent) => {
       event.sender.send(StoreResponses.CreateStoreSuccess)
     })
   }
-
-  /* const readStore = () => {
-    fs.readFile(configPath, (err, data) => {
-      if (err) {
-        event.sender.send(StoreResponses.ReadStoreFailure)
-        return
-      }
-      const storeData = JSON.parse(data.toString())
-      const { tabs } = storeData
-
-      if (tabs) {
-        // Checks if the tabs that were opened when the app was last closed are still valid
-        validateOpenTabs(tabs).then((validatedTabs) => {
-          const validatedStore = { ...storeData, tabs: validatedTabs }
-          const storeJson = JSON.stringify(validatedStore, null, 2)
-          fs.writeFile(configPath, storeJson, (err) => {
-            if (err) {
-              event.sender.send(StoreResponses.ReadStoreFailure)
-              return
-            }
-            event.sender.send(StoreResponses.ReadStoreSuccess, validatedStore)
-          })
-        })
-      } else {
-        event.sender.send(StoreResponses.ReadStoreSuccess, storeData)
-      }
-    })
-  }
-
-  fs.existsSync(configPath) ? readStore() : createStore()
-}
-
-const updateStore = (event: IpcMainEvent, updateData: UpdateStore) => {
-  const dirPath = app.getPath('appData')
-  const configPath = getJoinedPath([dirPath, configFileName])
-
-  fs.readFile(configPath, (_err, data) => {
-    const storeData = JSON.parse(data.toString())
-    const updatedStoreData = JSON.stringify({ ...storeData, ...updateData.data }, null, 2)
-    fs.writeFile(configPath, updatedStoreData, (err) => {
-      if (err) {
-        event.sender.send(StoreResponses.UpdateStoreFailure)
-      }
-      event.sender.send(StoreResponses.UpdateStoreSuccess)
-    })
-  })
-}
-
-const validateOpenTabs = (tabs: Tab[]) => {
-  const paths = tabs.map((tab) => tab.path)
-  const promises: Promise<Tab>[] = paths.map(
-    (filePath) =>
-      new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf-8', (err, content) => {
-          if (err) {
-            reject()
-          }
-          fs.stat(filePath, (err, fileStats) => {
-            if (err) {
-              reject()
-            }
-            const tabData: Tab = {
-              fileName: getBaseName(filePath),
-              extension: getExtension(filePath),
-              path: filePath,
-              textContent: content,
-              data: {
-                lastUpdated: fileStats.mtime,
-              },
-            }
-            resolve(tabData)
-          })
-        })
-      })
-  )
-
-  return Promise.all(promises)
-} */
 }

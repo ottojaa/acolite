@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
-import { uniqBy } from 'lodash'
+import { uniq, uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { take } from 'rxjs/operators'
@@ -8,7 +8,7 @@ import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/d
 import { ElectronService } from '../../../core/services'
 import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
-import { StateService } from '../../../services/state.service'
+import { State, StateService, StateUpdate } from '../../../services/state.service'
 
 @Component({
   selector: 'app-tree',
@@ -24,6 +24,7 @@ export class TreeComponent implements OnInit {
   selection: TreeElement[] = [] // Used for shift-key multi selection, as primeng tree does not support it for some reason.
   contextMenuItems: MenuItem[]
   draggedElements: TreeElement[]
+  activeIndents: number[] = []
   isHovering = false
 
   constructor(
@@ -59,6 +60,10 @@ export class TreeComponent implements OnInit {
       }
     }
     this.selection = this.selectedFiles
+  }
+
+  getActiveIndents(): number[] {
+    return uniq(this.selectedFiles.map((file) => file.data.indents))
   }
 
   /**

@@ -98,10 +98,10 @@ export class StateService extends AbstractComponent {
       map((state) => {
         const { key, payload } = update
 
-        const newState = cloneDeep({
+        const newState = {
           ...state,
           [key]: payload,
-        })
+        }
 
         console.log({ oldState: state, newState })
         return { state: newState, updateStore: this.shouldTriggerStoreUpdate([key]) }

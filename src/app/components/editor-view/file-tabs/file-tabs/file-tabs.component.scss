@@ -1,3 +1,5 @@
+@import 'src/variables.scss';
+
 :host ::ng-deep .mat-tab-label {
   opacity: 1;
   height: 3rem;
@@ -49,6 +51,7 @@
   background-color: var(--secondary);
   &.mat-tab-label-active {
     background-color: var(--buttonColor);
+    box-shadow: $box-shadow-elevation;
   }
 }
 

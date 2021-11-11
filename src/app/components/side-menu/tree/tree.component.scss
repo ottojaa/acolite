@@ -73,17 +73,15 @@
     .indent {
       border-right: 1px solid rgba(77, 77, 77, 0.608);
     }
-    /* .indent:not(:last-of-type) {
-      border-right: 1px solid rgba(77, 77, 77, 0.308);
+    .indentActive {
+      border-right: 1px solid rgb(187 180 180 / 87%);
     }
-    .indent:last-of-type {
-      border-right: 1px solid grey;
-    } */
   }
 }
 
 .indent {
   width: 1rem;
+  min-width: 1rem;
   height: 2.5rem; // same as p-treenode-content
 }
 

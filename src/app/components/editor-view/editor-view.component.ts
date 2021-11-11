@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map, takeUntil } from 'rxjs/operators'
+import { delay, map, skipUntil, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { FileEntity } from '../../interfaces/File'
 import { Tab } from '../../interfaces/Menu'
@@ -22,7 +22,9 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
+    const initialized$ = this.state.getStatePart('initialized')
+
+    this.tabs$ = this.state.getStatePart('tabs').pipe(skipUntil(initialized$), takeUntil(this.destroy$))
     this.files = this.getMockFiles()
   }
 
