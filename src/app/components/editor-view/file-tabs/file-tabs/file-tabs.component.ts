@@ -11,11 +11,6 @@ import { StateService } from '../../../../services/state.service'
   selector: 'app-file-tabs',
   templateUrl: './file-tabs.component.html',
   styleUrls: ['./file-tabs.component.scss'],
-  animations: [
-    trigger('componentLoaded', [
-      transition(':enter', [style({ opacity: 0 }), animate('300ms', style({ opacity: 1 }))]),
-    ]),
-  ],
 })
 export class FileTabsComponent extends AbstractComponent implements OnInit {
   @Input() tabs: Tab[]

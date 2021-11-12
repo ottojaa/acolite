@@ -49,6 +49,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     BaseDirectoryDialogModule,
     ChangeDirectoryDialogModule,
     FolderCreationDialogModule,
+    BrowserAnimationsModule,
     RenameFileDialogModule,
     DeleteFilesDialogModule,
     MoveFilesDialogModule,

@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, NgZone, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
 import { delay, map, skipUntil, takeUntil, tap } from 'rxjs/operators'
@@ -11,10 +12,19 @@ import { filterClosedTab } from '../../utils/tab-utils'
   selector: 'app-editor-view',
   templateUrl: './editor-view.component.html',
   styleUrls: ['./editor-view.component.scss'],
+  animations: [
+    trigger('componentLoaded', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-20px)' }),
+        animate('300ms 0ms ease-in-out', style({ opacity: 1, transform: 'translateX(0)' })),
+      ]),
+    ]),
+  ],
 })
 export class EditorViewComponent extends AbstractComponent implements OnInit {
   files: FileEntity[]
   tabs$: Observable<Tab[]>
+  initialized$: Observable<boolean>
   contrastColor: string
 
   constructor(private state: StateService, public zone: NgZone) {
@@ -22,9 +32,8 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const initialized$ = this.state.getStatePart('initialized')
-
-    this.tabs$ = this.state.getStatePart('tabs').pipe(skipUntil(initialized$), takeUntil(this.destroy$))
+    this.initialized$ = this.state.getStatePart('initialized').pipe(delay(350)) // Delay because showing the spinner for e.g 20ms looks wonky in case the app loads quickly
+    this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
     this.files = this.getMockFiles()
   }
 
