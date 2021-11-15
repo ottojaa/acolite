@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StoreResponses = exports.FileActionResponses = exports.StoreActions = exports.FileActions = exports.FolderActionResponses = exports.FolderActions = void 0;
+exports.SearchResponses = exports.StoreResponses = exports.FileActionResponses = exports.SearchActions = exports.StoreActions = exports.FileActions = exports.FolderActionResponses = exports.FolderActions = void 0;
 var FolderActions;
 (function (FolderActions) {
     FolderActions["ChooseDir"] = "choose-directory";
@@ -35,6 +35,10 @@ var StoreActions;
     StoreActions["GetStore"] = "read-store";
     StoreActions["UpdateStore"] = "update-store";
 })(StoreActions = exports.StoreActions || (exports.StoreActions = {}));
+var SearchActions;
+(function (SearchActions) {
+    SearchActions["Query"] = "query-index";
+})(SearchActions = exports.SearchActions || (exports.SearchActions = {}));
 var FileActionResponses;
 (function (FileActionResponses) {
     FileActionResponses["CreateSuccess"] = "create-file-success";
@@ -62,4 +66,9 @@ var StoreResponses;
     StoreResponses["InitAppSuccess"] = "init-app-success";
     StoreResponses["InitAppFailure"] = "init-app-failure";
 })(StoreResponses = exports.StoreResponses || (exports.StoreResponses = {}));
+var SearchResponses;
+(function (SearchResponses) {
+    SearchResponses["QuerySuccess"] = "query-success";
+    SearchResponses["QueryFailure"] = "query-failure";
+})(SearchResponses = exports.SearchResponses || (exports.SearchResponses = {}));
 //# sourceMappingURL=actions.js.map

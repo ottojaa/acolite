@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import * as faker from 'faker'
+import { SearchResponses, StoreResponses } from '../../../../../app/actions'
+import { ElectronService } from '../../../core/services'
 import { fileExtensionIcons } from '../../../entities/file/constants'
 
 class File {
@@ -18,39 +20,43 @@ class File {
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.scss'],
 })
-export class AutocompleteComponent implements OnInit {
+export class AutocompleteComponent {
   openDrop: boolean = false
   selectedItem: File
-  files: File[] = []
   filterFiles: File[] = []
-  constructor() {}
+  searchQuery: string
 
-  ngOnInit(): void {
-    for (let index = 0; index < 100; index++) {
-      const file = new File()
-      file.name = faker.system.commonFileName()
-      file.filePath = faker.system.directoryPath()
-      file.content = faker.lorem.lines(15)
-      file.extension = file.name.split('.')[1]
-      file.createdDate = '2020/12/12'
-      file.modifiedDate = '2020/01/01'
-      file.iconName = this.getFileExtensionIconName(file.extension)
+  constructor(private electronService: ElectronService, public zone: NgZone, public cdRef: ChangeDetectorRef) {
+    this.zone.run(() => {
+      console.log(this.searchQuery)
+      this.electronService.on(SearchResponses.QuerySuccess, (_ipcEvent: Electron.IpcMessageEvent, results: any) => {
+        this.filterFiles = [
+          ...results.map((file: File) => {
+            if (file.content) {
+              file.highlightContentText = this.getHighlightText(file.content, this.searchQuery)
+            }
 
-      this.files.push(file)
-    }
+            return file
+          }),
+        ]
+        this.cdRef.detectChanges()
+      })
+    })
   }
 
   onOpenDrop(state: boolean) {
     this.openDrop = state
   }
 
+  trackByPath(_index: number, file: File): string {
+    return file.filePath
+  }
+
   getFileExtensionIconName(extension: string | undefined): string | null {
     if (!extension) {
       return 'folder'
     }
-    const icon = fileExtensionIcons.find((e) =>
-      e.acceptedExtensions.includes(extension)
-    )
+    const icon = fileExtensionIcons.find((e) => e.acceptedExtensions.includes(extension))
     return icon ? icon.name : null
   }
 
@@ -58,26 +64,22 @@ export class AutocompleteComponent implements OnInit {
     this.selectedItem = file
   }
 
-  onSearchFiles(value: string) {
-    value = (value || '').toLowerCase()
+  onSearchFiles() {
+    const value = (this.searchQuery || '').toLowerCase()
     if (!value || value.length < 3) {
       this.filterFiles = []
       return
     }
+    this.electronService.searchFiles({ searchOpts: { content: value } })
 
-    this.filterFiles = this.files
+    /* this.filterFiles = this.files
       .filter((f) => {
         const name = f.name.toLowerCase()
         const extension = f.extension.toLowerCase()
         const filePath = f.filePath.toLowerCase()
         const content = f.content.toLowerCase()
 
-        return (
-          name.includes(value) ||
-          extension.includes(value) ||
-          filePath.includes(value) ||
-          content.includes(value)
-        )
+        return name.includes(value) || extension.includes(value) || filePath.includes(value) || content.includes(value)
       })
       .map((file) => {
         if (file.content) {
@@ -85,7 +87,7 @@ export class AutocompleteComponent implements OnInit {
         }
 
         return file
-      })
+      }) */
   }
 
   /**
@@ -114,15 +116,9 @@ export class AutocompleteComponent implements OnInit {
 
     const highlightStartIndex = highlightText.indexOf('<span ')
     const highlightEndIndex = highlightText.indexOf('</span>') + 7 // length of '</span>'
-    const highlightString = highlightText.substring(
-      highlightStartIndex,
-      highlightEndIndex
-    )
+    const highlightString = highlightText.substring(highlightStartIndex, highlightEndIndex)
     let prefix = highlightText.substring(0, highlightStartIndex - 1)
-    let suffix = highlightText.substring(
-      highlightEndIndex + 1,
-      highlightText.length
-    )
+    let suffix = highlightText.substring(highlightEndIndex + 1, highlightText.length)
 
     const shouldTruncateString = (string: string) => string.length > 90
 

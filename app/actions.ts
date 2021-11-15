@@ -14,8 +14,9 @@ export type UpdateActionPayload =
   | GetStore
   | UpdateStore
   | InitApp
+  | SearchQuery
 
-export type ActionType = FileActions | FolderActions | StoreActions
+export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
 
 export interface CreateFile {
   type: FileActions.Create
@@ -93,6 +94,17 @@ export interface UpdateStore {
   sideMenuWidth?: number
 }
 
+export interface SearchQuery {
+  type: SearchActions.Query
+  searchOpts?: SearchOptions
+}
+
+interface SearchOptions {
+  content?: string
+  modifiedAt?: string
+  createdAt?: string
+}
+
 export enum FolderActions {
   ChooseDir = 'choose-directory',
   SetDefaultDir = 'set-default-directory',
@@ -127,6 +139,10 @@ export enum StoreActions {
   UpdateStore = 'update-store',
 }
 
+export enum SearchActions {
+  Query = 'query-index',
+}
+
 export enum FileActionResponses {
   CreateSuccess = 'create-file-success',
   CreateFailure = 'create-file-failure',
@@ -152,4 +168,9 @@ export enum StoreResponses {
   UpdateStoreFailure = 'update-store-failure',
   InitAppSuccess = 'init-app-success',
   InitAppFailure = 'init-app-failure',
+}
+
+export enum SearchResponses {
+  QuerySuccess = 'query-success',
+  QueryFailure = 'query-failure',
 }

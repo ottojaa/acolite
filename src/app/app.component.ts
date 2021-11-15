@@ -6,7 +6,7 @@ import appConfig from '../../app/acolite.config.json'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { State, StateService, StateUpdate } from './services/state.service'
-import { FileActionResponses, FolderActionResponses, StoreResponses } from '../../app/actions'
+import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/actions'
 import { Tab } from './interfaces/Menu'
 import { Router } from '@angular/router'
 
@@ -15,7 +15,7 @@ interface AppConfig {
   tabs?: Tab[]
 }
 type IPCEvent = Electron.IpcMessageEvent
-type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses
+type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
 
 @Component({
   selector: 'app-root',
@@ -84,6 +84,7 @@ export class AppComponent implements OnInit {
       StoreResponses.InitAppSuccess,
       StoreResponses.InitAppFailure,
       StoreResponses.UpdateStoreFailure,
+      SearchResponses.QuerySuccess,
     ]
 
     actions.forEach((action) => this.startListener(action))
@@ -195,6 +196,10 @@ export class AppComponent implements OnInit {
         }
         case StoreResponses.UpdateStoreFailure: {
           this.dialogService.openToast('Updating configuration file failed', 'failure')
+          break
+        }
+        case SearchResponses.QuerySuccess: {
+          break
         }
         default: {
           console.log({ message: 'default reducer', action, response })

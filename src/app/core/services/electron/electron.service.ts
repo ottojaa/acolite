@@ -17,6 +17,8 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  SearchActions,
+  SearchQuery,
   StoreActions,
   UpdateActionPayload,
   UpdateFileContent,
@@ -119,6 +121,10 @@ export class ElectronService {
 
   readStore(): void {
     this.send(StoreActions.GetStore, {})
+  }
+
+  searchFiles(payload: OmitActionType<SearchQuery>): void {
+    this.send(SearchActions.Query, payload)
   }
 
   updateStore(payload: OmitActionType<AppConfig>): void {

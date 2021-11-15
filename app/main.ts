@@ -22,6 +22,9 @@ import {
   ReadDirectory,
   ReadFile,
   RenameFile,
+  SearchActions,
+  SearchQuery,
+  SearchResponses,
   StoreActions,
   StoreResponses,
   UpdateActionPayload,
@@ -29,20 +32,22 @@ import {
   UpdateStore,
 } from './actions'
 import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
-import { cloneDeep, first, isObjectLike, isPlainObject } from 'lodash'
+import { cloneDeep, first, isEqual, isPlainObject } from 'lodash'
 import { AppConfig, Tab, TreeElement } from '../src/app/interfaces/Menu'
+import { Worker, Document } from 'flexsearch'
 
-type IPCChannelAction = FileActions | FolderActions | StoreActions
+type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
 // Initialize remote module
 require('@electron/remote/main').initialize()
 
 let win: BrowserWindow = null
-const defaultConfigFilePath = path.join(__dirname, 'acolite.config.json')
 const configFileName = 'acolite.config.json'
 const dirPath = app.getPath('appData')
 const configPath = getJoinedPath([dirPath, configFileName])
 const args = process.argv.slice(1),
   serve = args.some((val) => val === '--serve')
+
+let index: Document<unknown, true>
 
 function createWindow(): BrowserWindow {
   const electronScreen = screen
@@ -110,6 +115,7 @@ const IPCChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
+  SearchActions.Query,
 ]
 
 const startIPCChannelListeners = () => {
@@ -171,6 +177,10 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         updateStore(event, payload)
         break
       }
+      case SearchActions.Query: {
+        searchFiles(event, payload)
+        break
+      }
     }
   })
 }
@@ -183,6 +193,15 @@ try {
   app.on('ready', () => setTimeout(createWindow, 400))
 
   startIPCChannelListeners()
+
+  index = new Document({
+    tokenize: 'forward',
+    document: {
+      id: 'id',
+      index: ['filePath', 'fileName', 'content', 'createdAt', 'modifiedAt', 'extension'],
+      store: true,
+    },
+  })
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -201,6 +220,7 @@ try {
     }
   })
 } catch (e) {
+  console.log(e)
   // Catch Error
   // throw e;
 }
@@ -243,13 +263,24 @@ const initAppState = (event: IpcMainEvent) => {
         fs.writeFileSync(configPath, defaultConfig)
       }
 
+      const configCopy = cloneDeep(config)
       const updatedConfig = validateAndUpdateConfig(config)
-      const updatedConfigJSON = JSON.stringify(updatedConfig, null, 2)
-      fs.writeFileSync(configPath, updatedConfigJSON)
+
+      if (!isEqual(configCopy, updatedConfig)) {
+        const updatedConfigJSON = JSON.stringify(updatedConfig, null, 2)
+        fs.writeFileSync(configPath, updatedConfigJSON)
+      }
 
       const getPayload = () => {
         const baseDir = updatedConfig.baseDir
-        return baseDir ? { ...updatedConfig, rootDirectory: getRootDirectory(baseDir) } : {}
+        if (!baseDir) {
+          return {}
+        }
+
+        const state = { ...updatedConfig, rootDirectory: getRootDirectory(baseDir) }
+        addFilesToIndex(state.rootDirectory.children)
+
+        return state
       }
       event.sender.send(StoreResponses.InitAppSuccess, getPayload())
     }
@@ -259,8 +290,55 @@ const initAppState = (event: IpcMainEvent) => {
   }
 }
 
+const searchFiles = async (event: IpcMainEvent, query: SearchQuery) => {
+  const { searchOpts } = query
+  const results = await index.searchAsync(searchOpts.content, { enrich: true })
+  const mappedResults = results.length ? results.reduce((acc, curr) => acc.concat(curr.result[0].doc), []) : []
+  event.sender.send(SearchResponses.QuerySuccess, mappedResults)
+}
+
+const addFilesToIndex = (treeStruct: TreeElement[]) => {
+  const files = flattenTreeStructure(treeStruct)
+  files.forEach((file) => {
+    if (file.data.type === 'file') {
+      addToIndex(file)
+    }
+  })
+}
+
+const addToIndex = (file: TreeElement) => {
+  const { filePath } = file.data
+  fs.readFile(filePath, 'utf-8', (_err, data) => {
+    fs.stat(filePath, (_err, stats) => {
+      const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
+      const extension = getExtension(filePath)
+      const fileName = getBaseName(filePath)
+      const doc = {
+        filePath,
+        fileName,
+        extension,
+        content: data,
+        modifiedAt: mtime,
+        createdAt: birthtime,
+      }
+      index.addAsync(ino, doc, () => {
+        console.log('added succesfully')
+      })
+    })
+  })
+}
+
+const flattenTreeStructure = (treeElement: TreeElement[], arr: TreeElement[] = []) => {
+  treeElement.forEach((el) => {
+    arr.push(el)
+    if (el.children?.length) {
+      flattenTreeStructure(el.children, arr)
+    }
+  })
+  return arr
+}
+
 const updateStore = (event: IpcMainEvent, updateData: UpdateStore) => {
-  console.log(updateData)
   fs.readFile(configPath, (_err, data) => {
     const storeData = JSON.parse(data.toString())
     const updatedStoreData = JSON.stringify({ ...storeData, ...updateData }, null, 2)
@@ -293,10 +371,10 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
             },
           }
         }
-        return config['tabs'].map((tab) => getTabData(tab.path)).filter((tab) => !!tab)
+        return config.tabs.map((tab) => getTabData(tab.path)).filter((tab) => !!tab)
       }
       case 'baseDir': {
-        const baseDir = config['baseDir']
+        const { baseDir } = config
         if (typeof baseDir === 'string' && fs.existsSync(baseDir)) {
           return baseDir
         }
@@ -304,10 +382,11 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
       }
       case 'sideMenuWidth': {
         const defaultWidth = 20
-        const width = config['sideMenuWidth']
-        if (typeof width === 'number') {
-          const isValidWidth = Number.isInteger(width) && width >= 0 && width <= 100
-          return isValidWidth ? width : defaultWidth
+
+        const { sideMenuWidth } = config
+        if (typeof sideMenuWidth === 'number') {
+          const isValidWidth = Number.isInteger(sideMenuWidth) && sideMenuWidth >= 0 && sideMenuWidth <= 100
+          return isValidWidth ? sideMenuWidth : defaultWidth
         }
         return defaultWidth
       }
@@ -365,7 +444,7 @@ const chooseDirectory = (event: IpcMainEvent) => {
 }
 
 const setDefaultDirectory = (event: IpcMainEvent) => {
-  writeToFile(defaultConfigFilePath, { key: 'baseDir', payload: __dirname })
+  writeToFile(configPath, { key: 'baseDir', payload: __dirname })
     .then(() => {
       event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
     })
