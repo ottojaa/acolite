@@ -30,6 +30,7 @@
 
   .list-item-information {
     flex-direction: column;
+    width: 100%;
     > p {
       margin: 0;
     }
@@ -39,24 +40,34 @@
     height: 2rem;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    p {
-      font-size: 15px;
+    align-items: center;
+
+    p:not(.file-path) {
+      font-size: 1.25rem;
       font-weight: bolder;
-      color: var(--buttonColor);
+      color: var(--contrast);
     }
   }
   .bottom-row {
     display: flex;
     flex-direction: row;
   }
-  p {
+  p:not(.file-path) {
     margin: 0;
     color: var(--contrast);
   }
   :focus {
     padding: 100px;
     background-color: white;
+  }
+  .file-path {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin: 0 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--contrast);
   }
 }
 
@@ -106,6 +117,7 @@
 
 :host ::ng-deep.highlightText {
   background: var(--textHighlightBg);
+  border-radius: 2px;
 }
 
 .drop-down {

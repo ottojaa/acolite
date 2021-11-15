@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 import { ElectronService } from '../core/services'
-import { Tab, TreeElement } from '../interfaces/Menu'
+import { SearchResult, Tab, TreeElement } from '../interfaces/Menu'
 import { SettingsService } from './settings.service'
 
 interface UpdatePayload {
@@ -15,6 +15,7 @@ export interface State {
   baseDir: string
   initialized: boolean
   selectedTab: number
+  searchResults: SearchResult[]
   tabs: Tab[]
   rootDirectory: TreeElement
 }
@@ -38,6 +39,7 @@ export class StateService extends AbstractComponent {
     initialized: false,
     baseDir: '',
     selectedTab: 0,
+    searchResults: [],
     tabs: [],
     rootDirectory: {},
   }

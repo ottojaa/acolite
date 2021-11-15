@@ -21,3 +21,13 @@ export interface FilePathContainer {
   folders: string[]
   files: string[]
 }
+
+export interface Doc {
+  ino: number
+  filePath: string
+  fileName: string
+  extension: string
+  content: string
+  modifiedAt: Date
+  createdAt: Date
+}

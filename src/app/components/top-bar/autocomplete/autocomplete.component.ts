@@ -1,46 +1,31 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import * as faker from 'faker'
+import { Observable, Subject } from 'rxjs'
+import { debounceTime, filter, switchMap, takeUntil, tap } from 'rxjs/operators'
 import { SearchResponses, StoreResponses } from '../../../../../app/actions'
+import { AbstractComponent } from '../../../abstract/abstract-component'
 import { ElectronService } from '../../../core/services'
 import { fileExtensionIcons } from '../../../entities/file/constants'
-
-class File {
-  name: string
-  extension: string
-  content: string
-  filePath: string
-  iconName: string | undefined
-  createdDate: string
-  modifiedDate: string
-  highlightContentText?: string | undefined
-}
+import { SearchResult } from '../../../interfaces/Menu'
+import { StateService } from '../../../services/state.service'
 
 @Component({
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.scss'],
 })
-export class AutocompleteComponent {
+export class AutocompleteComponent extends AbstractComponent {
   openDrop: boolean = false
   selectedItem: File
-  filterFiles: File[] = []
+  searchResults$: Observable<SearchResult[]>
   searchQuery: string
+  debouncedSearch$ = new Subject<string>()
 
-  constructor(private electronService: ElectronService, public zone: NgZone, public cdRef: ChangeDetectorRef) {
-    this.zone.run(() => {
-      console.log(this.searchQuery)
-      this.electronService.on(SearchResponses.QuerySuccess, (_ipcEvent: Electron.IpcMessageEvent, results: any) => {
-        this.filterFiles = [
-          ...results.map((file: File) => {
-            if (file.content) {
-              file.highlightContentText = this.getHighlightText(file.content, this.searchQuery)
-            }
-
-            return file
-          }),
-        ]
-        this.cdRef.detectChanges()
-      })
+  constructor(private electronService: ElectronService, private state: StateService) {
+    super()
+    this.searchResults$ = this.state.getStatePart('searchResults')
+    this.debouncedSearch$.pipe(takeUntil(this.destroy$), debounceTime(20)).subscribe(() => {
+      this.onSearchFiles()
     })
   }
 
@@ -48,8 +33,8 @@ export class AutocompleteComponent {
     this.openDrop = state
   }
 
-  trackByPath(_index: number, file: File): string {
-    return file.filePath
+  trackByPath<T extends { filePath: string }>(_index: number, item: T): string {
+    return item.filePath
   }
 
   getFileExtensionIconName(extension: string | undefined): string | null {
@@ -64,70 +49,21 @@ export class AutocompleteComponent {
     this.selectedItem = file
   }
 
-  onSearchFiles() {
-    const value = (this.searchQuery || '').toLowerCase()
-    if (!value || value.length < 3) {
-      this.filterFiles = []
-      return
-    }
-    this.electronService.searchFiles({ searchOpts: { content: value } })
-
-    /* this.filterFiles = this.files
-      .filter((f) => {
-        const name = f.name.toLowerCase()
-        const extension = f.extension.toLowerCase()
-        const filePath = f.filePath.toLowerCase()
-        const content = f.content.toLowerCase()
-
-        return name.includes(value) || extension.includes(value) || filePath.includes(value) || content.includes(value)
-      })
-      .map((file) => {
-        if (file.content) {
-          file.highlightContentText = this.getHighlightText(file.content, value)
-        }
-
-        return file
-      }) */
+  search(): void {
+    this.debouncedSearch$.next(this.searchQuery)
   }
 
-  /**
-   * generates a highlight text that is shown alongside other file data. Attempts to truncate the text while keeping the highlighted part intact
-   * @param textContent the file's text content
-   * @param query search query
-   */
-  getHighlightText(textContent: string, query: string): string {
-    if (!textContent) {
-      return ''
-    }
-    const highlightText = textContent.replace(
-      new RegExp(query, 'gi'),
-      (match) => '<span class="highlightText">' + match + '</span>'
-    )
+  onSearchFiles() {
+    const value = (this.searchQuery || '').toLowerCase()
 
-    const length = highlightText.length
-    if (length < 80) {
-      return highlightText
+    if (!value || value.length < 3) {
+      if (this.state.getStatePartValue('searchResults').length) {
+        this.state.updateState$.next({ key: 'searchResults', payload: [] })
+      }
+      return
     }
 
-    const shorten = (str: string, maxLen: number, separator = ' ') => {
-      if (str.length <= maxLen) return str
-      return str.substr(0, str.lastIndexOf(separator, maxLen))
-    }
-
-    const highlightStartIndex = highlightText.indexOf('<span ')
-    const highlightEndIndex = highlightText.indexOf('</span>') + 7 // length of '</span>'
-    const highlightString = highlightText.substring(highlightStartIndex, highlightEndIndex)
-    let prefix = highlightText.substring(0, highlightStartIndex - 1)
-    let suffix = highlightText.substring(highlightEndIndex + 1, highlightText.length)
-
-    const shouldTruncateString = (string: string) => string.length > 90
-
-    if (shouldTruncateString(prefix)) {
-      prefix = '...' + shorten(prefix, 90)
-    }
-    if (shouldTruncateString(suffix)) {
-      suffix = shorten(suffix, 90) + '...'
-    }
-    return prefix + ' ' + highlightString + ' ' + suffix
+    const baseDir = this.state.getStatePartValue('baseDir')
+    this.electronService.searchFiles({ searchOpts: { content: value, baseDir } })
   }
 }

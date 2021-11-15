@@ -119,10 +119,6 @@ export class ElectronService {
     this.send(FileActions.Update, payload)
   }
 
-  readStore(): void {
-    this.send(StoreActions.GetStore, {})
-  }
-
   searchFiles(payload: OmitActionType<SearchQuery>): void {
     this.send(SearchActions.Query, payload)
   }

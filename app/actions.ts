@@ -102,6 +102,7 @@ export interface SearchQuery {
 interface SearchOptions {
   content?: string
   modifiedAt?: string
+  baseDir?: string
   createdAt?: string
 }
 

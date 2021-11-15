@@ -9,6 +9,7 @@ export interface FileEntity {
   type: 'folder' | 'file'
   icon?: string
   indents?: number
+  ino: number
   filePath: string
   parentPath: string
   size: number
@@ -38,4 +39,17 @@ export interface AppConfig {
   baseDir?: string
   tabs?: Tab[]
   sideMenuWidth?: number
+}
+
+export interface SearchResult {
+  fileName: string
+  extension: string
+  content: string
+  filePath: string
+  iconName: string | undefined
+  createdDate: string
+  modifiedDate: string
+  highlightContentText?: string | undefined
+  highlightTitleText?: string | undefined
+  highlightPathText?: string | undefined
 }

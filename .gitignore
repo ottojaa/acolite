@@ -8,6 +8,9 @@
 /release
 main.js
 src/**/*.js
+app/**/*.js
+app/ipc-events/*.js
+app/*.js/
 !src/karma.conf.js
 *.js.map
 

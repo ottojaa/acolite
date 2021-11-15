@@ -2,10 +2,8 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { join } from 'path'
 import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
-import { folderStructureToMenuItems } from '../src/app/utils/menu-utils'
-import { getDirName, getPathSeparator } from '../src/app/utils/file-utils'
-import { cloneDeep } from 'lodash'
-import { FilePathContainer } from '../src/app/interfaces/File'
+import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from '../src/app/utils/menu-utils'
+import { getDirName } from '../src/app/utils/file-utils'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)
@@ -20,6 +18,7 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
 
   return {
     filePath,
+    ino: fileInfo.ino,
     parentPath: getDirName(filePath),
     type: isFolder ? 'folder' : 'file',
     size: fileInfo.size,
@@ -30,11 +29,12 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
 }
 
 /**
- * Since the file entity does not exist after deletion, we can just mock it
+ * Since the file entity does not exist after deletion, we need to mock it
  */
 export const getDeletedFileEntityMock = (filePath: string): FileEntity => {
   return {
     filePath,
+    ino: 0,
     parentPath: getDirName(filePath),
     type: 'file',
     size: 0,
@@ -98,4 +98,11 @@ export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: 
   }
 
   return copy
+}
+
+export const getRootDirectory = (baseDir: string): TreeElement => {
+  const menuItems = getMenuItemsFromBaseDirectory(baseDir)
+  const rootEntity = getFileEntityFromPath(baseDir)
+
+  return { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
 }

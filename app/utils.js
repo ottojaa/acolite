@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.patchCollectionBy = exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getDeletedFileEntityMock = exports.getFileEntityFromPath = void 0;
+exports.getRootDirectory = exports.patchCollectionBy = exports.getTreeStructureFromBaseDirectory = exports.getMenuItemsFromBaseDirectory = exports.getDeletedFileEntityMock = exports.getFileEntityFromPath = void 0;
 var path = require("path");
 var fs = require("fs");
 var path_1 = require("path");
@@ -27,15 +27,16 @@ var getFileEntityFromPath = function (filePath) {
     var getIcon = function (extension) { return extension + '.svg'; };
     var fileExtension = isFolder ? null : getExtension(filePath);
     var icon = isFolder ? null : getIcon(fileExtension);
-    return __assign({ filePath: filePath, parentPath: (0, file_utils_1.getDirName)(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
+    return __assign({ filePath: filePath, ino: fileInfo.ino, parentPath: (0, file_utils_1.getDirName)(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
 };
 exports.getFileEntityFromPath = getFileEntityFromPath;
 /**
- * Since the file entity does not exist after deletion, we can just mock it
+ * Since the file entity does not exist after deletion, we need to mock it
  */
 var getDeletedFileEntityMock = function (filePath) {
     return {
         filePath: filePath,
+        ino: 0,
         parentPath: (0, file_utils_1.getDirName)(filePath),
         type: 'file',
         size: 0,
@@ -96,4 +97,10 @@ var patchCollectionBy = function (collection, newEl, key) {
     return copy;
 };
 exports.patchCollectionBy = patchCollectionBy;
+var getRootDirectory = function (baseDir) {
+    var menuItems = (0, exports.getMenuItemsFromBaseDirectory)(baseDir);
+    var rootEntity = (0, exports.getFileEntityFromPath)(baseDir);
+    return __assign(__assign({}, (0, menu_utils_1.getTreeNodeFromFileEntity)(rootEntity)), { children: menuItems });
+};
+exports.getRootDirectory = getRootDirectory;
 //# sourceMappingURL=utils.js.map

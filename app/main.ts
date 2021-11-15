@@ -1,40 +1,27 @@
-import { app, BrowserWindow, ipcMain, screen, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
-import { getDeletedFileEntityMock, getFileEntityFromPath, getMenuItemsFromBaseDirectory } from './utils'
+import { FileActions, FolderActions, SearchActions, StoreActions, StoreResponses, UpdateActionPayload } from './actions'
+import { getJoinedPath } from '../src/app/utils/file-utils'
+import { Document } from 'flexsearch'
 import {
-  getTreeNodeFromFileEntity,
-  getUpdatedFilePathsRecursive,
-  getUpdatedMenuItemsRecursive,
-  moveRecursive,
-} from '../src/app/utils/menu-utils'
+  createNewDirectory,
+  chooseDirectory,
+  setDefaultDirectory,
+  readAndSendMenuItemsFromBaseDirectory,
+} from './ipc-events/directory-events'
 import {
-  CreateFile,
-  CreateNewDirectory,
-  DeleteFiles,
-  FileActionResponses,
-  FileActions,
-  FolderActionResponses,
-  FolderActions,
-  MoveFiles,
-  ReadDirectory,
-  ReadFile,
-  RenameFile,
-  SearchActions,
-  SearchQuery,
-  SearchResponses,
-  StoreActions,
-  StoreResponses,
-  UpdateActionPayload,
-  UpdateFileContent,
-  UpdateStore,
-} from './actions'
-import { getBaseName, getDirName, getExtension, getJoinedPath } from '../src/app/utils/file-utils'
-import { cloneDeep, first, isEqual, isPlainObject } from 'lodash'
-import { AppConfig, Tab, TreeElement } from '../src/app/interfaces/Menu'
-import { Worker, Document } from 'flexsearch'
+  createFile,
+  renameFile,
+  deleteFiles,
+  moveFiles,
+  updateFileContent,
+  readAndSendTabData,
+} from './ipc-events/file-events'
+import { initAppState, searchFiles, updateStore } from './ipc-events/store-events'
+import { Doc } from '../src/app/interfaces/File'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
 // Initialize remote module
@@ -47,7 +34,7 @@ const configPath = getJoinedPath([dirPath, configFileName])
 const args = process.argv.slice(1),
   serve = args.some((val) => val === '--serve')
 
-let index: Document<unknown, true>
+let index: Document<Doc, true>
 
 function createWindow(): BrowserWindow {
   const electronScreen = screen
@@ -130,11 +117,11 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FolderActions.ChooseDir: {
-        chooseDirectory(event)
+        chooseDirectory(event, win)
         break
       }
       case FolderActions.SetDefaultDir: {
-        setDefaultDirectory(event)
+        setDefaultDirectory(event, configPath)
         break
       }
       case FolderActions.ReadDir: {
@@ -142,23 +129,23 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FileActions.Create: {
-        createFile(event, payload)
+        createFile(event, payload, index)
         break
       }
       case FileActions.Rename: {
-        renameFile(event, payload)
+        renameFile(event, payload, index)
         break
       }
       case FileActions.DeleteFiles: {
-        deleteFiles(event, payload)
+        deleteFiles(event, payload, index)
         break
       }
       case FileActions.MoveFiles: {
-        moveFiles(event, payload)
+        moveFiles(event, payload, index)
         break
       }
       case FileActions.Update: {
-        updateFileContent(event, payload)
+        updateFileContent(event, payload, index)
         break
       }
       case FileActions.ReadFile: {
@@ -166,19 +153,15 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case StoreActions.InitApp: {
-        initAppState(event)
-        break
-      }
-      case StoreActions.GetStore: {
-        getStoreData(event)
+        initAppState(event, configPath, index)
         break
       }
       case StoreActions.UpdateStore: {
-        updateStore(event, payload)
+        updateStore(event, payload, configPath)
         break
       }
       case SearchActions.Query: {
-        searchFiles(event, payload)
+        searchFiles(event, payload, index)
         break
       }
     }
@@ -195,7 +178,9 @@ try {
   startIPCChannelListeners()
 
   index = new Document({
-    tokenize: 'forward',
+    tokenize: 'full',
+    resolution: 1,
+    optimize: true,
     document: {
       id: 'id',
       index: ['filePath', 'fileName', 'content', 'createdAt', 'modifiedAt', 'extension'],
@@ -223,449 +208,4 @@ try {
   console.log(e)
   // Catch Error
   // throw e;
-}
-
-/**
- *
- * @param filePath path to acolite.config.json
- * @param args object data to be added to the config
- */
-export const writeToFile = <T extends { key: string; payload: any }>(filePath: string, args: T): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) reject()
-      const { payload, key } = args
-      const configurationObject = JSON.parse(data)
-      configurationObject[key] = payload
-
-      const config = JSON.stringify(configurationObject, null, 2)
-      fs.writeFile(filePath, config, (err) => {
-        if (err) reject()
-        resolve()
-      })
-    })
-  })
-}
-
-const initAppState = (event: IpcMainEvent) => {
-  try {
-    const defaultConfig = JSON.stringify({ baseDir: '' }, null, 2)
-    const configExists = fs.existsSync(configPath)
-
-    if (!configExists) {
-      fs.writeFileSync(configPath, defaultConfig)
-      event.sender.send(StoreResponses.InitAppSuccess)
-    } else {
-      const configBuffer = fs.readFileSync(configPath)
-      const config: AppConfig = JSON.parse(configBuffer.toString())
-
-      if (!isPlainObject(config)) {
-        fs.writeFileSync(configPath, defaultConfig)
-      }
-
-      const configCopy = cloneDeep(config)
-      const updatedConfig = validateAndUpdateConfig(config)
-
-      if (!isEqual(configCopy, updatedConfig)) {
-        const updatedConfigJSON = JSON.stringify(updatedConfig, null, 2)
-        fs.writeFileSync(configPath, updatedConfigJSON)
-      }
-
-      const getPayload = () => {
-        const baseDir = updatedConfig.baseDir
-        if (!baseDir) {
-          return {}
-        }
-
-        const state = { ...updatedConfig, rootDirectory: getRootDirectory(baseDir) }
-        addFilesToIndex(state.rootDirectory.children)
-
-        return state
-      }
-      event.sender.send(StoreResponses.InitAppSuccess, getPayload())
-    }
-  } catch (err) {
-    console.log(err)
-    event.sender.send(StoreResponses.InitAppFailure)
-  }
-}
-
-const searchFiles = async (event: IpcMainEvent, query: SearchQuery) => {
-  const { searchOpts } = query
-  const results = await index.searchAsync(searchOpts.content, { enrich: true })
-  const mappedResults = results.length ? results.reduce((acc, curr) => acc.concat(curr.result[0].doc), []) : []
-  event.sender.send(SearchResponses.QuerySuccess, mappedResults)
-}
-
-const addFilesToIndex = (treeStruct: TreeElement[]) => {
-  const files = flattenTreeStructure(treeStruct)
-  files.forEach((file) => {
-    if (file.data.type === 'file') {
-      addToIndex(file)
-    }
-  })
-}
-
-const addToIndex = (file: TreeElement) => {
-  const { filePath } = file.data
-  fs.readFile(filePath, 'utf-8', (_err, data) => {
-    fs.stat(filePath, (_err, stats) => {
-      const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
-      const extension = getExtension(filePath)
-      const fileName = getBaseName(filePath)
-      const doc = {
-        filePath,
-        fileName,
-        extension,
-        content: data,
-        modifiedAt: mtime,
-        createdAt: birthtime,
-      }
-      index.addAsync(ino, doc, () => {
-        console.log('added succesfully')
-      })
-    })
-  })
-}
-
-const flattenTreeStructure = (treeElement: TreeElement[], arr: TreeElement[] = []) => {
-  treeElement.forEach((el) => {
-    arr.push(el)
-    if (el.children?.length) {
-      flattenTreeStructure(el.children, arr)
-    }
-  })
-  return arr
-}
-
-const updateStore = (event: IpcMainEvent, updateData: UpdateStore) => {
-  fs.readFile(configPath, (_err, data) => {
-    const storeData = JSON.parse(data.toString())
-    const updatedStoreData = JSON.stringify({ ...storeData, ...updateData }, null, 2)
-    fs.writeFile(configPath, updatedStoreData, (err) => {
-      if (err) {
-        event.sender.send(StoreResponses.UpdateStoreFailure)
-      }
-      event.sender.send(StoreResponses.UpdateStoreSuccess)
-    })
-  })
-}
-
-const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
-  const validatedConfigVal = <K extends keyof AppConfig>(key: K) => {
-    switch (key) {
-      case 'tabs': {
-        const getTabData = (path: string) => {
-          if (!fs.existsSync(path)) {
-            return null
-          }
-          const content = fs.readFileSync(path, 'utf-8')
-          const fileStats = fs.statSync(path)
-          return <Tab>{
-            fileName: getBaseName(path),
-            extension: getExtension(path),
-            path: path,
-            textContent: content,
-            data: {
-              lastUpdated: fileStats.mtime,
-            },
-          }
-        }
-        return config.tabs.map((tab) => getTabData(tab.path)).filter((tab) => !!tab)
-      }
-      case 'baseDir': {
-        const { baseDir } = config
-        if (typeof baseDir === 'string' && fs.existsSync(baseDir)) {
-          return baseDir
-        }
-        return ''
-      }
-      case 'sideMenuWidth': {
-        const defaultWidth = 20
-
-        const { sideMenuWidth } = config
-        if (typeof sideMenuWidth === 'number') {
-          const isValidWidth = Number.isInteger(sideMenuWidth) && sideMenuWidth >= 0 && sideMenuWidth <= 100
-          return isValidWidth ? sideMenuWidth : defaultWidth
-        }
-        return defaultWidth
-      }
-      default: {
-        break
-      }
-    }
-  }
-  const allowedKeys = ['baseDir', 'tabs', 'sideMenuWidth']
-  const keys = Object.keys(config).filter((key) => allowedKeys.includes(key)) as (keyof AppConfig)[]
-
-  return keys.reduce((acc, curr) => {
-    acc[curr] = validatedConfigVal(curr)
-    return acc
-  }, {})
-}
-
-const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
-  const { directoryName, baseDir, rootDirectory, parentPath } = payload
-  const directoryPath = path.join(parentPath ? parentPath : baseDir, directoryName)
-  fs.promises
-    .mkdir(directoryPath, { recursive: true })
-    .then(() => {
-      const newDir = getFileEntityFromPath(directoryPath)
-      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [newDir], 'create', {
-        baseDir: rootDirectory.data.filePath,
-      })
-
-      const rootDir = first(updatedRootDirectory)
-
-      event.sender.send(FolderActionResponses.MakeDirectorySuccess, rootDir)
-    })
-    .catch((err) => {
-      event.sender.send(FolderActionResponses.MakeDirectoryFailure, err)
-    })
-}
-
-const chooseDirectory = (event: IpcMainEvent) => {
-  dialog
-    .showOpenDialog(win, {
-      properties: ['openDirectory', 'createDirectory'],
-    })
-    .then((result) => {
-      if (result.canceled) {
-        event.reply(FolderActionResponses.ChooseDirectoryCanceled)
-      } else if (result.filePaths) {
-        // Take the dirPath chosen by the user and write it in the acolite.config.json to overwrite the base-url
-        const filePathRef = result.filePaths[0]
-        event.reply(FolderActionResponses.ChooseDirectorySuccess, filePathRef)
-      }
-    })
-    .catch((err) => {
-      event.reply(FolderActionResponses.ChooseDirectoryFailure, err)
-    })
-}
-
-const setDefaultDirectory = (event: IpcMainEvent) => {
-  writeToFile(configPath, { key: 'baseDir', payload: __dirname })
-    .then(() => {
-      event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
-    })
-    .catch((err) => {
-      event.sender.send(FolderActionResponses.SetDefaultDirFailure, err)
-    })
-}
-
-const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: ReadDirectory) => {
-  try {
-    const rootDirectory = getRootDirectory(action.baseDir)
-    event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
-  } catch (err) {
-    console.log(err)
-    event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
-  }
-}
-
-const getRootDirectory = (baseDir: string): TreeElement => {
-  const menuItems = getMenuItemsFromBaseDirectory(baseDir)
-  const rootEntity = getFileEntityFromPath(baseDir)
-
-  return { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
-}
-
-const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
-  const { filePath } = action.node.data
-  fs.readFile(filePath, 'utf-8', (err, content) => {
-    if (err) {
-      event.sender.send(FileActionResponses.ReadFailure)
-      return
-    }
-    const fileStats = fs.statSync(filePath)
-    const tabData: Tab = {
-      fileName: getBaseName(filePath),
-      extension: getExtension(filePath),
-      path: filePath,
-      textContent: content,
-      data: {
-        lastUpdated: fileStats.mtime,
-      },
-    }
-    event.sender.send(FileActionResponses.ReadSuccess, tabData)
-  })
-}
-
-const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent) => {
-  const { path, content } = action
-
-  fs.writeFile(path, content, (err) => {
-    if (err) {
-      event.sender.send(FileActionResponses.UpdateFailure)
-      return
-    }
-
-    const tabs = action.tabs
-    const tabIdx = tabs.findIndex((tab) => tab.path === path)
-    if (tabIdx > -1) {
-      const fileStats = fs.statSync(path)
-      tabs[tabIdx] = {
-        ...tabs[tabIdx],
-        textContent: content,
-        data: {
-          ...tabs[tabIdx].data,
-          lastUpdated: fileStats.mtime,
-        },
-      }
-      tabs[tabIdx].textContent = content
-    }
-    event.sender.send(FileActionResponses.UpdateSuccess, tabs)
-  })
-}
-
-const createFile = (event: IpcMainEvent, action: CreateFile) => {
-  const { path, rootDirectory } = action
-
-  fs.writeFile(path, '', (err) => {
-    if (err) {
-      event.sender.send(FileActionResponses.CreateFailure, err)
-      return
-    }
-    const file = getFileEntityFromPath(path)
-    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
-      baseDir: rootDirectory.data.filePath,
-    })
-
-    const rootDir = first(updatedRootDirectory)
-
-    event.sender.send(FileActionResponses.CreateSuccess, rootDir)
-  })
-}
-
-const renameFile = (event: IpcMainEvent, action: RenameFile) => {
-  const { path, newName, rootDirectory } = action
-  const parentDirectory = getDirName(path)
-  const extension = getExtension(path)
-  const newPath = getJoinedPath([parentDirectory, newName]) + extension
-  const oldPath = path
-
-  fs.rename(path, newPath, (err) => {
-    if (err) {
-      event.sender.send(FileActionResponses.RenameFailure)
-      return
-    }
-    const file = getFileEntityFromPath(newPath)
-    const fileInfo = fs.statSync(newPath)
-    const isFolder = fileInfo.isDirectory()
-
-    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'rename', {
-      oldPath,
-      newPath,
-      isFolder,
-      baseDir: rootDirectory.data.filePath,
-    })
-    const rootDir = first(updatedRootDirectory)
-    event.sender.send(FileActionResponses.RenameSuccess, rootDir)
-  })
-}
-
-const moveFiles = (event: IpcMainEvent, action: MoveFiles) => {
-  const { target, elementsToMove, rootDirectory, tabs } = action
-  const newParentPath = target.data.filePath
-  const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'folder' ? -1 : 1))
-  const failedToMove = []
-
-  const getNewPath = (currentPath: string, newParentPath: string) => {
-    return getJoinedPath([currentPath.replace(currentPath, newParentPath), getBaseName(currentPath)])
-  }
-
-  const patchTabValue = (currentPath: string, newPath: string, tabs: Tab[]) => {
-    const tabIdx = tabs.findIndex((tab) => tab.path === currentPath)
-    if (tabIdx > -1) {
-      tabs[tabIdx].path = newPath
-    }
-  }
-
-  const promises: Promise<void>[] = sortedElements.map(
-    (element) =>
-      new Promise((resolve, reject) => {
-        const currentPath = element.data.filePath
-        const newPath = getNewPath(currentPath, newParentPath)
-        patchTabValue(currentPath, newPath, tabs)
-
-        fs.rename(currentPath, newPath, (err) => {
-          if (err) {
-            failedToMove.push(currentPath)
-            reject(err)
-          }
-          resolve()
-        })
-      })
-  )
-  Promise.all(promises)
-    .then(() => {
-      const elementsToDelete = cloneDeep(sortedElements)
-      const elementsToAdd = cloneDeep(sortedElements)
-        .filter((el) => !failedToMove.includes(el.data.filePath))
-        .map((treeEl) => {
-          const oldPath = getDirName(treeEl.data.filePath)
-          return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
-        })
-
-      moveRecursive(elementsToAdd, elementsToDelete, [rootDirectory], { baseDir: rootDirectory.data.filePath })
-      event.sender.send(FileActionResponses.MoveSuccess, { rootDirectory, tabs })
-    })
-    .catch((err) => {
-      console.log('Error while moving:', err)
-      event.sender.send(FileActionResponses.MoveFailure)
-    })
-}
-
-const deleteFiles = (event: IpcMainEvent, action: DeleteFiles) => {
-  const { directoryPaths, filePaths, baseDir, rootDirectory } = action
-  const paths = [...directoryPaths, ...filePaths]
-  let failedToDelete = []
-
-  const promises: Promise<void>[] = paths.map(
-    (filePath) =>
-      new Promise((resolve, reject) => {
-        fs.rm(filePath, { recursive: true, force: true }, (err) => {
-          if (err) {
-            failedToDelete.push(filePath)
-            reject()
-          }
-          resolve()
-        })
-      })
-  )
-  Promise.all(promises).then(
-    () => {
-      const files = paths
-        .filter((el) => !failedToDelete.includes(el))
-        .map((filePath) => getDeletedFileEntityMock(filePath))
-
-      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
-      const rootDir = first(updatedRootDirectory)
-      event.sender.send(FileActionResponses.DeleteSuccess, rootDir)
-    },
-    (err) => {
-      console.error(err)
-      event.sender.send(FileActionResponses.DeleteFailure)
-    }
-  )
-}
-
-const loop = () => {}
-
-//////////// App data store /////////////
-
-const getStoreData = (event: IpcMainEvent) => {
-  const dirPath = app.getPath('appData')
-  const configPath = getJoinedPath([dirPath, configFileName])
-
-  const createStore = () => {
-    const defaultPayload = JSON.stringify({ baseDir: '' }, null, 2)
-    fs.writeFile(configPath, defaultPayload, (err) => {
-      if (err) {
-        event.sender.send(StoreResponses.CreateStoreFailure)
-        return
-      }
-      event.sender.send(StoreResponses.CreateStoreSuccess)
-    })
-  }
 }
