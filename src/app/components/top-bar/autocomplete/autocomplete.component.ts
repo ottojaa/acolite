@@ -1,3 +1,4 @@
+import { trigger, state, style, transition, animate } from '@angular/animations'
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import * as faker from 'faker'
 import { Observable, Subject } from 'rxjs'
@@ -8,6 +9,7 @@ import { ElectronService } from '../../../core/services'
 import { fileExtensionIcons } from '../../../entities/file/constants'
 import { SearchResult } from '../../../interfaces/Menu'
 import { StateService } from '../../../services/state.service'
+import { TabService } from '../../../services/tab.service'
 
 @Component({
   selector: 'app-autocomplete',
@@ -21,7 +23,7 @@ export class AutocompleteComponent extends AbstractComponent {
   searchQuery: string
   debouncedSearch$ = new Subject<string>()
 
-  constructor(private electronService: ElectronService, private state: StateService) {
+  constructor(private electronService: ElectronService, private state: StateService, private tabService: TabService) {
     super()
     this.searchResults$ = this.state.getStatePart('searchResults')
     this.debouncedSearch$.pipe(takeUntil(this.destroy$), debounceTime(20)).subscribe(() => {
@@ -29,8 +31,11 @@ export class AutocompleteComponent extends AbstractComponent {
     })
   }
 
-  onOpenDrop(state: boolean) {
-    this.openDrop = state
+  onOpenDrop(event: MouseEvent, state: boolean) {
+    const target = event.target as HTMLElement
+    if (!target.classList.contains('keyboard-navigation-item')) {
+      this.openDrop = state
+    }
   }
 
   trackByPath<T extends { filePath: string }>(_index: number, item: T): string {
@@ -45,8 +50,9 @@ export class AutocompleteComponent extends AbstractComponent {
     return icon ? icon.name : null
   }
 
-  onSelectItem(file: File) {
-    this.selectedItem = file
+  onSelectItem<T extends { filePath: string }>(file: T) {
+    this.tabService.openNewTab(file.filePath)
+    this.state.updateState$.next({ key: 'searchResults', payload: [] })
   }
 
   search(): void {

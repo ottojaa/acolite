@@ -62,7 +62,7 @@ export interface MoveFiles {
 
 export interface ReadFile {
   type: FileActions.ReadFile
-  node: TreeElement
+  filePath: string
 }
 export interface UpdateFileContent {
   type: FileActions.Update

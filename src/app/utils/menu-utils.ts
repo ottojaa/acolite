@@ -171,7 +171,7 @@ export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
         removeExistingStyleClasses(item.children)
       }
     })
-  }, 2000)
+  }, 500)
 }
 
 export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string): TreeNode<FileEntity> => {

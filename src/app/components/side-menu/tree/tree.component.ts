@@ -9,6 +9,7 @@ import { ElectronService } from '../../../core/services'
 import { FileEntity, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { State, StateService, StateUpdate } from '../../../services/state.service'
+import { TabService } from '../../../services/tab.service'
 
 @Component({
   selector: 'app-tree',
@@ -31,6 +32,7 @@ export class TreeComponent implements OnInit {
     private state: StateService,
     private electronService: ElectronService,
     private dialogService: AppDialogService,
+    private tabService: TabService,
     private cdRef: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
@@ -49,14 +51,7 @@ export class TreeComponent implements OnInit {
 
     if (!modifierKeyPressed) {
       if (node.data.type === 'file') {
-        const { tabs, selectedTab } = this.state.getStateParts(['tabs', 'selectedTab'])
-        const tabIdx = tabs.findIndex((tab) => tab.path === node.data.filePath)
-
-        if (tabIdx > -1 && tabIdx !== selectedTab) {
-          this.state.updateState$.next({ key: 'selectedTab', payload: tabIdx })
-        } else if (tabIdx === -1) {
-          this.electronService.readFileRequest({ node })
-        }
+        this.tabService.openNewTab(node.data.filePath)
       }
     }
     this.selection = this.selectedFiles

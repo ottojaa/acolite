@@ -6,13 +6,8 @@
 
 .list-item {
   position: relative;
-  background-color: var(--secondary);
   cursor: pointer;
-  transition: background-color 100ms linear;
-  :hover {
-    background-color: #484a4e !important;
-  }
-  :focus {
+  :hover:not(.selected) {
     background-color: #484a4e !important;
   }
 }
@@ -20,20 +15,29 @@
 .keyboard-navigation-item {
   width: 100%;
   padding: 1rem;
-  margin-top: 1px;
   outline: none;
-  background-color: var(--primary);
+  cursor: pointer;
   height: auto;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+  border-bottom: 1px solid #504f4f;
 
   .list-item-information {
     flex-direction: column;
+    pointer-events: none;
     width: 100%;
     > p {
       margin: 0;
     }
+  }
+
+  &.selected {
+    background: var(--buttonColor);
+  }
+
+  &:not(.selected):hover {
+    background-color: #484a4e;
   }
 
   .top-row {
@@ -55,10 +59,6 @@
   p:not(.file-path) {
     margin: 0;
     color: var(--contrast);
-  }
-  :focus {
-    padding: 100px;
-    background-color: white;
   }
   .file-path {
     font-size: 1.1rem;

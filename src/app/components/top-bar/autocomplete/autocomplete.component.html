@@ -8,15 +8,15 @@
       placeholder="Search for files"
       [(ngModel)]="searchQuery"
       (ngModelChange)="search()"
-      (click)="onOpenDrop(true)"
-      (clickOutside)="onOpenDrop(false)"
+      (click)="onOpenDrop($event, true)"
+      (clickOutside)="onOpenDrop($event, false)"
       [exclude]="'.input-search'"
     />
 
     <!-- Dropdown Menu -->
     <ul *ngIf="openDrop" class="drop-down" keyboardNavigationList>
-      <div class="list-item" id="item" *ngFor="let file of searchResults$ | async; let i = index; trackBy: trackByPath">
-        <li role="option" keyboardNavigationItem>
+      <ng-container *ngFor="let file of searchResults$ | async; let i = index; trackBy: trackByPath">
+        <li role="option" keyboardNavigationItem (click)="onSelectItem(file, i)">
           <div class="list-item-information">
             <div class="top-row">
               <p
@@ -43,7 +43,7 @@
             <div class="icon-width"></div>
           </ng-template> -->
         </li>
-      </div>
+      </ng-container>
     </ul>
   </div>
 </div>

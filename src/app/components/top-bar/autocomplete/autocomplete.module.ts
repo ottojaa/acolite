@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button'
 import { RippleModule } from 'primeng/ripple'
 import { SharedModule } from 'primeng/api'
 import { KeyboardEventsModule } from '../../directives/keyboard-events/keyboard-events.module'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 @NgModule({
   declarations: [AutocompleteComponent],
@@ -19,6 +20,7 @@ import { KeyboardEventsModule } from '../../directives/keyboard-events/keyboard-
     ButtonModule,
     RippleModule,
     KeyboardEventsModule,
+    BrowserAnimationsModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

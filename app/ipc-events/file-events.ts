@@ -23,7 +23,7 @@ import { addToIndex, removeIndexes, updateIndex } from './store-events'
 import { Doc } from '../../src/app/interfaces/File'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
-  const { filePath } = action.node.data
+  const { filePath } = action
   fs.readFile(filePath, 'utf-8', (err, content) => {
     if (err) {
       event.sender.send(FileActionResponses.ReadFailure)
@@ -176,7 +176,9 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
       inodes.push(el.data.ino)
     }
     if (el.children?.length) {
-      getInodesRecursive(el, inodes)
+      for (let child of el.children) {
+        getInodesRecursive(child, inodes)
+      }
     }
     return inodes
   }
@@ -188,15 +190,13 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
   const promises: Promise<void>[] = paths.map(
     (filePath) =>
       new Promise((resolve, reject) => {
-        fs.stat(filePath, (_err, stats) => {
-          fs.rm(filePath, { recursive: true, force: true }, (err) => {
-            if (err) {
-              failedToDelete.push(filePath)
-              reject()
-            }
+        fs.rm(filePath, { recursive: true, force: true }, (err) => {
+          if (err) {
+            failedToDelete.push(filePath)
+            reject()
+          }
 
-            resolve()
-          })
+          resolve()
         })
       })
   )

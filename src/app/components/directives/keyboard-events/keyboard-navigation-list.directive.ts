@@ -8,23 +8,19 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core'
   selector: '[keyboardNavigationList]',
 })
 export class KeyboardNavigationListDirective {
-  @Input('keyboardNavigationType') type: 'focus' | 'click' = 'focus'
+  @Input('keyboardNavigationType') type: 'focus' | 'click' = 'click'
 
   currentIndex: number | undefined
 
   get items(): HTMLElement[] {
-    return Array.from(
-      this.element.nativeElement.getElementsByClassName(
-        'keyboard-navigation-item'
-      )
-    )
+    return Array.from(this.element.nativeElement.getElementsByClassName('keyboard-navigation-item'))
   }
 
   constructor(private element: ElementRef) {}
 
   selectFirstElementIfExists(): void {
     if (this.items.length) {
-      this.items[0].focus()
+      this.items[0].classList.add('selected')
       this.currentIndex = 0
     }
   }
@@ -32,7 +28,13 @@ export class KeyboardNavigationListDirective {
   previous(): void {
     const newIdx = this.currentIndex - 1
     if (newIdx >= 0) {
-      this.items[newIdx][this.type]()
+      const currentEl = this.items[this.currentIndex]
+      const newEl = this.items[newIdx]
+
+      if (currentEl) {
+        currentEl.classList.remove('selected')
+      }
+      newEl.classList.add('selected')
       this.currentIndex--
     }
   }
@@ -44,7 +46,13 @@ export class KeyboardNavigationListDirective {
     }
     const newIdx = this.currentIndex + 1
     if (newIdx < this.items.length) {
-      this.items[newIdx][this.type]()
+      const currentEl = this.items[this.currentIndex]
+      const newEl = this.items[newIdx]
+
+      if (currentEl) {
+        currentEl.classList.remove('selected')
+      }
+      newEl.classList.add('selected')
       this.currentIndex++
     }
   }
@@ -74,6 +82,8 @@ export class KeyboardNavigationListDirective {
         this.clickCurrent()
         event.preventDefault()
         break
+      }
+      case 'Click': {
       }
       default:
     }
