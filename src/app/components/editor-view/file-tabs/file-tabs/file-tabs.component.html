@@ -1,18 +1,30 @@
-<mat-tab-group animationDuration="0ms" [selectedIndex]="selectedTab$ | async" (selectedTabChange)="onSelectTab($event)">
-  <ng-container *ngFor="let tab of tabs; trackBy: trackByPath">
-    <mat-tab matRipple [matRippleColor]="'ffff'">
-      <ng-template mat-tab-label>
-        <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ tab.extension }}.svg" />
-        <span class="tab-name">{{ tab.fileName }}</span>
-        <mat-icon class="close-button" (click)="onCloseTab(tab.path)">close</mat-icon>
-      </ng-template>
+<p-contextMenu #cm appendTo="body" [model]="contextMenuItems"></p-contextMenu>
 
-      <ng-container [ngSwitch]="tab.extension">
-        <div *ngSwitchCase="'txt'" class="editor">
-          <app-text-editor [tab]="tab"></app-text-editor>
-        </div>
-        <div *ngSwitchDefault>No editor for this type of file</div>
-      </ng-container>
-    </mat-tab>
-  </ng-container>
-</mat-tab-group>
+<div #tabContainer class="editor">
+  <mat-tab-group
+    animationDuration="0ms"
+    [selectedIndex]="selectedTab$ | async"
+    (selectedTabChange)="onSelectTab($event)"
+  >
+    <ng-container *ngFor="let tab of tabs; trackBy: trackByPath">
+      <div class="editor">
+        <mat-tab matRipple [matRippleColor]="'ffff'">
+          <ng-template mat-tab-label>
+            <div class="contextmenu-container" (contextmenu)="onRightClick($event, tab)">
+              <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ tab.extension }}.svg" />
+              <span class="tab-name">{{ tab.fileName }}</span>
+              <mat-icon class="close-button" (click)="onCloseTab(tab.path)">close</mat-icon>
+            </div>
+          </ng-template>
+
+          <ng-container [ngSwitch]="tab.extension">
+            <div *ngSwitchCase="'txt'" class="editor">
+              <app-text-editor [tab]="tab"></app-text-editor>
+            </div>
+            <div *ngSwitchDefault>No editor for this type of file</div>
+          </ng-container>
+        </mat-tab>
+      </div>
+    </ng-container>
+  </mat-tab-group>
+</div>

@@ -41,7 +41,8 @@
   visibility: hidden;
 }
 
-:host ::ng-deep .tab-label-container {
+:host ::ng-deep .tab-label-container,
+.contextmenu-container {
   width: 100%;
   display: flex;
   justify-content: space-around;

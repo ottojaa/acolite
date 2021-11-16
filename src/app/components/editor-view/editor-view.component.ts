@@ -1,12 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations'
-import { Component, NgZone, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
-import { delay, map, skipUntil, takeUntil, tap } from 'rxjs/operators'
+import { delay, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { FileEntity } from '../../interfaces/File'
 import { Tab } from '../../interfaces/Menu'
-import { State, StateService, StateUpdate } from '../../services/state.service'
-import { filterClosedTab } from '../../utils/tab-utils'
+import { StateService } from '../../services/state.service'
+import { TabService } from '../../services/tab.service'
 
 @Component({
   selector: 'app-editor-view',
@@ -27,7 +27,7 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   initialized$: Observable<boolean>
   contrastColor: string
 
-  constructor(private state: StateService, public zone: NgZone) {
+  constructor(private state: StateService, public tabService: TabService) {
     super()
   }
 
@@ -72,16 +72,7 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
     return [file1, ...secondaryFiles]
   }
 
-  onCloseTab(event: { filePath: string }): void {
-    const selectedTab = this.state.getStatePartValue('selectedTab')
-    const currentTabs = this.state.getStatePartValue('tabs')
-    const newTabs = filterClosedTab(currentTabs, event.filePath)
-    const newIndex = selectedTab - 1 >= 0 ? selectedTab - 1 : 0
-
-    const payload: StateUpdate<State>[] = [
-      { key: 'selectedTab', payload: newIndex },
-      { key: 'tabs', payload: newTabs },
-    ]
-    this.state.updateMulti$.next(payload)
+  closeTab(event: { filePath: string }): void {
+    this.tabService.closeTab(event.filePath)
   }
 }
