@@ -6,10 +6,19 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatRippleModule } from '@angular/material/core'
 import { TextEditorModule } from '../../editors/text-editor/text-editor.module'
 import { ContextMenuModule } from 'primeng/contextmenu'
+import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/markdown-editor.module'
 
 @NgModule({
   declarations: [FileTabsComponent],
   exports: [FileTabsComponent],
-  imports: [CommonModule, MatTabsModule, MatIconModule, MatRippleModule, TextEditorModule, ContextMenuModule],
+  imports: [
+    CommonModule,
+    MatTabsModule,
+    MatIconModule,
+    MatRippleModule,
+    TextEditorModule,
+    ContextMenuModule,
+    MarkdownEditorContainerModule,
+  ],
 })
 export class FileTabsModule {}

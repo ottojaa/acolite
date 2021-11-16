@@ -21,6 +21,11 @@
             <div *ngSwitchCase="'txt'" class="editor">
               <app-text-editor [tab]="tab"></app-text-editor>
             </div>
+
+            <div *ngSwitchCase="'md'" class="editor">
+              <app-markdown-editor [tab]="tab"></app-markdown-editor>
+            </div>
+
             <div *ngSwitchDefault>No editor for this type of file</div>
           </ng-container>
         </mat-tab>
