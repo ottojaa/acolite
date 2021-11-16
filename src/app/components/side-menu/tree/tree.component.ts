@@ -222,11 +222,6 @@ export class TreeComponent implements OnInit {
   getMenuItems(): MenuItem[] {
     let baseItems = [
       {
-        label: 'Reveal in finder',
-        icon: 'pi pi-search',
-        command: (event) => this.electronService.send(event),
-      },
-      {
         label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
         icon: 'pi pi-times',
         command: (_event) => this.openDeleteFilesDialog(),
@@ -254,11 +249,18 @@ export class TreeComponent implements OnInit {
         )
       }
       if (singleSelected) {
-        additionalItems.push({
-          label: 'Rename',
-          icon: 'pi pi-pencil',
-          command: (_event) => this.openRenameFileDialog(),
-        })
+        additionalItems.push(
+          {
+            label: 'Rename',
+            icon: 'pi pi-pencil',
+            command: (_event) => this.openRenameFileDialog(),
+          },
+          {
+            label: 'Reveal in finder',
+            icon: 'pi pi-search',
+            command: () => this.tabService.openTabInFileLocation(this.selectedFiles[0].data.filePath),
+          }
+        )
       }
       baseItems = [...additionalItems, { separator: true }, ...baseItems]
     }

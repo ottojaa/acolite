@@ -28,6 +28,7 @@ var FileActions;
     FileActions["DeleteFiles"] = "delete-files";
     FileActions["MoveFiles"] = "move-files";
     FileActions["ReadFile"] = "read-file";
+    FileActions["OpenFileLocation"] = "open-file-location";
 })(FileActions = exports.FileActions || (exports.FileActions = {}));
 var StoreActions;
 (function (StoreActions) {

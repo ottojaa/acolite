@@ -24,7 +24,6 @@ import { TabService } from '../../../../services/tab.service'
 })
 export class FileTabsComponent extends AbstractComponent implements OnInit {
   @Input() tabs: Tab[]
-  @Output() closeTab: EventEmitter<{ filePath: string }> = new EventEmitter()
   @ViewChild('cm') cm: ContextMenu
 
   contextMenuItems: MenuItem[]
@@ -52,9 +51,7 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
   }
 
   onCloseTab(filePath: string) {
-    event.stopPropagation()
-    console.log('closink')
-    this.closeTab.emit({ filePath })
+    this.tabService.closeTab(filePath)
   }
 
   onSelectTab(event: { index: number }): void {
@@ -84,6 +81,11 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
       {
         label: 'Close All',
         command: () => this.tabService.closeAllTabs(),
+      },
+      {
+        label: 'Show in folder',
+        icon: 'pi pi-search',
+        command: () => this.tabService.openTabInFileLocation(filePath),
       },
     ]
   }

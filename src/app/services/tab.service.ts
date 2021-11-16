@@ -25,29 +25,29 @@ export class TabService {
     const newTabs = this.filterClosedTab(tabs, filePath)
     const newIndex = selectedTab - 1 >= 0 ? selectedTab - 1 : 0
 
-    const payload: StateUpdate<State>[] = [
-      { key: 'selectedTab', payload: newIndex },
-      { key: 'tabs', payload: newTabs },
-    ]
-    this.state.updateMulti$.next(payload)
+    this.update(newIndex, newTabs)
   }
 
   closeOtherTabs(filePath: string): void {
     const { tabs } = this.state.getStateParts(['selectedTab', 'tabs'])
     const tabToKeepOpen = tabs.find((tab) => tab.path === filePath)
     if (tabToKeepOpen) {
-      const payload: StateUpdate<State>[] = [
-        { key: 'selectedTab', payload: 0 },
-        { key: 'tabs', payload: [tabToKeepOpen] },
-      ]
-      this.state.updateMulti$.next(payload)
+      this.update(0, [tabToKeepOpen])
     }
   }
 
   closeAllTabs(): void {
+    this.update(0, [])
+  }
+
+  openTabInFileLocation(filePath: string): void {
+    this.electronService.openFileLocationRequest({ filePath })
+  }
+
+  update(selectedTab: number, tabs: Tab[]): void {
     const payload: StateUpdate<State>[] = [
-      { key: 'selectedTab', payload: 0 },
-      { key: 'tabs', payload: [] },
+      { key: 'selectedTab', payload: selectedTab },
+      { key: 'tabs', payload: tabs },
     ]
     this.state.updateMulti$.next(payload)
   }

@@ -2,7 +2,7 @@
   <ng-container *ngIf="initialized$ | async; else showLoader">
     <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
       <ng-container *ngIf="tabs?.length; else showDefault">
-        <app-file-tabs [tabs]="tabs" (closeTab)="onCloseTab($event)"></app-file-tabs>
+        <app-file-tabs [tabs]="tabs"></app-file-tabs>
       </ng-container>
 
       <ng-template #showDefault>

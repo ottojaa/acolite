@@ -19,6 +19,7 @@ import {
   moveFiles,
   updateFileContent,
   readAndSendTabData,
+  openFileLocation,
 } from './ipc-events/file-events'
 import { initAppState, searchFiles, updateStore } from './ipc-events/store-events'
 import { Doc } from '../src/app/interfaces/File'
@@ -99,6 +100,7 @@ const IPCChannels = [
   FileActions.MoveFiles,
   FileActions.ReadFile,
   FileActions.Update,
+  FileActions.OpenFileLocation,
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
@@ -150,6 +152,10 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
       }
       case FileActions.ReadFile: {
         readAndSendTabData(event, payload)
+        break
+      }
+      case FileActions.OpenFileLocation: {
+        openFileLocation(event, payload)
         break
       }
       case StoreActions.InitApp: {

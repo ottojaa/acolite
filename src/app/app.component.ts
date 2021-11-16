@@ -199,7 +199,6 @@ export class AppComponent implements OnInit {
           break
         }
         case SearchResponses.QuerySuccess: {
-          console.log(response)
           this.state.updateState$.next({ key: 'searchResults', payload: response })
           break
         }

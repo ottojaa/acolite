@@ -15,6 +15,7 @@ export type UpdateActionPayload =
   | UpdateStore
   | InitApp
   | SearchQuery
+  | OpenFileLocation
 
 export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
 
@@ -63,6 +64,11 @@ export interface MoveFiles {
 
 export interface ReadFile {
   type: FileActions.ReadFile
+  filePath: string
+}
+
+export interface OpenFileLocation {
+  type: FileActions.OpenFileLocation
   filePath: string
 }
 export interface UpdateFileContent {
@@ -133,6 +139,7 @@ export enum FileActions {
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
   ReadFile = 'read-file',
+  OpenFileLocation = 'open-file-location',
 }
 
 export enum StoreActions {

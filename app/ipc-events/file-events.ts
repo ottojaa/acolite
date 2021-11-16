@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
 import { Tab, TreeElement } from '../../src/app/interfaces/Menu'
@@ -17,6 +18,7 @@ import {
   MoveFiles,
   DeleteFiles,
   FileActions,
+  OpenFileLocation,
 } from '../actions'
 import { getFileEntityFromPath, getDeletedFileEntityMock } from '../utils'
 import { Document } from 'flexsearch'
@@ -222,4 +224,8 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
       event.sender.send(FileActionResponses.DeleteFailure)
     }
   )
+}
+
+export const openFileLocation = (_event: IpcMainEvent, action: OpenFileLocation) => {
+  shell.showItemInFolder(action.filePath)
 }

@@ -71,8 +71,4 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
 
     return [file1, ...secondaryFiles]
   }
-
-  closeTab(event: { filePath: string }): void {
-    this.tabService.closeTab(event.filePath)
-  }
 }

@@ -14,6 +14,7 @@ import {
   FileActions,
   FolderActions,
   MoveFiles,
+  OpenFileLocation,
   ReadDirectory,
   ReadFile,
   RenameFile,
@@ -114,6 +115,10 @@ export class ElectronService {
 
   readFileRequest(payload: OmitActionType<ReadFile>): void {
     this.send(FileActions.ReadFile, payload)
+  }
+
+  openFileLocationRequest(payload: OmitActionType<OpenFileLocation>): void {
+    this.send(FileActions.OpenFileLocation, payload)
   }
 
   updateFileContent(payload: OmitActionType<UpdateFileContent>): void {
