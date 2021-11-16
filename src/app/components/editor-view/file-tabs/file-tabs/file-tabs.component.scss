@@ -4,10 +4,13 @@
   opacity: 1;
   height: 3rem;
   font-size: 1rem;
+  .icon {
+    width: 1.3rem;
+  }
 }
 
 :host ::ng-deep .mat-tab-labels {
-  padding: 0 1rem;
+  // padding: 0 1rem;
 }
 
 :host ::ng-deep .mat-tab-header-pagination {
@@ -29,14 +32,13 @@
 
 :host ::ng-deep ::-webkit-scrollbar {
   width: 10px;
-  height: 5px;
+  height: 3px;
   border-radius: 5px;
 }
 
 :host ::ng-deep ::-webkit-scrollbar-thumb {
-  background: #252525d6;
+  background: #dcdadad6;
   visibility: hidden;
-  transition: 0.5s all linear;
 }
 
 :host ::ng-deep .tab-label-container {
@@ -47,7 +49,8 @@
 }
 
 :host ::ng-deep .mat-tab-label {
-  border-right: 1px solid #0c0c0c38;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background-color: var(--secondary);
   &.mat-tab-label-active {
     background-color: var(--buttonColor);
@@ -66,11 +69,8 @@
   height: 100%;
 }
 
-.border {
-  border-right: 1px solid #0c0c0c38;
-}
-
 .tab-name {
+  margin-left: 0.5rem;
   color: var(--contrast);
 }
 

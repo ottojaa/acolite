@@ -1,11 +1,36 @@
 @import 'src/variables.scss';
 
+$container-bg-dark: #1b161636;
+$textarea-bg-dark: var(--secondary);
+$textarea-color-dark: var(--contrast);
+
+$container-bg-light: #efeeee;
+$textarea-bg-light: white;
+$textarea-color-light: black;
+
 :host ::-webkit-scrollbar-thumb {
   visibility: visible;
 }
 
 .top-bar {
   color: white;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  .editor-settings {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #cccccc;
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+  background-color: white;
 }
 
 .editor-container {
@@ -20,21 +45,41 @@
 }
 
 .area-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   border: none;
-}
+  border-radius: 5px;
+  transition: all 50ms linear;
 
-textarea {
-  padding: 1rem;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  background: var(--secondary);
-  border: none;
-  box-shadow: $box-shadow;
-  outline: 1px solid #80808042;
-  font-family: $font-family;
-  resize: none;
-  color: var(--contrast);
+  textarea {
+    padding: 1rem;
+    width: 99%;
+    height: 99%;
+    overflow-y: scroll;
+    border: none;
+    box-shadow: $box-shadow;
+    outline: none;
+    font-family: $font-family;
+    resize: none;
+    transition: all 50ms linear;
+  }
+  &.dark-theme {
+    background: $container-bg-dark;
+
+    textarea {
+      background: $textarea-bg-dark;
+      color: $textarea-color-dark;
+    }
+  }
+  &.light-theme {
+    background: $container-bg-light;
+
+    textarea {
+      background: $textarea-bg-light;
+      color: $textarea-color-light;
+    }
+  }
 }

@@ -7,6 +7,7 @@ import { StoreResponses, SearchQuery, SearchResponses, UpdateStore } from '../ac
 import { getRootDirectory } from '../utils'
 import { Document, EnrichedDocumentSearchResultSetUnitResultUnit } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
+import { allowedConfigKeys } from '../../src/app/entities/file/constants'
 
 export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -196,12 +197,21 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
         }
         return defaultWidth
       }
+      case 'editorTheme': {
+        if (
+          (typeof config.editorTheme === 'string' && config.editorTheme === 'dark') ||
+          config.editorTheme === 'light'
+        ) {
+          return config.editorTheme
+        }
+        return 'dark'
+      }
       default: {
         break
       }
     }
   }
-  const allowedKeys = ['baseDir', 'tabs', 'sideMenuWidth']
+  const allowedKeys = allowedConfigKeys
   const keys = Object.keys(config).filter((key) => allowedKeys.includes(key)) as (keyof AppConfig)[]
 
   return keys.reduce((acc, curr) => {

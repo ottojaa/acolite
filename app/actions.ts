@@ -21,6 +21,7 @@ export type ActionType = FileActions | FolderActions | StoreActions | SearchActi
 export interface CreateFile {
   type: FileActions.Create
   path: string
+  openFileAfterCreation: boolean
   rootDirectory: TreeElement
 }
 export interface ReadDirectory {

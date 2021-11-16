@@ -16,11 +16,16 @@ export class KeyboardNavigationListDirective {
     return Array.from(this.element.nativeElement.getElementsByClassName('keyboard-navigation-item'))
   }
 
+  get parentEl(): HTMLElement {
+    return document.getElementById('drop-down-list')
+  }
+
   constructor(private element: ElementRef) {}
 
   selectFirstElementIfExists(): void {
     if (this.items.length) {
       this.items[0].classList.add('selected')
+      this.scrollIntoViewIfNeeded(this.items[0])
       this.currentIndex = 0
     }
   }
@@ -34,16 +39,22 @@ export class KeyboardNavigationListDirective {
       if (currentEl) {
         currentEl.classList.remove('selected')
       }
-      newEl.classList.add('selected')
-      this.currentIndex--
+      if (newEl) {
+        newEl.classList.add('selected')
+        this.scrollIntoViewIfNeeded(newEl)
+        this.currentIndex--
+      } else {
+        this.currentIndex = 0
+      }
     }
   }
 
   next(): void {
-    if (this.currentIndex === undefined) {
+    if (this.currentIndex === undefined || this.currentIndex > this.items.length) {
       this.selectFirstElementIfExists()
       return
     }
+
     const newIdx = this.currentIndex + 1
     if (newIdx < this.items.length) {
       const currentEl = this.items[this.currentIndex]
@@ -52,13 +63,42 @@ export class KeyboardNavigationListDirective {
       if (currentEl) {
         currentEl.classList.remove('selected')
       }
-      newEl.classList.add('selected')
-      this.currentIndex++
+      if (newEl) {
+        newEl.classList.add('selected')
+        this.scrollIntoViewIfNeeded(newEl)
+        this.currentIndex++
+      } else {
+        this.currentIndex = 0
+      }
+    }
+  }
+
+  scrollIntoViewIfNeeded(child: HTMLElement): void {
+    const parentRect = this.parentEl.getBoundingClientRect()
+    const parentViewableArea = {
+      height: this.parentEl.clientHeight,
+      width: this.parentEl.clientWidth,
+    }
+    const childRect = child.getBoundingClientRect()
+    const isChildInView =
+      childRect.top >= parentRect.top && childRect.bottom <= parentRect.top + parentViewableArea.height
+
+    if (!isChildInView) {
+      const scrollTop = childRect.top - parentRect.top
+      const scrollBot = childRect.bottom - parentRect.bottom
+      if (Math.abs(scrollTop) < Math.abs(scrollBot)) {
+        this.parentEl.scrollTop += scrollTop
+      } else {
+        this.parentEl.scrollTop += scrollBot
+      }
     }
   }
 
   clickCurrent(): void {
-    this.items[this.currentIndex].click()
+    const currentItem = this.items[this.currentIndex]
+    if (currentItem) {
+      currentItem.click()
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -82,8 +122,6 @@ export class KeyboardNavigationListDirective {
         this.clickCurrent()
         event.preventDefault()
         break
-      }
-      case 'Click': {
       }
       default:
     }

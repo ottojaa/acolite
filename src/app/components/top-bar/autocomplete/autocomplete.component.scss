@@ -36,6 +36,9 @@
     flex-direction: row;
     pointer-events: none;
     width: 100%;
+    .information-container {
+      overflow: hidden;
+    }
     > p {
       margin: 0;
     }

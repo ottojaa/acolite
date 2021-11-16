@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { MenuItem } from 'primeng/api'
 import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, switchMap, take } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, switchMap, take, takeUntil } from 'rxjs/operators'
+import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
@@ -11,21 +12,31 @@ import { StateService } from '../../../../services/state.service'
   templateUrl: './text-editor.component.html',
   styleUrls: ['./text-editor.component.scss'],
 })
-export class TextEditorComponent implements OnInit {
+export class TextEditorComponent extends AbstractComponent implements OnInit {
   @Input() tab: Tab
+
+  isChecked: boolean
   textContent: string
   rand = new Date()
   autoSave$ = new Subject()
   currentSelection: any
   menuItems: MenuItem[]
 
-  constructor(private electronService: ElectronService, private state: StateService) {}
+  constructor(private electronService: ElectronService, private state: StateService) {
+    super()
+  }
 
   ngOnInit(): void {
     this.textContent = this.tab.textContent
     this.menuItems = this.getMenuItems()
+    this.initAutoSave()
+    this.initThemeListener()
+  }
+
+  initAutoSave(): void {
     this.autoSave$
       .pipe(
+        takeUntil(this.destroy$),
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
@@ -35,6 +46,13 @@ export class TextEditorComponent implements OnInit {
       })
   }
 
+  initThemeListener(): void {
+    this.state
+      .getStatePart('editorTheme')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => (this.isChecked = data === 'light'))
+  }
+
   updateContent(tabs: Tab[], path: string, content: string): void {
     const payload = { tabs, path, content }
     this.electronService.updateFileContent(payload)
@@ -42,6 +60,11 @@ export class TextEditorComponent implements OnInit {
 
   onInputChange(): void {
     this.autoSave$.next(this.textContent)
+  }
+
+  onChangeTheme(): void {
+    const theme = this.isChecked ? 'light' : 'dark'
+    this.state.updateState$.next({ key: 'editorTheme', payload: theme })
   }
 
   handleKeydown(event: any) {
@@ -101,7 +124,7 @@ export class TextEditorComponent implements OnInit {
     navigator.clipboard.readText().then((paste) => {
       switch (type) {
         case 'copy':
-          const selection = this.currentSelection.toString()
+          const selection = actElem.value
           navigator.clipboard.writeText(selection).then(() => {})
           break
         case 'paste': {

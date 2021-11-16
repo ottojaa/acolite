@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
 import { ContextMenuModule } from 'primeng/contextmenu'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 
 @NgModule({
   declarations: [TextEditorComponent],
@@ -20,6 +21,7 @@ import { ContextMenuModule } from 'primeng/contextmenu'
     ReactiveFormsModule,
     MatInputModule,
     ContextMenuModule,
+    MatSlideToggleModule,
   ],
 })
 export class TextEditorModule {}

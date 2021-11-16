@@ -25,6 +25,7 @@ import {
 } from '../../../../../app/actions'
 import { AppConfig } from '../../../interfaces/Menu'
 import { omit, pick } from 'lodash'
+import { allowedConfigKeys } from '../../../entities/file/constants'
 
 type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({
@@ -124,7 +125,7 @@ export class ElectronService {
   }
 
   updateStore(payload: OmitActionType<AppConfig>): void {
-    const filtered = pick(payload, ['tabs', 'baseDir', 'sideMenuWidth'])
+    const filtered = pick(payload, allowedConfigKeys)
     this.send(StoreActions.UpdateStore, filtered)
   }
 

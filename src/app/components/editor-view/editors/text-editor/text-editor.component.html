@@ -1,12 +1,16 @@
 <div class="editor-container">
   <span class="top-bar"
     ><p *ngIf="tab.data?.lastUpdated">
-      <span style="opacity: 0.7">Last updated</span> {{ tab.data?.lastUpdated | date: 'medium' }}
+      <span style="opacity: 0.7">Last saved</span> {{ tab.data?.lastUpdated | date: 'medium' }}
     </p>
+
+    <div class="editor-settings">
+      <mat-slide-toggle id="theme-toggle" [(ngModel)]="isChecked" (ngModelChange)="onChangeTheme()"></mat-slide-toggle>
+    </div>
   </span>
   <p-contextMenu [target]="editor" appendTo="body" [model]="menuItems"></p-contextMenu>
 
-  <div class="area-container">
+  <div class="area-container dark-theme" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'">
     <textarea
       #editor
       (keydown)="handleKeydown($event)"

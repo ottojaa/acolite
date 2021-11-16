@@ -39,6 +39,7 @@ export interface AppConfig {
   baseDir?: string
   tabs?: Tab[]
   sideMenuWidth?: number
+  editorTheme?: 'dark' | 'light'
 }
 
 export interface SearchResult {

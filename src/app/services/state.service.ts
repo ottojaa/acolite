@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 import { ElectronService } from '../core/services'
+import { allowedConfigKeys } from '../entities/file/constants'
 import { SearchResult, Tab, TreeElement } from '../interfaces/Menu'
 import { SettingsService } from './settings.service'
 
@@ -15,6 +16,7 @@ export interface State {
   baseDir: string
   initialized: boolean
   selectedTab: number
+  editorTheme: 'dark' | 'light'
   searchResults: SearchResult[]
   tabs: Tab[]
   rootDirectory: TreeElement
@@ -39,6 +41,7 @@ export class StateService extends AbstractComponent {
     initialized: false,
     baseDir: '',
     selectedTab: 0,
+    editorTheme: 'dark',
     searchResults: [],
     tabs: [],
     rootDirectory: {},
@@ -144,7 +147,7 @@ export class StateService extends AbstractComponent {
   }
 
   shouldTriggerStoreUpdate(keys: string[]): boolean {
-    const triggers = ['baseDir', 'tabs', 'sideMenuWidth']
+    const triggers = allowedConfigKeys
     return keys.some((key) => triggers.includes(key))
   }
 }

@@ -16,6 +16,7 @@ import {
   RenameFile,
   MoveFiles,
   DeleteFiles,
+  FileActions,
 } from '../actions'
 import { getFileEntityFromPath, getDeletedFileEntityMock } from '../utils'
 import { Document } from 'flexsearch'
@@ -39,7 +40,6 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
         lastUpdated: fileStats.mtime,
       },
     }
-    console.log(tabData.extension)
     event.sender.send(FileActionResponses.ReadSuccess, tabData)
   })
 }
@@ -75,7 +75,7 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
 }
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
-  const { path, rootDirectory } = action
+  const { path, rootDirectory, openFileAfterCreation } = action
 
   fs.writeFile(path, '', (err) => {
     if (err) {
@@ -91,6 +91,10 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
     addToIndex(path, index)
 
     event.sender.send(FileActionResponses.CreateSuccess, rootDir)
+
+    if (openFileAfterCreation) {
+      readAndSendTabData(event, { filePath: path, type: FileActions.ReadFile })
+    }
   })
 }
 

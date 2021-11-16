@@ -78,7 +78,12 @@ export class FileCreationComponent {
   onCreateClick(): void {
     const path = getJoinedPath([this.data, this.result])
     const { rootDirectory } = this.state.state$.value
-    this.electronService.createNewFileRequest({ path, rootDirectory })
+
+    this.electronService.createNewFileRequest({
+      path,
+      rootDirectory,
+      openFileAfterCreation: this.openFileAfterCreation,
+    })
     this.dialogRef.close()
   }
 }

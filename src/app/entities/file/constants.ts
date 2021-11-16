@@ -21,3 +21,5 @@ export enum EntityTypes {
   File = 'file',
   Folder = 'folder',
 }
+
+export const allowedConfigKeys = ['baseDir', 'tabs', 'sideMenuWidth', 'editorTheme']

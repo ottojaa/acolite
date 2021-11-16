@@ -1,8 +1,9 @@
-<mat-tab-group [selectedIndex]="selectedTab$ | async" (selectedTabChange)="onSelectTab($event)">
+<mat-tab-group animationDuration="0ms" [selectedIndex]="selectedTab$ | async" (selectedTabChange)="onSelectTab($event)">
   <ng-container *ngFor="let tab of tabs; trackBy: trackByPath">
     <mat-tab matRipple [matRippleColor]="'ffff'">
       <ng-template mat-tab-label>
-        <span class="tab-name" style="margin-left: 20px">{{ tab.fileName }}</span>
+        <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ tab.extension }}.svg" />
+        <span class="tab-name">{{ tab.fileName }}</span>
         <mat-icon class="close-button" (click)="onCloseTab(tab.path)">close</mat-icon>
       </ng-template>
 
