@@ -1,12 +1,8 @@
 {
-  "name": "angular-electron",
-  "version": "10.1.0",
-  "description": "Angular 12 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
-  "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
-  },
+  "name": "acolite",
+  "version": "0.0.1",
+  "description": "Angular + Electron Text / Markdown editor",
+  "homepage": "https://github.com/ottojaa/acolite",
   "keywords": [
     "angular",
     "angular 12",
@@ -17,8 +13,7 @@
     "eslint",
     "sass",
     "windows",
-    "mac",
-    "linux"
+    "mac"
   ],
   "main": "app/main.js",
   "private": true,

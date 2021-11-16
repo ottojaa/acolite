@@ -25,7 +25,7 @@ export class AutocompleteComponent extends AbstractComponent {
 
   constructor(private electronService: ElectronService, private state: StateService, private tabService: TabService) {
     super()
-    this.searchResults$ = this.state.getStatePart('searchResults')
+    this.searchResults$ = this.state.getStatePart('searchResults').pipe(tap((data) => console.log(data)))
     this.debouncedSearch$.pipe(takeUntil(this.destroy$), debounceTime(20)).subscribe(() => {
       this.onSearchFiles()
     })
@@ -40,14 +40,6 @@ export class AutocompleteComponent extends AbstractComponent {
 
   trackByPath<T extends { filePath: string }>(_index: number, item: T): string {
     return item.filePath
-  }
-
-  getFileExtensionIconName(extension: string | undefined): string | null {
-    if (!extension) {
-      return 'folder'
-    }
-    const icon = fileExtensionIcons.find((e) => e.acceptedExtensions.includes(extension))
-    return icon ? icon.name : null
   }
 
   onSelectItem<T extends { filePath: string }>(file: T) {

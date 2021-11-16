@@ -5,6 +5,9 @@ import * as fs from 'fs'
 import { getUpdatedMenuItemsRecursive } from '../../src/app/utils/menu-utils'
 import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../actions'
 import { getFileEntityFromPath, getRootDirectory } from '../utils'
+import { addFilesToIndex } from './store-events'
+import { Document } from 'flexsearch'
+import { Doc } from '../../src/app/interfaces/File'
 
 export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
   const { directoryName, baseDir, rootDirectory, parentPath } = payload
@@ -55,10 +58,15 @@ export const setDefaultDirectory = (event: IpcMainEvent, configPath: string) => 
     })
 }
 
-export const readAndSendMenuItemsFromBaseDirectory = (event: IpcMainEvent, action: ReadDirectory) => {
+export const readAndSendMenuItemsFromBaseDirectory = (
+  event: IpcMainEvent,
+  action: ReadDirectory,
+  index: Document<Doc, true>
+) => {
   try {
     const rootDirectory = getRootDirectory(action.baseDir)
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
+    addFilesToIndex(rootDirectory?.children, index)
   } catch (err) {
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)

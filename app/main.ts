@@ -29,7 +29,7 @@ require('@electron/remote/main').initialize()
 
 let win: BrowserWindow = null
 const configFileName = 'acolite.config.json'
-const dirPath = app.getPath('appData')
+const dirPath = app.getPath('userData')
 const configPath = getJoinedPath([dirPath, configFileName])
 const args = process.argv.slice(1),
   serve = args.some((val) => val === '--serve')
@@ -125,7 +125,7 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FolderActions.ReadDir: {
-        readAndSendMenuItemsFromBaseDirectory(event, payload)
+        readAndSendMenuItemsFromBaseDirectory(event, payload, index)
         break
       }
       case FileActions.Create: {

@@ -1,8 +1,8 @@
 import { AppConfig, SearchResult, Tab, TreeElement } from '../../src/app/interfaces/Menu'
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
-import { isPlainObject, cloneDeep, isEqual, first, uniqBy } from 'lodash'
-import { getExtension, getBaseName } from '../../src/app/utils/file-utils'
+import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
+import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../../src/app/utils/file-utils'
 import { StoreResponses, SearchQuery, SearchResponses, UpdateStore } from '../actions'
 import { getRootDirectory } from '../utils'
 import { Document, EnrichedDocumentSearchResultSetUnitResultUnit } from 'flexsearch'
@@ -64,7 +64,7 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   )
 
   const replacePath = (pathToReplace: string) => {
-    return pathToReplace.replace(baseDir, '')
+    return pathToReplace.replace(getJoinedPath([baseDir, getPathSeparator()]), '')
   }
 
   const mappedResults = uniqueElements.map((file) => {
@@ -115,7 +115,7 @@ const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
           reject()
         }
         const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
-        const extension = getExtension(filePath)
+        const extension = getExtensionSplit(filePath)
         const fileName = getBaseName(filePath)
         const doc = {
           ino,
@@ -169,7 +169,7 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
           const fileStats = fs.statSync(path)
           return <Tab>{
             fileName: getBaseName(path),
-            extension: getExtension(path),
+            extension: getExtensionSplit(path),
             path: path,
             textContent: content,
             data: {
@@ -238,17 +238,12 @@ const getHighlightContentText = (textContent: string, query: string): string => 
   const highlightEndIndex = highlightText.indexOf('</span>') + 7 // length of '</span>'
   const highlightString = highlightText.substring(highlightStartIndex, highlightEndIndex)
   let prefix = highlightText.substring(0, highlightStartIndex - 1)
-  let suffix = highlightText.substring(highlightEndIndex + 1, highlightText.length)
+  let suffix = highlightText.substring(highlightEndIndex, highlightText.length)
 
-  const shouldTruncateString = (string: string) => string.length > 90
-
-  if (shouldTruncateString(prefix)) {
+  if (highlightStartIndex > 100) {
     prefix = '...' + shorten(prefix, 90)
   }
-  if (shouldTruncateString(suffix)) {
-    suffix = shorten(suffix, 90) + '...'
-  }
-  return prefix + ' ' + highlightString + ' ' + suffix
+  return prefix + highlightString + suffix
 }
 
 const getHighlightText = (textContent: string, query: string) => {

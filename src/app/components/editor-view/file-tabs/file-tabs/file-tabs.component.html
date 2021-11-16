@@ -7,7 +7,7 @@
       </ng-template>
 
       <ng-container [ngSwitch]="tab.extension">
-        <div *ngSwitchCase="'.txt'" class="editor">
+        <div *ngSwitchCase="'txt'" class="editor">
           <app-text-editor [tab]="tab"></app-text-editor>
         </div>
         <div *ngSwitchDefault>No editor for this type of file</div>

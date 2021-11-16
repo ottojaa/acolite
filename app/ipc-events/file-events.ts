@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
 import { Tab, TreeElement } from '../../src/app/interfaces/Menu'
-import { getBaseName, getExtension, getDirName, getJoinedPath } from '../../src/app/utils/file-utils'
+import { getBaseName, getExtension, getDirName, getJoinedPath, getExtensionSplit } from '../../src/app/utils/file-utils'
 import {
   getUpdatedMenuItemsRecursive,
   getUpdatedFilePathsRecursive,
@@ -32,13 +32,14 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
     const fileStats = fs.statSync(filePath)
     const tabData: Tab = {
       fileName: getBaseName(filePath),
-      extension: getExtension(filePath),
+      extension: getExtensionSplit(filePath),
       path: filePath,
       textContent: content,
       data: {
         lastUpdated: fileStats.mtime,
       },
     }
+    console.log(tabData.extension)
     event.sender.send(FileActionResponses.ReadSuccess, tabData)
   })
 }
