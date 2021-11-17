@@ -1,1 +1,17 @@
-<ngx-markdown-editor></ngx-markdown-editor>
+<div class="editor-container">
+  <span class="top-bar" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
+    ><p *ngIf="tab.data?.lastUpdated">
+      <span style="opacity: 0.7">Last saved</span> {{ tab.data?.lastUpdated | date: 'medium' }}
+    </p>
+
+    <div class="editor-settings">
+      <mat-slide-toggle id="theme-toggle" [(ngModel)]="isChecked" (ngModelChange)="onChangeTheme()"></mat-slide-toggle>
+    </div>
+  </span>
+  <div class="editor-border">
+    <ngx-markdown-editor
+      [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
+      (contentChange)="onEditorContentChange()"
+    ></ngx-markdown-editor>
+  </div>
+</div>

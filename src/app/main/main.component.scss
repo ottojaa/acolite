@@ -51,6 +51,7 @@
   ::ng-deep .as-split-gutter.as-dragged .as-split-gutter-icon,
   ::ng-deep .as-split-gutter-icon:hover {
     opacity: 0.8;
+    z-index: 1;
     width: 7px !important;
     left: -3px;
     right: 3px;

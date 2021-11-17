@@ -12,22 +12,24 @@
       "accent": "#00000021",
       "iconColor": "#8d2d49",
       "gutterBg": "#3496c5",
-      "contrast": "#fafafa"
+      "contrast": "#fafafa",
+      "indent": "1px solid rgba(77, 77, 77, 0.608)"
     }
   },
   {
-    "name": "Light Blue",
+    "name": "Light Grey",
     "styles": {
       "primary": "#F3F3F3",
       "secondary": "#FFFFFF",
-      "topbarBg": "#0070B5",
+      "topbarBg": "#ffffff",
       "dropdownmenuBg": "#FFFFFF",
       "textHighlight": "#005386",
       "textHighlightBg": "#8accf5",
-      "buttonColor": "#0070B5",
+      "buttonColor": "#96a0b39c",
       "accent": "#00000021",
-      "gutterBg": "#100e0e",
-      "contrast": "#000000"
+      "gutterBg": "#3496c5",
+      "contrast": "#000000",
+      "indent": "1px solid rgba(77, 77, 77, 0.208)"
     }
   }
 ]

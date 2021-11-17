@@ -71,7 +71,7 @@
     display: flex;
     align-items: center;
     .indent {
-      border-right: 1px solid rgba(77, 77, 77, 0.608);
+      border-right: var(--indent);
     }
     .indentActive {
       border-right: 1px solid rgb(187 180 180 / 87%);

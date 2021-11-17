@@ -5,7 +5,7 @@ import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
 import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../../src/app/utils/file-utils'
 import { StoreResponses, SearchQuery, SearchResponses, UpdateStore } from '../actions'
 import { getRootDirectory } from '../utils'
-import { Document, EnrichedDocumentSearchResultSetUnitResultUnit } from 'flexsearch'
+import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
 import { allowedConfigKeys } from '../../src/app/entities/file/constants'
 

@@ -1,7 +1,7 @@
 :host ::ng-deep .mat-icon-button,
 mat-icon {
   background: none;
-  color: white !important;
+  color: var(--contrast);
 }
 
 span {

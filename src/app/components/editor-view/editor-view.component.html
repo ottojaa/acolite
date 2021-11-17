@@ -1,5 +1,5 @@
 <div class="editor-view">
-  <ng-container *ngIf="initialized$ | async; else showLoader">
+  <ng-container *ngIf="initialized$ | async as init; else showLoader">
     <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
       <ng-container *ngIf="tabs?.length; else showDefault">
         <app-file-tabs [tabs]="tabs"></app-file-tabs>
