@@ -27,6 +27,17 @@ app-main {
   background-color: var(--primary);
 }
 
+body ::-webkit-scrollbar {
+  width: 5px;
+  height: 3px;
+  border-radius: 5px;
+}
+
+body ::-webkit-scrollbar-thumb {
+  background: #dcdadad6;
+  visibility: hidden;
+}
+
 body .mat-dialog-container {
   background-color: var(--primary);
 

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core'
 import { fromCmEvent, MarkdownEditorComponent } from '@mdefy/ngx-markdown-editor'
 import { MarkdownService } from 'ngx-markdown'
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
@@ -19,13 +19,9 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   // Perhaps something to do with animations, but ngxMde is not immediately available on NgOnInit, and
   // there's a small delay between the ngxMde instance being available and the underlying
   // CodeMirror being available. SetTimeOut used as a bandaid fix for this
-  @ViewChild(MarkdownEditorComponent) set content(ngxMde: MarkdownEditorComponent) {
-    this.ngxMde = ngxMde
-    setTimeout(() => this.ngxMde.mde.setContent(this.tab.textContent))
-  }
+  @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
   public autoSave$ = new Subject()
-  ngxMde: MarkdownEditorComponent
   init: boolean = false
   textContent: string
   isChecked: boolean
@@ -39,6 +35,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   }
 
   ngOnInit(): void {
+    this.initSelectedTabListener()
     this.initAutoSave()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
@@ -50,6 +47,26 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     }
     this.textContent = this.ngxMde.mde.cm.getValue()
     this.autoSave$.next()
+  }
+
+  /**
+   * Workaround for editor value initialisation bug: under the hood, prism.js tries to do highlight checks on the markdown editor
+   * even if the editor is hidden by *ngIf, which causes problems if the editor shown on pageload is not a markdown editor
+   */
+  initTextContentIfNgxMdeInView(): void {
+    setTimeout(() => {
+      const editor = document.querySelector('.ngx-markdown-editor-toolbar')
+      if (editor && this.ngxMde) {
+        this.ngxMde.mde.setContent(this.tab.textContent)
+      }
+    })
+  }
+
+  initSelectedTabListener(): void {
+    this.state
+      .getStatePart('selectedTab')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.initTextContentIfNgxMdeInView())
   }
 
   initAutoSave(): void {

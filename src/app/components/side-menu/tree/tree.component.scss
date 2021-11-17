@@ -2,6 +2,10 @@
   font-size: 1.1rem;
 }
 
+:host :hover::-webkit-scrollbar-thumb {
+  visibility: visible !important;
+}
+
 :host ::ng-deep .p-tree .p-tree-container .p-treenode {
   padding: 0;
   border-radius: 0;
@@ -66,6 +70,10 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
+
+  ::-webkit-scrollbar-thumb {
+    visibility: visible !important;
+  }
 
   .row-container {
     display: flex;

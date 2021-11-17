@@ -146,16 +146,17 @@ export const flattenTreeStructure = (treeElement: TreeElement[], arr: TreeElemen
 }
 
 export const updateStore = (event: IpcMainEvent, updateData: UpdateStore, configPath: string) => {
-  fs.readFile(configPath, (_err, data) => {
-    const storeData = JSON.parse(data.toString())
-    const updatedStoreData = JSON.stringify({ ...storeData, ...updateData }, null, 2)
-    fs.writeFile(configPath, updatedStoreData, (err) => {
-      if (err) {
-        event.sender.send(StoreResponses.UpdateStoreFailure)
-      }
-      event.sender.send(StoreResponses.UpdateStoreSuccess)
+  try {
+    fs.readFile(configPath, (_err, data) => {
+      const storeData = JSON.parse(data.toString())
+      const updatedStoreData = JSON.stringify({ ...storeData, ...updateData }, null, 2)
+      fs.writeFile(configPath, updatedStoreData, (err) => {
+        event.sender.send(StoreResponses.UpdateStoreSuccess)
+      })
     })
-  })
+  } catch (err) {
+    event.sender.send(StoreResponses.UpdateStoreFailure)
+  }
 }
 
 const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
