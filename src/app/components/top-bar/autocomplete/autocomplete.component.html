@@ -17,21 +17,26 @@
     <ul *ngIf="openDrop" id="drop-down-list" class="drop-down" keyboardNavigationList>
       <ng-container *ngFor="let file of searchResults$ | async; let i = index; trackBy: trackByPath">
         <li role="option" keyboardNavigationItem (click)="onSelectItem(file, i)">
-          <div class="list-item-information">
-            <div class="icon-container">
-              <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ file.extension }}.svg" />
-            </div>
-
-            <div class="information-container">
-              <div class="top-row">
-                <p
-                  class="text-highlight"
-                  [innerHtml]="file.highlightTitleText ? file.highlightTitleText : file.fileName"
-                ></p>
-                <p class="file-path" [innerHtml]="file.highlightPathText ? file.highlightPathText : file.filePath"></p>
+          <div class="separator-el">
+            <div class="list-item-information">
+              <div class="icon-container">
+                <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ file.extension }}.svg" />
               </div>
-              <div class="bottom-row">
-                <p [innerHtml]="file.highlightContentText ? file.highlightContentText : file.content"></p>
+
+              <div class="information-container">
+                <div class="top-row">
+                  <p
+                    class="text-highlight"
+                    [innerHtml]="file.highlightTitleText ? file.highlightTitleText : file.fileName"
+                  ></p>
+                  <p
+                    class="file-path"
+                    [innerHtml]="file.highlightPathText ? file.highlightPathText : file.filePath"
+                  ></p>
+                </div>
+                <div class="bottom-row">
+                  <p [innerHtml]="file.highlightContentText ? file.highlightContentText : file.content"></p>
+                </div>
               </div>
             </div>
           </div>

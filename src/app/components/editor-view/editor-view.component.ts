@@ -32,7 +32,6 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initialized$ = this.state.getStatePart('initialized') // Delay because showing the spinner for e.g 20ms looks wonky in case the app loads quickly
     this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
     this.files = this.getMockFiles()
   }

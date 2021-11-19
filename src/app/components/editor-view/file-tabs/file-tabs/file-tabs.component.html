@@ -10,24 +10,40 @@
       <div class="editor">
         <mat-tab matRipple [matRippleColor]="'ffff'">
           <ng-template mat-tab-label>
-            <div class="contextmenu-container" (contextmenu)="onRightClick($event, tab)">
+            <div
+              class="contextmenu-container"
+              [ngClass]="tab.deleted ? 'deleted-tab-title' : ''"
+              (contextmenu)="onRightClick($event, tab)"
+            >
               <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ tab.extension }}.svg" />
               <span class="tab-name">{{ tab.fileName }}</span>
               <mat-icon class="close-button" (click)="onCloseTab(tab.path)">close</mat-icon>
             </div>
           </ng-template>
 
-          <ng-container [ngSwitch]="tab.extension">
-            <div *ngSwitchCase="'txt'" class="editor">
-              <app-text-editor [tab]="tab"></app-text-editor>
+          <ng-container *ngIf="tab.deleted; else showEditor">
+            <div class="deleted">
+              <h2 class="deleted-text">
+                This file appears to be deleted! If this was a mistake, press
+                <span aria-label="bring-deleted-file-back" class="bring-back" (click)="revertDelete(tab)">here</span>
+                to bring it back
+              </h2>
             </div>
-
-            <div *ngSwitchCase="'md'" class="editor">
-              <app-markdown-editor [tab]="tab"></app-markdown-editor>
-            </div>
-
-            <div *ngSwitchDefault>No editor for this type of file</div>
           </ng-container>
+
+          <ng-template #showEditor>
+            <ng-container [ngSwitch]="tab.extension">
+              <div *ngSwitchCase="'txt'" class="editor">
+                <app-text-editor [tab]="tab"></app-text-editor>
+              </div>
+
+              <div *ngSwitchCase="'md'" class="editor">
+                <app-markdown-editor [tab]="tab"></app-markdown-editor>
+              </div>
+
+              <div *ngSwitchDefault>No editor for this type of file</div>
+            </ng-container>
+          </ng-template>
         </mat-tab>
       </div>
     </ng-container>

@@ -6,13 +6,8 @@ import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { State, StateService, StateUpdate } from './services/state.service'
 import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/actions'
-import { Tab } from './interfaces/Menu'
 import { Router } from '@angular/router'
 
-interface AppConfig {
-  baseDir?: string
-  tabs?: Tab[]
-}
 type IPCEvent = Electron.IpcMessageEvent
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
 
@@ -165,7 +160,12 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.DeleteSuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          const { rootDir, tabs } = response
+          const payload: StateUpdate<State>[] = [
+            { key: 'rootDirectory', payload: rootDir },
+            { key: 'tabs', payload: tabs },
+          ]
+          this.state.updateMulti$.next(payload)
           this.dialogService.openToast('Delete success', 'success')
           break
         }
@@ -211,8 +211,7 @@ export class AppComponent implements OnInit {
 
   initialiseApp(response: Partial<State>): void {
     const initialState = this.state.initialState
-    this.state.state$.next({ ...initialState, ...response })
-    this.state.updateState$.next({ key: 'initialized', payload: true })
+    this.state.state$.next({ ...initialState, ...response, initialized: true })
 
     if (!this.state.getStatePartValue('baseDir')) {
       this.router.navigate(['base-dir'])

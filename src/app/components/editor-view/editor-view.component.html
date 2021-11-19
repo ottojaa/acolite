@@ -1,23 +1,17 @@
 <div class="editor-view">
-  <ng-container *ngIf="initialized$ | async as init; else showLoader">
-    <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
-      <ng-container *ngIf="tabs?.length; else showDefault">
-        <app-file-tabs [tabs]="tabs"></app-file-tabs>
-      </ng-container>
+  <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
+    <ng-container *ngIf="tabs?.length; else showDefault">
+      <app-file-tabs [tabs]="tabs"></app-file-tabs>
+    </ng-container>
 
-      <ng-template #showDefault>
-        <div class="file-cards">
-          <ng-container *ngFor="let file of files">
-            <span class="file-card-container">
-              <app-file-card [file]="file"></app-file-card>
-            </span>
-          </ng-container>
-        </div>
-      </ng-template>
-    </div>
-  </ng-container>
-
-  <ng-template #showLoader>
-    <div class="loading-container"><p-progressSpinner></p-progressSpinner></div>
-  </ng-template>
+    <ng-template #showDefault>
+      <div class="file-cards">
+        <ng-container *ngFor="let file of files">
+          <span class="file-card-container">
+            <app-file-card [file]="file"></app-file-card>
+          </span>
+        </ng-container>
+      </div>
+    </ng-template>
+  </div>
 </div>

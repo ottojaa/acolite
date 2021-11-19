@@ -1,4 +1,4 @@
-import { AppConfig, SearchResult, Tab, TreeElement } from '../../src/app/interfaces/Menu'
+import { SearchResult, Tab, TreeElement } from '../../src/app/interfaces/Menu'
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
@@ -8,6 +8,7 @@ import { getRootDirectory } from '../utils'
 import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
 import { allowedConfigKeys } from '../../src/app/entities/file/constants'
+import { AppConfig } from '../electron-interfaces'
 
 export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -159,6 +160,11 @@ export const updateStore = (event: IpcMainEvent, updateData: UpdateStore, config
   }
 }
 
+/**
+ * Validates whether the value stored in the persistent appConfig makes sense, if not, return default value for that field
+ * @param config persistent appConfig
+ * @returns validated appConfig
+ */
 const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
   const validatedConfigVal = <K extends keyof AppConfig>(key: K) => {
     switch (key) {
@@ -193,10 +199,14 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
 
         const { sideMenuWidth } = config
         if (typeof sideMenuWidth === 'number') {
-          const isValidWidth = Number.isInteger(sideMenuWidth) && sideMenuWidth >= 0 && sideMenuWidth <= 100
+          const isValidWidth = sideMenuWidth >= 0 && sideMenuWidth <= 100
           return isValidWidth ? sideMenuWidth : defaultWidth
         }
         return defaultWidth
+      }
+      case 'selectedTab': {
+        const tabIdx = config.tabs.findIndex((tab) => tab.data)
+        return tabIdx > -1 ? config.selectedTab : 0
       }
       case 'editorTheme': {
         if (
@@ -213,7 +223,7 @@ const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
     }
   }
   const allowedKeys = allowedConfigKeys
-  const keys = Object.keys(config).filter((key) => allowedKeys.includes(key)) as (keyof AppConfig)[]
+  const keys = Object.keys(config).filter((key: any) => allowedKeys.includes(key)) as (keyof AppConfig)[]
 
   return keys.reduce((acc, curr) => {
     acc[curr] = validatedConfigVal(curr)

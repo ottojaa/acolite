@@ -60,14 +60,14 @@ export class DeleteFilesDialogComponent {
   }
 
   onDeleteClick(): void {
-    const baseDir = this.state.getStatePartValue('baseDir')
-    const rootDirectory = this.state.getStatePartValue('rootDirectory')
+    const { baseDir, rootDirectory, tabs } = this.state.getStateParts(['baseDir', 'rootDirectory', 'tabs'])
 
     this.electronService.deleteFilesRequest({
       baseDir,
       rootDirectory,
       directoryPaths: this.data.folders,
       filePaths: this.data.files,
+      tabs,
     })
     this.dialogRef.close()
   }

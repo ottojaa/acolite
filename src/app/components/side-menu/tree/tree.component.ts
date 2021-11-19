@@ -223,7 +223,8 @@ export class TreeComponent implements OnInit {
     let baseItems = [
       {
         label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
-        icon: 'pi pi-times',
+        icon: 'pi pi-trash',
+        styleClass: 'delete',
         command: (_event) => this.openDeleteFilesDialog(),
       },
     ]
@@ -238,12 +239,10 @@ export class TreeComponent implements OnInit {
         additionalItems.push(
           {
             label: 'New file',
-            icon: 'pi pi-plus',
             command: () => this.openNewFileDialog(),
           },
           {
             label: 'New folder',
-            icon: 'pi pi-folder',
             command: () => this.createNewFolder(this.selectedFiles[0].data.filePath),
           }
         )
@@ -252,12 +251,10 @@ export class TreeComponent implements OnInit {
         additionalItems.push(
           {
             label: 'Rename',
-            icon: 'pi pi-pencil',
             command: (_event) => this.openRenameFileDialog(),
           },
           {
-            label: 'Reveal in finder',
-            icon: 'pi pi-search',
+            label: 'Show in folder',
             command: () => this.tabService.openTabInFileLocation(this.selectedFiles[0].data.filePath),
           }
         )

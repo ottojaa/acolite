@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { cloneDeep, isArray, merge } from 'lodash'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
@@ -17,6 +16,7 @@ export interface State {
   initialized: boolean
   selectedTab: number
   editorTheme: 'dark' | 'light'
+  sideMenuWidth: number
   searchResults: SearchResult[]
   tabs: Tab[]
   rootDirectory: TreeElement
@@ -42,6 +42,7 @@ export class StateService extends AbstractComponent {
     baseDir: '',
     selectedTab: 0,
     editorTheme: 'dark',
+    sideMenuWidth: 20,
     searchResults: [],
     tabs: [],
     rootDirectory: {},
@@ -146,7 +147,8 @@ export class StateService extends AbstractComponent {
     }, <State>{})
   }
 
-  shouldTriggerStoreUpdate(keys: string[]): boolean {
+  // If state property key is included in allowedConfigKeys, update the persistent config file
+  shouldTriggerStoreUpdate(keys: (keyof State)[]): boolean {
     const triggers = allowedConfigKeys
     return keys.some((key) => triggers.includes(key))
   }

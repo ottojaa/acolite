@@ -60,14 +60,29 @@ body .mat-dialog-container {
 }
 
 body .p-contextmenu {
-  background-color: var(--secondary);
+  background-color: #242529;
   opacity: 0.8;
+  border: none;
+  border-radius: 5px;
   .p-menuitem > .p-menuitem-link {
     .p-submenu-icon,
     .p-menuitem-icon,
     .p-menuitem-text {
       color: var(--contrast);
+      opacity: 0.8;
     }
+  }
+  .delete > .p-menuitem-link {
+    .p-submenu-icon,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+      color: rgb(216 11 67 / 1);
+    }
+  }
+  .p-menu-separator {
+    width: 90%;
+    margin: 0.5rem 5%;
+    border-top: 1px solid #5252524f;
   }
   .p-menuitem-link .p-menuitem-icon {
     color: var(--contrast);
@@ -77,7 +92,7 @@ body .p-contextmenu {
     color: var(--contrast);
   }
   .p-submenu-list {
-    background-color: var(--secondary);
+    background-color: #18191c;
   }
 }
 

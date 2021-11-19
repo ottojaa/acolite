@@ -77,9 +77,10 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
 }
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
-  const { path, rootDirectory, openFileAfterCreation } = action
+  const { path, rootDirectory, openFileAfterCreation, content } = action
+  const textContent = content || ''
 
-  fs.writeFile(path, '', (err) => {
+  fs.writeFile(path, textContent, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
@@ -139,6 +140,13 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
     return getJoinedPath([currentPath.replace(currentPath, newParentPath), getBaseName(currentPath)])
   }
 
+  const updateTabPath = (currentPath: string, newPath: string) => {
+    const tabIdx = tabs.findIndex((tab) => tab.path === currentPath)
+    if (tabIdx > -1) {
+      tabs[tabIdx].path = newPath
+    }
+  }
+
   const promises: Promise<void>[] = sortedElements.map(
     (element) =>
       new Promise((resolve, reject) => {
@@ -150,6 +158,7 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
             failedToMove.push(currentPath)
             reject(err)
           }
+          updateTabPath(currentPath, newPath)
           updateIndex(newPath, index)
           resolve()
         })
@@ -175,9 +184,10 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
 }
 
 export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Document<Doc, true>) => {
-  const { directoryPaths, filePaths, baseDir, rootDirectory } = action
+  const { directoryPaths, filePaths, baseDir, rootDirectory, tabs } = action
   const paths = [...directoryPaths, ...filePaths]
 
+  // Gather all inode-values prior to deleting, so we can remove the files' indexes if the deletions were succesfull
   const getInodesRecursive = (el: TreeElement, inodes: number[] = []) => {
     if (paths.includes(el.data.filePath)) {
       inodes.push(el.data.ino)
@@ -188,6 +198,13 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
       }
     }
     return inodes
+  }
+
+  const markTabAsDeleted = (filePath: string) => {
+    const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
+    if (tabIdx > -1) {
+      tabs[tabIdx].deleted = true
+    }
   }
 
   const inodes = getInodesRecursive(rootDirectory)
@@ -203,6 +220,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
             reject()
           }
 
+          markTabAsDeleted(filePath)
           resolve()
         })
       })
@@ -217,7 +235,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
 
       const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
       const rootDir = first(updatedRootDirectory)
-      event.sender.send(FileActionResponses.DeleteSuccess, rootDir)
+      event.sender.send(FileActionResponses.DeleteSuccess, { rootDir, tabs })
     },
     (err) => {
       console.error(err)

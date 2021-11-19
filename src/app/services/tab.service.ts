@@ -36,6 +36,24 @@ export class TabService {
     }
   }
 
+  revertDelete(tab: Tab): void {
+    const { textContent, path } = tab
+    const { tabs, selectedTab, rootDirectory } = this.state.getStateParts(['selectedTab', 'tabs', 'rootDirectory'])
+    const tabIdx = tabs.findIndex((tab) => tab.path === path)
+    if (tabIdx > -1) {
+      tabs[tabIdx].deleted = false
+      this.update(selectedTab, tabs)
+
+      const payload = {
+        rootDirectory,
+        path,
+        content: textContent,
+        openFileAfterCreation: false,
+      }
+      this.electronService.createNewFileRequest(payload)
+    }
+  }
+
   closeAllTabs(): void {
     this.update(0, [])
   }

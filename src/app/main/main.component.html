@@ -1,18 +1,26 @@
-<div class="app-container" @componentLoaded *ngIf="!this.loadingApp; else loading">
-  <as-split direction="horizontal" style="height: 100%" class="as-horizontal" gutterSize="1">
-    <as-split-area class="side-menu-split" [size]="20">
-      <app-side-menu></app-side-menu>
-    </as-split-area>
-    <as-split-area [size]="80">
-      <div class="editor-container">
-        <app-top-bar></app-top-bar>
-        <app-editor-view></app-editor-view>
-      </div>
-    </as-split-area>
-  </as-split>
+<ng-container *ngIf="initialized$ | async; else loading">
+  <div class="app-container" @componentLoaded>
+    <as-split
+      direction="horizontal"
+      style="height: 100%"
+      class="as-horizontal"
+      gutterSize="1"
+      (dragEnd)="onDragEnd($event)"
+    >
+      <as-split-area class="side-menu-split" [size]="sideMenuWidth">
+        <app-side-menu></app-side-menu>
+      </as-split-area>
+      <as-split-area [size]="editorWidth">
+        <div class="editor-container">
+          <app-top-bar></app-top-bar>
+          <app-editor-view></app-editor-view>
+        </div>
+      </as-split-area>
+    </as-split>
 
-  <!--   <a routerLink="/">{{ 'PAGES.DETAIL.BACK_TO_HOME' | translate }}</a> -->
-</div>
+    <!--   <a routerLink="/">{{ 'PAGES.DETAIL.BACK_TO_HOME' | translate }}</a> -->
+  </div>
+</ng-container>
 
 <ng-template #loading>
   <div class="loading-container"><p-progressSpinner></p-progressSpinner></div>

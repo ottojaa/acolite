@@ -24,6 +24,7 @@ export interface CreateFile {
   path: string
   openFileAfterCreation: boolean
   rootDirectory: TreeElement
+  content?: string
 }
 export interface ReadDirectory {
   type: FolderActions.ReadDir
@@ -49,6 +50,7 @@ export interface DeleteFiles {
   type: FileActions.DeleteFiles
   baseDir: string
   rootDirectory: TreeElement
+  tabs: Tab[]
   directoryPaths: string[]
   filePaths: string[]
 }

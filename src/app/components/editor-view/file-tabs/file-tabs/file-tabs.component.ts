@@ -68,6 +68,10 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
     this.cm.show(event)
   }
 
+  revertDelete(tab: Tab): void {
+    this.tabService.revertDelete(tab)
+  }
+
   getContextMenuItems(filePath: string): MenuItem[] {
     return [
       {

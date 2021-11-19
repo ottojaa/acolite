@@ -1,10 +1,5 @@
 import { TreeNode } from 'primeng/api'
 
-export enum MenuItemTypes {
-  File = 'file',
-  Folder = 'folder',
-}
-
 export interface FileEntity {
   type: 'folder' | 'file'
   icon?: string
@@ -18,29 +13,25 @@ export interface FileEntity {
   fileExtension?: string
 }
 
-export type TreeElement = TreeNode<FileEntity>
-
-export interface TabState {
-  selectedTab: number
-  tabs: Tab[]
-}
-
-export interface Tab {
-  path: string
-  fileName: string
-  extension: string
-  textContent: string
-  deleted?: boolean
-  data?: {
-    lastUpdated?: Date
-  }
-}
-
 export interface AppConfig {
   baseDir?: string
   tabs?: Tab[]
   sideMenuWidth?: number
+  selectedTab?: number
   editorTheme?: 'dark' | 'light'
+}
+
+export type TreeElement = TreeNode<FileEntity>
+
+export interface State {
+  baseDir: string
+  initialized: boolean
+  selectedTab: number
+  editorTheme: 'dark' | 'light'
+  sideMenuWidth: number
+  searchResults: SearchResult[]
+  tabs: Tab[]
+  rootDirectory: TreeElement
 }
 
 export interface SearchResult {
@@ -54,4 +45,15 @@ export interface SearchResult {
   highlightContentText?: string | undefined
   highlightTitleText?: string | undefined
   highlightPathText?: string | undefined
+}
+
+export interface Tab {
+  path: string
+  fileName: string
+  extension: string
+  textContent: string
+  deleted?: boolean
+  data?: {
+    lastUpdated?: Date
+  }
 }
