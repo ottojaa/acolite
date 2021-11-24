@@ -27,6 +27,7 @@ import { MoveFilesDialogModule } from './components/dialogs/move-files-dialog/mo
 import { ChangeDirectoryDialogModule } from './components/dialogs/change-directory-dialog/change-directory-dialog.module'
 import { SettingsService } from './services/settings.service'
 import '@angular/common/locales/global/en-GB'
+import { SearchBuilderDialogModule } from './components/dialogs/search-builder-dialog/search-builder-dialog.module'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -53,6 +54,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     RenameFileDialogModule,
     DeleteFilesDialogModule,
     MoveFilesDialogModule,
+    SearchBuilderDialogModule,
     MatSnackBarModule,
     TranslateModule.forRoot({
       loader: {

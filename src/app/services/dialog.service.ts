@@ -10,6 +10,7 @@ import { FileCreationComponent } from '../components/dialogs/file-creation/file-
 import { FolderCreationDialogComponent } from '../components/dialogs/folder-creation-dialog/folder-name-dialog/folder-creation-dialog.component'
 import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialog/move-files-dialog.component'
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
+import { SearchBuilderDialogComponent } from '../components/dialogs/search-builder-dialog/search-builder-dialog.component'
 import { FilePathContainer } from '../interfaces/File'
 import { TreeElement } from '../interfaces/Menu'
 
@@ -34,12 +35,22 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
+  openSearchBuilder(topPosition: string, leftPosition: string): Observable<string | undefined> {
+    const ref = this.dialog.open(SearchBuilderDialogComponent, {
+      hasBackdrop: false,
+      width: '600px',
+      position: { top: topPosition, left: leftPosition },
+    })
+    return ref.afterClosed().pipe(take(1))
+  }
+
   openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
     const ref = this.dialog.open(FileCreationComponent, {
       data: filePath,
       minWidth: '400px',
       maxWidth: '600px',
       hasBackdrop: true,
+      position: {},
     })
     return ref.afterClosed().pipe(take(1))
   }

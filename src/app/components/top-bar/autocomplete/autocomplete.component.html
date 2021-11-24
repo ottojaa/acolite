@@ -2,7 +2,7 @@
   <div class="auto-complete">
     <!-- Search Input -->
 
-    <div class="searchbar">
+    <div class="searchbar" #searchbar>
       <mat-icon>search</mat-icon>
       <input
         type="text"
@@ -13,7 +13,7 @@
         (clickOutside)="onOpenDrop($event, false)"
         [exclude]="'.input-search'"
       />
-      <mat-icon>tune</mat-icon>
+      <mat-icon class="search-builder" (click)="openSearchBuilder()">tune</mat-icon>
     </div>
 
     <!-- Dropdown Menu -->

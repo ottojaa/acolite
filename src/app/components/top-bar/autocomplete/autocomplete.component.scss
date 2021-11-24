@@ -129,6 +129,7 @@
   background: var(--secondary);
   color: var(--contrast);
 
+  padding: 0 1rem;
   mat-icon {
     margin-right: 0.5rem;
     opacity: 0.8;
@@ -141,7 +142,9 @@
     color: var(--contrast);
     outline: none;
   }
-  padding: 0 1rem;
+  .search-builder {
+    cursor: pointer;
+  }
 
   box-shadow: $box-shadow;
 }
