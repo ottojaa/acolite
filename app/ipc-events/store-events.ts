@@ -8,44 +8,50 @@ import { getRootDirectory } from '../utils'
 import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
 import { allowedConfigKeys } from '../../src/app/entities/file/constants'
-import { AppConfig } from '../electron-interfaces'
+import { AppConfig, WorkspaceConfig } from '../electron-interfaces'
+import {
+  getDefaultConfigJSON,
+  validateAppConfig,
+  updateSelectedWorkspaceConfig,
+} from '../config-helpers/config-helpers'
 
 export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
-    const defaultConfig = JSON.stringify({ baseDir: '' }, null, 2)
     const configExists = fs.existsSync(configPath)
 
     if (!configExists) {
-      fs.writeFileSync(configPath, defaultConfig)
+      fs.writeFileSync(configPath, getDefaultConfigJSON())
       event.sender.send(StoreResponses.InitAppSuccess)
     } else {
       const configBuffer = fs.readFileSync(configPath)
       const config: AppConfig = JSON.parse(configBuffer.toString())
 
       if (!isPlainObject(config)) {
-        fs.writeFileSync(configPath, defaultConfig)
+        fs.writeFileSync(configPath, getDefaultConfigJSON())
       }
 
       const configCopy = cloneDeep(config)
-      const updatedConfig = validateAndUpdateConfig(config)
+      const validatedConfig = validateAppConfig(config)
 
-      if (!isEqual(configCopy, updatedConfig)) {
-        const updatedConfigJSON = JSON.stringify(updatedConfig, null, 2)
+      if (!isEqual(configCopy, validatedConfig)) {
+        const updatedConfigJSON = JSON.stringify(validatedConfig, null, 2)
         fs.writeFileSync(configPath, updatedConfigJSON)
       }
 
-      const getPayload = () => {
-        const baseDir = updatedConfig.baseDir
+      const getWorkspaceData = () => {
+        const baseDir = validatedConfig.selectedWorkspace
         if (!baseDir) {
           return {}
         }
+        const selectedWorkspaceData = validatedConfig.workspaces.find((workspace) => workspace.baseDir === baseDir)
 
-        const state = { ...updatedConfig, rootDirectory: getRootDirectory(baseDir) }
+        const state = { ...selectedWorkspaceData, rootDirectory: getRootDirectory(baseDir) }
         addFilesToIndex(state.rootDirectory.children, index)
 
         return state
       }
-      event.sender.send(StoreResponses.InitAppSuccess, getPayload())
+      const workspaceData = getWorkspaceData()
+      event.sender.send(StoreResponses.InitAppSuccess, workspaceData)
     }
   } catch (err) {
     console.log(err)
@@ -91,13 +97,19 @@ export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, 
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
   const indexFile = await createIndexFileFromPath(newPath)
-  const { ino } = indexFile
+  if (indexFile.isFolder) {
+    return
+  }
 
+  const { ino } = indexFile
   await index.updateAsync(ino, indexFile)
 }
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
   const indexFile = await createIndexFileFromPath(filePath)
+  if (indexFile.isFolder) {
+    return
+  }
 
   const { ino } = indexFile
   await index.addAsync(ino, indexFile)
@@ -119,9 +131,11 @@ const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
         const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
         const extension = getExtensionSplit(filePath)
         const fileName = getBaseName(filePath)
-        const doc = {
+        const isFolder = stats.isDirectory()
+        const doc: Doc = {
           ino,
           filePath,
+          isFolder,
           fileName,
           extension,
           content: data,
@@ -147,88 +161,15 @@ export const flattenTreeStructure = (treeElement: TreeElement[], arr: TreeElemen
 }
 
 export const updateStore = (event: IpcMainEvent, updateData: UpdateStore, configPath: string) => {
-  try {
-    fs.readFile(configPath, (_err, data) => {
-      const storeData = JSON.parse(data.toString())
-      const updatedStoreData = JSON.stringify({ ...storeData, ...updateData }, null, 2)
-      fs.writeFile(configPath, updatedStoreData, (err) => {
-        event.sender.send(StoreResponses.UpdateStoreSuccess)
-      })
-    })
-  } catch (err) {
-    event.sender.send(StoreResponses.UpdateStoreFailure)
-  }
-}
-
-/**
- * Validates whether the value stored in the persistent appConfig makes sense, if not, return default value for that field
- * @param config persistent appConfig
- * @returns validated appConfig
- */
-const validateAndUpdateConfig = (config: AppConfig): AppConfig => {
-  const validatedConfigVal = <K extends keyof AppConfig>(key: K) => {
-    switch (key) {
-      case 'tabs': {
-        const getTabData = (path: string) => {
-          if (!fs.existsSync(path)) {
-            return null
-          }
-          const content = fs.readFileSync(path, 'utf-8')
-          const fileStats = fs.statSync(path)
-          return <Tab>{
-            fileName: getBaseName(path),
-            extension: getExtensionSplit(path),
-            path: path,
-            textContent: content,
-            data: {
-              lastUpdated: fileStats.mtime,
-            },
-          }
-        }
-        return config.tabs.map((tab) => getTabData(tab.path)).filter((tab) => !!tab)
-      }
-      case 'baseDir': {
-        const { baseDir } = config
-        if (typeof baseDir === 'string' && fs.existsSync(baseDir)) {
-          return baseDir
-        }
-        return ''
-      }
-      case 'sideMenuWidth': {
-        const defaultWidth = 20
-
-        const { sideMenuWidth } = config
-        if (typeof sideMenuWidth === 'number') {
-          const isValidWidth = sideMenuWidth >= 0 && sideMenuWidth <= 100
-          return isValidWidth ? sideMenuWidth : defaultWidth
-        }
-        return defaultWidth
-      }
-      case 'selectedTab': {
-        const tabIdx = config.tabs.findIndex((tab) => tab.data)
-        return tabIdx > -1 ? config.selectedTab : 0
-      }
-      case 'editorTheme': {
-        if (
-          (typeof config.editorTheme === 'string' && config.editorTheme === 'dark') ||
-          config.editorTheme === 'light'
-        ) {
-          return config.editorTheme
-        }
-        return 'dark'
-      }
-      default: {
-        break
-      }
+  updateSelectedWorkspaceConfig(updateData, configPath).then(
+    () => {
+      event.sender.send(StoreResponses.UpdateStoreSuccess)
+    },
+    (err) => {
+      console.error(err)
+      event.sender.send(StoreResponses.UpdateStoreFailure)
     }
-  }
-  const allowedKeys = allowedConfigKeys
-  const keys = Object.keys(config).filter((key: any) => allowedKeys.includes(key)) as (keyof AppConfig)[]
-
-  return keys.reduce((acc, curr) => {
-    acc[curr] = validatedConfigVal(curr)
-    return acc
-  }, {})
+  )
 }
 
 /**

@@ -31,6 +31,7 @@ require('@electron/remote/main').initialize()
 let win: BrowserWindow = null
 const configFileName = 'acolite.config.json'
 const dirPath = app.getPath('userData')
+const defaultDocumentPath = getJoinedPath([app.getPath('documents'), 'Acolite'])
 const configPath = getJoinedPath([dirPath, configFileName])
 const args = process.argv.slice(1),
   serve = args.some((val) => val === '--serve')
@@ -119,11 +120,11 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FolderActions.ChooseDir: {
-        chooseDirectory(event, win)
+        chooseDirectory(event, win, configPath)
         break
       }
       case FolderActions.SetDefaultDir: {
-        setDefaultDirectory(event, configPath)
+        setDefaultDirectory(event, configPath, defaultDocumentPath)
         break
       }
       case FolderActions.ReadDir: {

@@ -13,12 +13,17 @@ export interface FileEntity {
   fileExtension?: string
 }
 
-export interface AppConfig {
+export interface WorkspaceConfig {
   baseDir?: string
   tabs?: Tab[]
   sideMenuWidth?: number
   selectedTab?: number
   editorTheme?: 'dark' | 'light'
+}
+
+export interface AppConfig {
+  selectedWorkspace?: string
+  workspaces: WorkspaceConfig[]
 }
 
 export type TreeElement = TreeNode<FileEntity>

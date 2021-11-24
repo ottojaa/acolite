@@ -8,6 +8,7 @@ import { getFileEntityFromPath, getRootDirectory } from '../utils'
 import { addFilesToIndex } from './store-events'
 import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
+import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
 
 export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
   const { directoryName, baseDir, rootDirectory, parentPath } = payload
@@ -29,7 +30,7 @@ export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirect
     })
 }
 
-export const chooseDirectory = (event: IpcMainEvent, window: BrowserWindow) => {
+export const chooseDirectory = (event: IpcMainEvent, window: BrowserWindow, configPath: string) => {
   dialog
     .showOpenDialog(window, {
       properties: ['openDirectory', 'createDirectory'],
@@ -38,9 +39,17 @@ export const chooseDirectory = (event: IpcMainEvent, window: BrowserWindow) => {
       if (result.canceled) {
         event.reply(FolderActionResponses.ChooseDirectoryCanceled)
       } else if (result.filePaths) {
-        // Take the dirPath chosen by the user and write it in the acolite.config.json to overwrite the base-url
-        const filePathRef = result.filePaths[0]
-        event.reply(FolderActionResponses.ChooseDirectorySuccess, filePathRef)
+        // Take the dirPath chosen by the user and set it as selectedWorkspace in the acolite.config.json
+        const selectedFilepath = first(result.filePaths)
+
+        changeSelectedWorkspace(selectedFilepath, configPath).then(
+          (data) => {
+            event.reply(FolderActionResponses.ChooseDirectorySuccess, data)
+          },
+          (err) => {
+            event.reply(FolderActionResponses.ChooseDirectoryFailure, err)
+          }
+        )
       }
     })
     .catch((err) => {
@@ -48,14 +57,16 @@ export const chooseDirectory = (event: IpcMainEvent, window: BrowserWindow) => {
     })
 }
 
-export const setDefaultDirectory = (event: IpcMainEvent, configPath: string) => {
-  writeToFile(configPath, { key: 'baseDir', payload: __dirname })
-    .then(() => {
-      event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
-    })
-    .catch((err) => {
+export const setDefaultDirectory = (event: IpcMainEvent, configPath: string, workspacePath: string) => {
+  const defaultConfig = getDefaultConfigJSON(workspacePath)
+
+  fs.writeFile(configPath, defaultConfig, (err) => {
+    if (err) {
       event.sender.send(FolderActionResponses.SetDefaultDirFailure, err)
-    })
+      return
+    }
+    event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
+  })
 }
 
 export const readAndSendMenuItemsFromBaseDirectory = (
@@ -71,21 +82,4 @@ export const readAndSendMenuItemsFromBaseDirectory = (
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)
   }
-}
-
-const writeToFile = <T extends { key: string; payload: any }>(filePath: string, args: T): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) reject()
-      const { payload, key } = args
-      const configurationObject = JSON.parse(data)
-      configurationObject[key] = payload
-
-      const config = JSON.stringify(configurationObject, null, 2)
-      fs.writeFile(filePath, config, (err) => {
-        if (err) reject()
-        resolve()
-      })
-    })
-  })
 }

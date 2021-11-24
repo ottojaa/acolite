@@ -114,7 +114,8 @@ export class AppComponent implements OnInit {
           break
         }
         case FolderActionResponses.ChooseDirectorySuccess: {
-          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          const currentState = this.state.state$.getValue()
+          this.state.state$.next({ ...currentState, ...response })
           this.readDir()
           break
         }

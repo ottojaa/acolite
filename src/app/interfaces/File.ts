@@ -26,6 +26,7 @@ export interface Doc {
   ino: number
   filePath: string
   fileName: string
+  isFolder: boolean
   extension: string
   content: string
   modifiedAt: Date
