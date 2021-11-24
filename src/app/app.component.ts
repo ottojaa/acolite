@@ -149,7 +149,13 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.RenameSuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          const { rootDir, tabs } = response
+          const payload: StateUpdate<State>[] = [
+            { key: 'rootDirectory', payload: rootDir },
+            { key: 'tabs', payload: tabs },
+          ]
+          console.log(response)
+          this.state.updateMulti$.next(payload)
           break
         }
         case FileActionResponses.CreateSuccess: {

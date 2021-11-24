@@ -56,24 +56,37 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
     }
 
     const tabs = action.tabs
-    const tabIdx = tabs.findIndex((tab) => tab.path === path)
-    if (tabIdx > -1) {
-      const fileStats = fs.statSync(path)
-      tabs[tabIdx] = {
-        ...tabs[tabIdx],
-        textContent: content,
-        data: {
-          ...tabs[tabIdx].data,
-          lastUpdated: fileStats.mtime,
-        },
-      }
-      tabs[tabIdx].textContent = content
-    }
 
+    updateTabData(tabs, path, content)
     updateIndex(path, index)
 
     event.sender.send(FileActionResponses.UpdateSuccess, tabs)
   })
+}
+
+const updateTabData = (tabs: Tab[], oldTabPath: string, newContent?: string, newPath?: string): void => {
+  const tabIdx = tabs.findIndex((tab) => tab.path === oldTabPath)
+  if (tabIdx > -1) {
+    const pathToBeUsed = newPath ? newPath : oldTabPath
+    const fileStats = fs.statSync(pathToBeUsed)
+    const newName = getBaseName(pathToBeUsed)
+
+    tabs[tabIdx] = {
+      ...tabs[tabIdx],
+      fileName: newName,
+      data: {
+        ...tabs[tabIdx].data,
+        lastUpdated: fileStats.mtime,
+      },
+    }
+
+    if (newContent) {
+      tabs[tabIdx].textContent = newContent
+    }
+    if (newPath) {
+      tabs[tabIdx].path = newPath
+    }
+  }
 }
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
@@ -102,7 +115,7 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
 }
 
 export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Document<Doc, true>) => {
-  const { path, newName, rootDirectory } = action
+  const { path, newName, rootDirectory, tabs } = action
   const parentDirectory = getDirName(path)
   const extension = getExtension(path)
   const newPath = getJoinedPath([parentDirectory, newName]) + extension
@@ -124,9 +137,11 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
       baseDir: rootDirectory.data.filePath,
     })
     const rootDir = first(updatedRootDirectory)
+
+    updateTabData(tabs, path, null, newPath)
     updateIndex(newPath, index)
 
-    event.sender.send(FileActionResponses.RenameSuccess, rootDir)
+    event.sender.send(FileActionResponses.RenameSuccess, { rootDir, tabs })
   })
 }
 

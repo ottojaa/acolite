@@ -42,6 +42,7 @@ export interface CreateNewDirectory {
 export interface RenameFile {
   type: FileActions.Rename
   path: string
+  tabs: Tab[]
   newName: string
   rootDirectory: TreeElement
 }

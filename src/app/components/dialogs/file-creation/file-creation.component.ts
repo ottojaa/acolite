@@ -1,14 +1,12 @@
-import { Component, Inject, NgZone } from '@angular/core'
+import { Component, HostListener, Inject, NgZone, ViewChild } from '@angular/core'
 import { FormBuilder, FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { TreeNode } from 'primeng/api'
-import { FileActionResponses, FileActions } from '../../../../../app/actions'
 import { ElectronService } from '../../../core/services'
 import { nameValidationPattern } from '../../../entities/file/constants'
-import { FileEntity } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { getBaseName, getJoinedPath } from '../../../utils/file-utils'
+import { MatSelect } from '@angular/material/select'
 
 @Component({
   selector: 'app-file-creation',
@@ -16,6 +14,15 @@ import { getBaseName, getJoinedPath } from '../../../utils/file-utils'
   styleUrls: ['./file-creation.component.scss'],
 })
 export class FileCreationComponent {
+  @ViewChild('typeSelect') typeSelect: MatSelect
+  @HostListener('window:keyup.Enter', ['$event'])
+  onEnter(_event: KeyboardEvent): void {
+    if (this.fileName.invalid || this.extension.invalid || document.activeElement.tagName === 'MAT-SELECT') {
+      return
+    }
+    this.onCreateClick()
+  }
+
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
   extension = new FormControl('txt', [Validators.required])
   openFileAfterCreation = true

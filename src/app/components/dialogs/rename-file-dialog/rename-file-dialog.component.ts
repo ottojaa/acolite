@@ -1,4 +1,4 @@
-import { Component, Inject, NgZone } from '@angular/core'
+import { Component, HostListener, Inject, NgZone } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { FileActions } from '../../../../../app/actions'
@@ -16,6 +16,14 @@ import { getBaseName, getDirName } from '../../../utils/file-utils'
 export class RenameFileDialogComponent {
   extension: string
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
+
+  @HostListener('window:keyup.Enter', ['$event'])
+  onEnter(_event: KeyboardEvent): void {
+    if (this.fileName.invalid) {
+      return
+    }
+    this.onRenameClick()
+  }
 
   constructor(
     public dialogRef: MatDialogRef<RenameFileDialogComponent>,
@@ -48,8 +56,8 @@ export class RenameFileDialogComponent {
   }
 
   onRenameClick(): void {
-    const { rootDirectory } = this.state.state$.value
-    this.electronService.renameFileRequest({ path: this.data, newName: this.fileName.value, rootDirectory })
+    const { rootDirectory, tabs } = this.state.getStateParts(['rootDirectory', 'tabs'])
+    this.electronService.renameFileRequest({ path: this.data, tabs, newName: this.fileName.value, rootDirectory })
     this.dialogRef.close()
   }
 }

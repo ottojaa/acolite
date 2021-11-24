@@ -20,35 +20,46 @@ export class AppDialogService {
   constructor(public dialog: MatDialog, private _snackBar: MatSnackBar, public zone: NgZone) {}
 
   openWorkspaceDirectoryDialog(): Observable<string | undefined> {
-    const ref = this.dialog.open(BaseDirectoryDialogComponent)
+    const ref = this.dialog.open(BaseDirectoryDialogComponent, { hasBackdrop: true })
     return ref.afterClosed().pipe(take(1))
   }
 
   openChangeWorkspaceDialog(): Observable<undefined> {
-    const ref = this.dialog.open(ChangeDirectoryDialogComponent)
+    const ref = this.dialog.open(ChangeDirectoryDialogComponent, { hasBackdrop: true })
     return ref.afterClosed().pipe(take(1))
   }
 
   openFolderNameDialog(filePath: string): Observable<string | undefined> {
-    const ref = this.dialog.open(FolderCreationDialogComponent, { data: filePath })
+    const ref = this.dialog.open(FolderCreationDialogComponent, { data: filePath, hasBackdrop: true })
     return ref.afterClosed().pipe(take(1))
   }
 
   openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
-    const ref = this.dialog.open(FileCreationComponent, { data: filePath, minWidth: '400px', maxWidth: '600px' })
+    const ref = this.dialog.open(FileCreationComponent, {
+      data: filePath,
+      minWidth: '400px',
+      maxWidth: '600px',
+      hasBackdrop: true,
+    })
     return ref.afterClosed().pipe(take(1))
   }
 
   openRenameFileDialog(filePath: string): Observable<string> {
-    const ref = this.dialog.open(RenameFileDialogComponent, { data: filePath })
+    const ref = this.dialog.open(RenameFileDialogComponent, {
+      data: filePath,
+      hasBackdrop: true,
+      minWidth: '400px',
+      maxWidth: '600px',
+    })
     return ref.afterClosed().pipe(take(1))
   }
 
   openDeleteFilesDialog(pathContainer: FilePathContainer): Observable<string> {
     const ref = this.dialog.open(DeleteFilesDialogComponent, {
       data: pathContainer,
-      minWidth: '300px',
-      maxWidth: '400px',
+      minWidth: '400px',
+      maxWidth: '600px',
+      hasBackdrop: true,
     })
     return ref.afterClosed().pipe(take(1))
   }
@@ -61,7 +72,8 @@ export class AppDialogService {
     const ref = this.dialog.open(MoveFilesDialogComponent, {
       data: { pathContainer, selectedFiles, target },
       width: '20%',
-      minWidth: '300px',
+      minWidth: '500px',
+      hasBackdrop: true,
     })
     return ref.afterClosed().pipe(take(1))
   }

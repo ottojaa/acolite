@@ -2,16 +2,19 @@
   <div class="auto-complete">
     <!-- Search Input -->
 
-    <input
-      class="input-search"
-      type="text"
-      placeholder="Search for files"
-      [(ngModel)]="searchQuery"
-      (ngModelChange)="search()"
-      (click)="onOpenDrop($event, true)"
-      (clickOutside)="onOpenDrop($event, false)"
-      [exclude]="'.input-search'"
-    />
+    <div class="searchbar">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search for files"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="search()"
+        (click)="onOpenDrop($event, true)"
+        (clickOutside)="onOpenDrop($event, false)"
+        [exclude]="'.input-search'"
+      />
+      <mat-icon>tune</mat-icon>
+    </div>
 
     <!-- Dropdown Menu -->
     <ul *ngIf="openDrop" id="drop-down-list" class="drop-down" keyboardNavigationList>
