@@ -1,4 +1,30 @@
-<p>search-builder-dialog works!</p>
+<h1 mat-dialog-title>Search options</h1>
+<div mat-dialog-content class="mat-typography">
+  <mat-list role="list">
+    <mat-list-item role="listitem" *ngFor="let item of listItems">
+      <ng-container [ngSwitch]="item.type">
+        <div *ngSwitchCase="'label'" class="label">
+          <span>{{ item.label }}</span>
+        </div>
+
+        <div *ngSwitchCase="'separator'" class="separator"></div>
+
+        <div *ngSwitchDefault>
+          <div class="item-container">
+            <span class="item-content">
+              {{ item.text }}
+              <mat-slide-toggle [(ngModel)]="item.selected" (ngModelChange)="onChange()"></mat-slide-toggle>
+            </span>
+
+            <div class="datepickers" *ngIf="item.range && item.selected" [@grow]>
+              <app-date-range-picker></app-date-range-picker>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </mat-list-item>
+  </mat-list>
+</div>
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancelClick()">Cancel</button>

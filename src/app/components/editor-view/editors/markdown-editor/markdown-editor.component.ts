@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core'
 import { fromCmEvent, MarkdownEditorComponent } from '@mdefy/ngx-markdown-editor'
 import { MarkdownService } from 'ngx-markdown'
-import { Observable, Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, switchMap, take, takeUntil } from 'rxjs/operators'
+import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import { debounceTime, distinctUntilChanged, skip, skipUntil, switchMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
@@ -22,7 +22,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
   public autoSave$ = new Subject()
-  init: boolean = false
   textContent: string
   isChecked: boolean
 
@@ -73,6 +72,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     this.autoSave$
       .pipe(
         takeUntil(this.destroy$),
+        skip(1), // Skip the initial update caused by the initialization of the editor
         debounceTime(1000),
         switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
       )

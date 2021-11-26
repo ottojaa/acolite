@@ -9,7 +9,7 @@
 }
 
 .top-bar-split {
-  background: var(--topbarBg);
+  background: var(--primary);
 }
 
 .editor-container {
@@ -37,6 +37,7 @@
     ::ng-deep .as-split-gutter {
       background-color: transparent !important;
       position: relative;
+      margin-left: -1px;
     }
   }
 

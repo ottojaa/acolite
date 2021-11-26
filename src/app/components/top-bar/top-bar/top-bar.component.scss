@@ -21,6 +21,8 @@ p-autocomplete {
   min-height: 7rem;
   align-items: center;
   padding: 1rem;
+  border-left: $app-border;
+  border-bottom: $app-border;
 }
 
 .input {

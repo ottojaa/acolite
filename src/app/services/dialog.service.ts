@@ -35,11 +35,10 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openSearchBuilder(topPosition: string, leftPosition: string): Observable<string | undefined> {
+  openSearchBuilder(): Observable<string | undefined> {
     const ref = this.dialog.open(SearchBuilderDialogComponent, {
-      hasBackdrop: false,
-      width: '600px',
-      position: { top: topPosition, left: leftPosition },
+      hasBackdrop: true,
+      width: '450px',
     })
     return ref.afterClosed().pipe(take(1))
   }

@@ -133,6 +133,7 @@
   mat-icon {
     margin-right: 0.5rem;
     opacity: 0.8;
+    transform: scale(0.8);
   }
   input {
     width: 100%;
@@ -169,7 +170,7 @@
 }
 
 :host ::ng-deep.highlightText {
-  background: var(--textHighlightBg);
+  background: var(--buttonColor);
   border-radius: 2px;
 }
 

@@ -6,6 +6,11 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatListModule } from '@angular/material/list'
+import { MatDatepickerModule } from '@angular/material/datepicker'
+import { DateRangePickerModule } from '../../common/date-range-picker/date-range-picker.module'
+import { MatNativeDateModule } from '@angular/material/core'
 
 @NgModule({
   declarations: [SearchBuilderDialogComponent],
@@ -17,7 +22,11 @@ import { MatInputModule } from '@angular/material/input'
     MatFormFieldModule,
     FormsModule,
     ReactiveFormsModule,
+    MatSlideToggleModule,
+    MatListModule,
     MatInputModule,
+    MatDatepickerModule,
+    DateRangePickerModule,
   ],
   providers: [MatDialog],
 })

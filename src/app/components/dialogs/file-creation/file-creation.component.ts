@@ -17,10 +17,11 @@ export class FileCreationComponent {
   @ViewChild('typeSelect') typeSelect: MatSelect
   @HostListener('window:keyup.Enter', ['$event'])
   onEnter(_event: KeyboardEvent): void {
-    if (this.fileName.invalid || this.extension.invalid || document.activeElement.tagName === 'MAT-SELECT') {
+    console.log('disabled for the time being, need to rethink this implementation')
+    /* if (this.fileName.invalid || this.extension.invalid || document.activeElement.tagName === 'MAT-SELECT') {
       return
     }
-    this.onCreateClick()
+    this.onCreateClick() */
   }
 
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])

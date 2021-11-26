@@ -1,0 +1,58 @@
+@import 'src/variables.scss';
+
+:host ::ng-deep .mat-list-item {
+  height: auto !important;
+}
+:host ::ng-deep .mat-list-item-content {
+  color: var(--contrast);
+}
+
+.mat-dialog-title {
+  margin: 0 15px 20px !important;
+  color: var(--buttonColor);
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: var(--buttonColor);
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+  background-color: white;
+}
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-ripple .mat-ripple-element {
+  background-color: var(--buttonColor);
+}
+
+.separator {
+  width: 100%;
+  margin: 0.7rem 0;
+  border-top: 1px solid #5252524f;
+}
+
+.label {
+  margin-bottom: 0.4rem;
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+.item-container {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+
+  .item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 370px;
+    height: 35px;
+  }
+  .datepickers {
+    width: 370px;
+  }
+}
+
+hr {
+  width: 100%;
+  border: $app-border;
+}

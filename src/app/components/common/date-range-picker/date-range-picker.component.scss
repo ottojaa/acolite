@@ -1,0 +1,79 @@
+::ng-deep
+  .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover
+  > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical),
+.cdk-keyboard-focused
+  .mat-calendar-body-active
+  > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical),
+.cdk-program-focused
+  .mat-calendar-body-active
+  > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical),
+.mat-calendar-body-selected {
+  background-color: var(--buttonColor);
+  &:hover {
+    background-color: var(--buttonColor);
+  }
+}
+
+::ng-deep {
+  .mat-calendar-body-in-preview {
+    color: transparent;
+  }
+  .mat-calendar-body-selected {
+    background-color: var(--buttonColor);
+  }
+  .mat-datepicker-content {
+    background: var(--secondary) !important;
+  }
+  .mat-calendar-body-in-range::before {
+    background: var(--buttonColor);
+  }
+  .mat-calendar-body-in-preview {
+    &.mat-calendar-body-preview-start {
+      border-top-left-radius: 50%;
+      border-bottom-left-radius: 50%;
+    }
+    &.mat-calendar-body-preview-end {
+      border-top-right-radius: 50%;
+      border-bottom-right-radius: 50%;
+    }
+    &:not(.mat-calendar-body-preview-end),
+    &:not(.mat-calendar-body-preview-start) {
+      background-color: var(--buttonColorLowOpacity);
+    }
+  }
+  .mat-calendar-previous-button,
+  .mat-calendar-next-button,
+  .mat-datepicker-content,
+  .mat-calendar-table-header,
+  .mat-calendar-body-label,
+  .mat-calendar-body-cell-content,
+  .mat-button-wrapper,
+  .mat-date-range-input-separator {
+    color: var(--contrast);
+  }
+  .mat-datepicker-toggle,
+  .mat-datepicker-content .mat-calendar-next-button,
+  .mat-datepicker-content .mat-calendar-previous-button {
+    color: var(--contrast);
+    opacity: 0.8;
+  }
+  .mat-calendar-body-today {
+    background: transparent !important;
+  }
+  .mat-calendar-body-today:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+    border-color: var(--buttonColor) !important;
+  }
+  .mat-calendar-arrow {
+    fill: var(--contrast);
+  }
+  mat-form-field {
+    width: 100%;
+  }
+  .mat-form-field-appearance-fill .mat-form-field-underline::before {
+    background-color: transparent;
+    border-top: 1px solid #5252524f;
+  }
+  .mat-form-field-label {
+    opacity: 0.7;
+  }
+}

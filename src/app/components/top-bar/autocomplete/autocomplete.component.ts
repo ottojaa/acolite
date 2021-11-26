@@ -50,16 +50,9 @@ export class AutocompleteComponent extends AbstractComponent {
   }
 
   openSearchBuilder(): void {
-    console.log('hih')
-    const { bottom, left, right } = this.searchbar.nativeElement.getBoundingClientRect()
-    const topPosition = `${bottom + 2}px`
-    const rightPosition = `${right - 600}px`
-    console.log(rightPosition)
-    console.log(right)
-
     this.zone.run(() => {
       this.dialogService
-        .openSearchBuilder(topPosition, rightPosition)
+        .openSearchBuilder()
         .pipe(take(1))
         .subscribe((data) => console.log(data))
     })

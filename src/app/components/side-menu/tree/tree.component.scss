@@ -50,6 +50,10 @@
   margin-left: 0;
 }
 
+:host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
+  box-shadow: none;
+}
+
 .workspace-title {
   background: var(--secondary);
   h4 {

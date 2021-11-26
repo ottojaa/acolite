@@ -26,10 +26,14 @@ $toolbar-bg-light: #ffffffeb;
   flex-direction: row;
   box-shadow: $box-shadow;
   padding: 0.5rem 0.8rem;
-  background-color: var(--secondary);
+  background-color: var(--topbarBg);
   width: 100%;
   align-items: center;
   justify-content: space-between;
+  border-left: $app-border;
+  border-right: $app-border;
+  border-top: $app-border;
+
   p {
     margin: 0;
   }
@@ -38,12 +42,12 @@ $toolbar-bg-light: #ffffffeb;
     flex-direction: column;
   }
   &.dark-theme {
-    background-color: $toolbar-bg-dark;
-    border-bottom: $toolbar-border;
+    background-color: var(--topbarBg);
+    border-bottom: $app-border;
   }
   &.light-theme {
     background-color: $toolbar-bg-light;
-    border-bottom: $toolbar-border;
+    border-bottom: $app-border;
     p,
     span {
       color: #424242;
@@ -77,7 +81,6 @@ $toolbar-bg-light: #ffffffeb;
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 5px;
 
   textarea {
     padding: 1rem;
@@ -85,9 +88,7 @@ $toolbar-bg-light: #ffffffeb;
     height: 100%;
     overflow-y: scroll;
     box-shadow: $box-shadow;
-    border: none;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border: $app-border;
     outline: none;
     font-family: $font-family;
     resize: none;
@@ -96,7 +97,7 @@ $toolbar-bg-light: #ffffffeb;
     background: $container-bg-dark;
 
     textarea {
-      background: $textarea-bg-dark;
+      background: var(--editorBg1);
       color: $textarea-color-dark;
     }
   }

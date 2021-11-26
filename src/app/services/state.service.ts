@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
-import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil } from 'rxjs/operators'
+import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 import { ElectronService } from '../core/services'
 import { allowedConfigKeys } from '../entities/file/constants'
@@ -82,11 +82,17 @@ export class StateService extends AbstractComponent {
   }
 
   handleStateUpdate(): Observable<UpdatePayload> {
-    return this.updateState$.pipe(mergeMap((value) => this.updateStatePart(value)))
+    return this.updateState$.pipe(
+      tap((update) => console.log('Triggered update:', update)),
+      mergeMap((value) => this.updateStatePart(value))
+    )
   }
 
   handleStateUpdateMulti(): Observable<UpdatePayload> {
-    return this.updateMulti$.pipe(mergeMap((value) => this.updateStateMulti(value)))
+    return this.updateMulti$.pipe(
+      tap((update) => console.log('Triggered update:', update)),
+      mergeMap((value) => this.updateStateMulti(value))
+    )
   }
 
   getStatePart<K extends keyof State>(key: K): Observable<State[K]> {

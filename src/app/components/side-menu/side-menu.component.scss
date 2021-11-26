@@ -9,7 +9,7 @@
 }
 
 :host ::ng-deep .p-inputtext:enabled:focus {
-  border-color: var(--contrast);
+  border-color: var(--buttonColor);
 }
 
 :host ::ng-deep .p-tree-empty-message {

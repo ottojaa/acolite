@@ -1,6 +1,6 @@
 [
   {
-    "name": "Light grey",
+    "name": "Light grey pink",
     "styles": {
       "primary": "#37393E",
       "secondary": "#2F3136",
@@ -17,19 +17,25 @@
     }
   },
   {
-    "name": "Light Grey",
+    "name": "Dark blue green",
     "styles": {
-      "primary": "#F3F3F3",
-      "secondary": "#FFFFFF",
-      "topbarBg": "#ffffff",
-      "dropdownmenuBg": "#FFFFFF",
-      "textHighlight": "#005386",
-      "textHighlightBg": "#8accf5",
-      "buttonColor": "#8accf5",
+      "primary": "#1B2026",
+      "secondary": "#21252E",
+      "topbarBg": "#181a1f",
+      "dropdownmenuBg": "#28313a",
+      "textHighlight": "#56DB80",
+      "textHighlightBg": "#c53457a6",
+      "buttonColor": "#0fb38d",
+      "buttonColorLowOpacity": "#0fb38d85",
       "accent": "#00000021",
+      "editorBg1": "#21252E",
+      "editorBg2": "#1B2026",
+      "mdStatusToolbarBg": "#171b20ad",
+      "iconColor": "#8d2d49",
       "gutterBg": "#3496c5",
-      "contrast": "#000000",
-      "indent": "1px solid rgba(77, 77, 77, 0.208)"
+      "contrast": "#fafafa",
+      "contrastActive": "#111213",
+      "indent": "1px solid rgba(77, 77, 77, 0.608)"
     }
   }
 ]

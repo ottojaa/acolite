@@ -59,6 +59,9 @@
 :host ::ng-deep .mat-tab-label {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   background-color: var(--secondary);
+  border-right: $app-border;
+  border-bottom: $app-border;
+
   &.mat-tab-label-active {
     background-color: var(--buttonColor);
     box-shadow: $box-shadow-elevation;

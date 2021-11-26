@@ -12,38 +12,41 @@ $toolbar-bg-light: white;
   height: 100%;
   width: 100%;
   padding: 1rem 2rem 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
 
-  .top-bar {
-    width: 100%;
-    color: white;
+  .elevation {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 0.8rem;
-
-    p {
-      margin: 0;
-    }
-
-    .editor-settings {
+    justify-content: center;
+    flex-direction: column;
+    box-shadow: $box-shadow-elevation;
+    .top-bar {
+      width: 100%;
+      color: white;
       display: flex;
-      flex-direction: column;
-    }
-    &.dark-theme {
-      background-color: $toolbar-bg-dark;
-      border-bottom: $toolbar-border;
-    }
-    &.light-theme {
-      background-color: $toolbar-bg-light;
-      border-bottom: $toolbar-border;
-      p,
-      span {
-        color: #424242;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.8rem;
+
+      p {
+        margin: 0;
+      }
+
+      .editor-settings {
+        display: flex;
+        flex-direction: column;
+      }
+      &.dark-theme {
+        background-color: var(--topbarBg);
+        border: $app-border;
+      }
+      &.light-theme {
+        background-color: $toolbar-bg-light;
+        border: $app-border;
+        p,
+        span {
+          color: #424242;
+        }
       }
     }
   }
@@ -84,8 +87,7 @@ ngx-markdown-editor {
 }
 
 :host ::ng-deep .ngx-markdown-editor-wrapper {
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border: $app-border;
 }
 
 :host ::ng-deep ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
@@ -94,9 +96,13 @@ ngx-markdown-editor {
 :host ::ng-deep .dark-theme {
   .ngx-markdown-editor-statusbar {
     color: white;
+    margin: 0;
+    padding: 0.5rem;
   }
   .ngx-markdown-editor-toolbar {
-    background-color: $toolbar-bg-dark;
+    background-color: var(--mdStatusToolbarBg);
+    border-left: $app-border;
+    border-right: $app-border;
   }
   .cm-header {
     color: #8c8cff;
@@ -119,14 +125,14 @@ ngx-markdown-editor {
   }
   .ngx-markdown-editor-preview {
     color: $markdown-color-dark;
-    background: #272a2dc2;
+    background: var(--editorBg2);
   }
   .ngx-markdown-editor-preview > .preview-wrapper {
     border-left: 1px solid #ffffff24;
   }
   .CodeMirror-scroll {
     color: $markdown-color-dark;
-    background: $markdown-bg-dark;
+    background: var(--editorBg1);
   }
   .CodeMirror-cursor {
     border-left: 1px solid $markdown-color-dark;
@@ -136,6 +142,8 @@ ngx-markdown-editor {
 :host ::ng-deep .light-theme {
   .ngx-markdown-editor-statusbar {
     color: white;
+    margin: 0;
+    padding: 0.5rem;
   }
   .ngx-markdown-editor-toolbar {
     background-color: $toolbar-bg-light;

@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.themeService.setTheme('Light grey')
+    this.themeService.setTheme('Dark blue green')
     /*   if (this.state.getStatePartValue('baseDir')) {
       this.readDir()
     } */
