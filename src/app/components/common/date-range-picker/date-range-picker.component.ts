@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../abstract/abstract-component'
@@ -9,18 +9,36 @@ import { AbstractComponent } from '../../../abstract/abstract-component'
   styleUrls: ['./date-range-picker.component.scss'],
 })
 export class DateRangePickerComponent extends AbstractComponent implements OnInit {
-  range = new FormGroup({
-    start: new FormControl(),
-    end: new FormControl(),
-  })
+  @Input() dateRange: { start: Date; end: Date }
+  @Output() dateRangeChange = new EventEmitter()
+  maxDate = new Date()
+
+  range: FormGroup
 
   constructor() {
     super()
   }
 
   ngOnInit(): void {
-    this.range.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      console.log(data)
+    this.initForm()
+    this.range.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: { start: Date; end: Date }) => {
+      this.dateRangeChange.emit(data)
     })
+  }
+
+  initForm(): any {
+    const { start, end } = this.dateRange
+
+    if (start || end) {
+      this.range = new FormGroup({
+        start: new FormControl(start),
+        end: new FormControl(end),
+      })
+    } else {
+      this.range = new FormGroup({
+        start: new FormControl(),
+        end: new FormControl(),
+      })
+    }
   }
 }

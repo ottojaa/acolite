@@ -55,3 +55,12 @@ export interface SearchResult {
   highlightTitleText?: string | undefined
   highlightPathText?: string | undefined
 }
+
+export interface SearchPreference {
+  value: string
+  selected: boolean
+  range?: {
+    start?: Date
+    end?: Date
+  }
+}

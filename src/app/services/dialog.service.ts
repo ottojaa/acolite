@@ -81,14 +81,13 @@ export class AppDialogService {
   ): Observable<any> {
     const ref = this.dialog.open(MoveFilesDialogComponent, {
       data: { pathContainer, selectedFiles, target },
-      width: '20%',
-      minWidth: '500px',
+      width: '300px',
       hasBackdrop: true,
     })
     return ref.afterClosed().pipe(take(1))
   }
 
-  openToast(message: string, type: 'success' | 'failure' | 'info', duration = 5000): void {
+  openToast(message: string, type: 'success' | 'failure' | 'info', duration = 3000): void {
     this.zone.run(() => {
       const panelClass = `snackbar-${type}`
       const snackBar = this._snackBar.open(message, 'Close', {

@@ -41,11 +41,13 @@ let index: Document<Doc, true>
 function createWindow(): BrowserWindow {
   const electronScreen = screen
 
+  console.log(__dirname)
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,
     y: 0,
     show: false,
+    icon: getJoinedPath([__dirname, 'acolite.ico']),
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: serve ? true : false,

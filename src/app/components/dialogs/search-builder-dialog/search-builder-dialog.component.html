@@ -13,11 +13,14 @@
           <div class="item-container">
             <span class="item-content">
               {{ item.text }}
-              <mat-slide-toggle [(ngModel)]="item.selected" (ngModelChange)="onChange()"></mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="item.selected"></mat-slide-toggle>
             </span>
 
             <div class="datepickers" *ngIf="item.range && item.selected" [@grow]>
-              <app-date-range-picker></app-date-range-picker>
+              <app-date-range-picker
+                [dateRange]="item.range"
+                (dateRangeChange)="onDateRangeChange($event, item.value)"
+              ></app-date-range-picker>
             </div>
           </div>
         </div>
@@ -28,5 +31,5 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancelClick()">Cancel</button>
-  <button mat-button (click)="onRenameClick()">Save</button>
+  <button mat-button (click)="onSaveClick()">Save</button>
 </mat-dialog-actions>

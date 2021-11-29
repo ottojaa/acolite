@@ -8,8 +8,8 @@
 }
 
 .mat-dialog-title {
-  margin: 0 15px 20px !important;
   color: var(--buttonColor);
+  text-align: center;
 }
 
 :host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {

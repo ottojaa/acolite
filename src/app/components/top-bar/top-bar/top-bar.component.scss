@@ -15,6 +15,12 @@ p-autocomplete {
   height: 100%;
 }
 
+.filler {
+  width: 20%;
+  display: flex;
+  justify-content: center;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -43,8 +49,10 @@ p-autocomplete {
   display: none;
 }
 .topbar-end {
+  width: 20%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .text {

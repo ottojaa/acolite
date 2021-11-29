@@ -123,10 +123,10 @@ body .mat-select-content {
 }
 
 .snackbar-success {
-  background-color: #cce7cd;
-  color: #375a38;
+  background-color: #13b38d;
+  color: white;
   .mat-button-wrapper {
-    color: #375a38;
+    color: white;
   }
 }
 
@@ -139,15 +139,15 @@ body .mat-select-content {
 }
 
 .snackbar-info {
-  background-color: #b8e6fb;
-  color: #0088d1;
+  background-color: #3bb8f1;
+  color: white;
   .mat-button-wrapper {
-    color: #0088d1;
+    color: white;
   }
 }
 
 body .topbar {
-  background: var(--primary);
+  background: var(--topbarBg);
 }
 
 body .p-tooltip {

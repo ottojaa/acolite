@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { isEqual } from 'lodash'
 import { TreeNode } from 'primeng/api'
@@ -28,7 +28,8 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
     public dialogService: AppDialogService,
     public state: StateService,
     public router: Router,
-    public cdRef: ChangeDetectorRef
+    public cdRef: ChangeDetectorRef,
+    public zone: NgZone
   ) {
     super()
   }
@@ -59,15 +60,17 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   createNewFolder(): void {
     const baseDir = this.state.state$.value.baseDir
 
-    this.dialogService
-      .openFolderNameDialog(baseDir)
-      .pipe(take(1))
-      .subscribe((name: string) => {
-        if (name && baseDir) {
-          const rootDirectory = this.state.getStatePartValue('rootDirectory')
-          this.electronService.createNewFolderRequest({ directoryName: name, baseDir, rootDirectory })
-        }
-      })
+    this.zone.run(() => {
+      this.dialogService
+        .openFolderNameDialog(baseDir)
+        .pipe(take(1))
+        .subscribe((name: string) => {
+          if (name && baseDir) {
+            const rootDirectory = this.state.getStatePartValue('rootDirectory')
+            this.electronService.createNewFolderRequest({ directoryName: name, baseDir, rootDirectory })
+          }
+        })
+    })
   }
 
   expandAll() {

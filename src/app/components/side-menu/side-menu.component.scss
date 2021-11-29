@@ -10,6 +10,7 @@
 
 :host ::ng-deep .p-inputtext:enabled:focus {
   border-color: var(--buttonColor);
+  box-shadow: none;
 }
 
 :host ::ng-deep .p-tree-empty-message {

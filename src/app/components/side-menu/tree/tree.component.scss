@@ -52,6 +52,8 @@
 
 :host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
   box-shadow: none;
+  outline: 1px solid var(--buttonColor);
+  outline-offset: -1px;
 }
 
 .workspace-title {

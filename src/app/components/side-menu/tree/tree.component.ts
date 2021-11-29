@@ -42,6 +42,7 @@ export class TreeComponent implements OnInit {
   }
 
   onSelectFile(event: { node: TreeElement; originalEvent: MouseEvent }): void {
+    console.log(event)
     const { node, originalEvent } = event
     const { shiftKey, metaKey } = originalEvent
     if (shiftKey) {

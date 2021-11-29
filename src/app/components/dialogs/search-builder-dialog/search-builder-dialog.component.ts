@@ -1,9 +1,10 @@
-import { trigger, state, style, transition, animate } from '@angular/animations'
+import { trigger, style, transition, animate } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
-import { FormGroup, FormControl } from '@angular/forms'
 import { MatDialogRef } from '@angular/material/dialog'
-
-type ListItemType = 'item' | 'separator' | 'label'
+import { omit } from 'lodash'
+import { SearchPreference } from '../../../interfaces/Menu'
+import { AppDialogService } from '../../../services/dialog.service'
+import { StateService } from '../../../services/state.service'
 
 interface SeparatorItem {
   type: 'separator'
@@ -20,8 +21,8 @@ interface OptionItem {
   text: string
   selected: boolean
   range?: {
-    from: string
-    to: string
+    start?: Date
+    end?: Date
   }
 }
 
@@ -42,19 +43,21 @@ type ListItem = SeparatorItem | LabelItem | OptionItem
   ],
 })
 export class SearchBuilderDialogComponent implements OnInit {
-  updatedDateRange = new FormGroup({
-    start: new FormControl(),
-    end: new FormControl(),
-  })
-
-  createdDateRange = new FormGroup({
-    start: new FormControl(),
-    end: new FormControl(),
-  })
-
   listItems: ListItem[]
 
-  constructor(public dialogRef: MatDialogRef<SearchBuilderDialogComponent>) {}
+  get atLeastOneSearchOptionSelected(): boolean {
+    const searchOptions = ['filePath', 'fileName', 'content']
+    return this.listItems
+      .filter(this.isOptionItem)
+      .filter((item) => searchOptions.includes(item.value))
+      .some((item) => item.selected)
+  }
+
+  constructor(
+    public dialogRef: MatDialogRef<SearchBuilderDialogComponent>,
+    public state: StateService,
+    public dialogService: AppDialogService
+  ) {}
 
   ngOnInit(): void {
     this.listItems = this.getListItems()
@@ -64,12 +67,36 @@ export class SearchBuilderDialogComponent implements OnInit {
     this.dialogRef.close()
   }
 
-  onChange(): void {
+  isOptionItem(item: ListItem): item is OptionItem {
+    return item.type === 'item'
+  }
+
+  getSearchPreferencesFromListItems(): SearchPreference[] {
+    return this.listItems.filter(this.isOptionItem).map((el) => omit(el, ['text', 'type']))
+  }
+
+  onSaveClick(): void {
+    if (this.atLeastOneSearchOptionSelected) {
+      const preferences = this.getSearchPreferencesFromListItems()
+      this.state.updateState$.next({ key: 'searchPreferences', payload: preferences })
+      this.dialogRef.close(true)
+    } else {
+      this.dialogService.openToast(`At least one 'search by' option must be selected!`, 'info')
+    }
+  }
+
+  onDateRangeChange(event: { start: Date; end: Date }, value: string): void {
+    const optionItems = this.listItems.filter(this.isOptionItem)
+    const itemIdx = optionItems.findIndex((item) => item.value === value)
+    if (itemIdx > -1) {
+      optionItems[itemIdx].range = event
+    }
     console.log(this.listItems)
   }
 
   getListItems(): ListItem[] {
-    return [
+    const currentPreferences = this.state.getStatePartValue('searchPreferences')
+    const items: ListItem[] = [
       {
         type: 'label',
         label: 'Search by',
@@ -105,8 +132,8 @@ export class SearchBuilderDialogComponent implements OnInit {
         text: 'Last modified date',
         selected: false,
         range: {
-          from: '',
-          to: '',
+          start: undefined,
+          end: undefined,
         },
       },
       {
@@ -115,10 +142,28 @@ export class SearchBuilderDialogComponent implements OnInit {
         type: 'item',
         selected: false,
         range: {
-          from: '',
-          to: '',
+          start: undefined,
+          end: undefined,
         },
       },
     ]
+
+    if (currentPreferences?.length) {
+      const isOptionItem = (item: ListItem): item is OptionItem => item.type === 'item'
+      currentPreferences.forEach((preference) => {
+        const preferenceIdx = items.findIndex((el) => {
+          if (isOptionItem(el)) {
+            return el.value === preference.value
+          }
+          return false
+        })
+
+        if (preferenceIdx > -1) {
+          items[preferenceIdx] = { ...items[preferenceIdx], ...preference }
+        }
+      })
+    }
+
+    return items
   }
 }

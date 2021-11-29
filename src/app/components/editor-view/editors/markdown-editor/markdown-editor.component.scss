@@ -48,6 +48,14 @@ $toolbar-bg-light: white;
           color: #424242;
         }
       }
+      .last-saved {
+        h4,
+        h3 {
+          margin: 0;
+        }
+        display: flex;
+        align-items: center;
+      }
     }
   }
 

@@ -54,7 +54,11 @@ export class AutocompleteComponent extends AbstractComponent {
       this.dialogService
         .openSearchBuilder()
         .pipe(take(1))
-        .subscribe((data) => console.log(data))
+        .subscribe((data) => {
+          if (data) {
+            this.dialogService.openToast('Updated succesfully', 'success')
+          }
+        })
     })
   }
 
