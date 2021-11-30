@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ElectronService } from '../core/services'
-import { Tab } from '../interfaces/Menu'
+import { SelectedTab, Tab } from '../interfaces/Menu'
+import { getBaseName, getDirName, getPathSeparator } from '../utils/file-utils'
 import { State, StateService, StateUpdate } from './state.service'
 
 @Injectable({
@@ -13,8 +14,9 @@ export class TabService {
     const { tabs, selectedTab } = this.state.getStateParts(['tabs', 'selectedTab'])
     const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
 
-    if (tabIdx > -1 && tabIdx !== selectedTab) {
-      this.state.updateState$.next({ key: 'selectedTab', payload: tabIdx })
+    if (tabIdx > -1 && tabIdx !== selectedTab.index) {
+      const newTab = this.getSelectedTabEntityFromIndex(tabIdx)
+      this.state.updateState$.next({ key: 'selectedTab', payload: newTab })
     } else if (tabIdx === -1) {
       this.electronService.readFileRequest({ filePath })
     }
@@ -23,16 +25,17 @@ export class TabService {
   closeTab(filePath: string): void {
     const { tabs, selectedTab } = this.state.getStateParts(['selectedTab', 'tabs'])
     const newTabs = this.filterClosedTab(tabs, filePath)
-    const newIndex = selectedTab - 1 >= 0 ? selectedTab - 1 : 0
+    const newIndex = selectedTab.index - 1 >= 0 ? selectedTab.index - 1 : 0
+    const newSelectedTab = { path: newTabs[newIndex].path, index: newIndex }
 
-    this.update(newIndex, newTabs)
+    this.update(newSelectedTab, newTabs)
   }
 
   closeOtherTabs(filePath: string): void {
     const { tabs } = this.state.getStateParts(['selectedTab', 'tabs'])
     const tabToKeepOpen = tabs.find((tab) => tab.path === filePath)
     if (tabToKeepOpen) {
-      this.update(0, [tabToKeepOpen])
+      this.update({ path: tabToKeepOpen.path, index: 0 }, [tabToKeepOpen])
     }
   }
 
@@ -55,14 +58,14 @@ export class TabService {
   }
 
   closeAllTabs(): void {
-    this.update(0, [])
+    this.update({ path: '', index: 0 }, [])
   }
 
   openTabInFileLocation(filePath: string): void {
     this.electronService.openFileLocationRequest({ filePath })
   }
 
-  update(selectedTab: number, tabs: Tab[]): void {
+  update(selectedTab: SelectedTab, tabs: Tab[]): void {
     const payload: StateUpdate<State>[] = [
       { key: 'selectedTab', payload: selectedTab },
       { key: 'tabs', payload: tabs },
@@ -72,5 +75,29 @@ export class TabService {
 
   filterClosedTab(tabs: Tab[], tabToClose: string): Tab[] {
     return tabs.filter((tab) => tab.path !== tabToClose)
+  }
+
+  getSelectedTabEntityFromIndex(index: number): SelectedTab {
+    const { tabs, baseDir } = this.state.getStateParts(['tabs', 'baseDir'])
+    const selectedTab = tabs[index]
+    if (selectedTab) {
+      return { path: tabs[index].path, index, activeIndent: this.getActiveIndent(baseDir, selectedTab.path) }
+    } else {
+      console.error(`No tab at index ${index}`)
+      return null
+    }
+  }
+
+  getActiveIndent(rootPath: string, path: string) {
+    if (!rootPath || !path) {
+      return undefined
+    }
+    const pathDiff = path.replace(rootPath, '')
+    const pathDepth = pathDiff.split(getPathSeparator()).length - 2
+    const parentPath = getDirName(path)
+    if (parentPath) {
+      return { activeParent: parentPath, activeNode: path, indent: pathDepth }
+    }
+    return null
   }
 }

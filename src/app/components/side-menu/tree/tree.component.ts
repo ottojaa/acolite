@@ -1,14 +1,14 @@
 import { ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
-import { uniq, uniqBy } from 'lodash'
+import { uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
-import { take } from 'rxjs/operators'
-import { FileActions } from '../../../../../app/actions'
+import { take, takeUntil } from 'rxjs/operators'
 import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/directory-utils'
+import { AbstractComponent } from '../../../abstract/abstract-component'
 import { ElectronService } from '../../../core/services'
-import { FileEntity, TreeElement } from '../../../interfaces/Menu'
+import { ActiveIndent, FileEntity, SelectedTab, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
-import { State, StateService, StateUpdate } from '../../../services/state.service'
+import { StateService } from '../../../services/state.service'
 import { TabService } from '../../../services/tab.service'
 
 @Component({
@@ -16,7 +16,7 @@ import { TabService } from '../../../services/tab.service'
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
 })
-export class TreeComponent implements OnInit {
+export class TreeComponent extends AbstractComponent implements OnInit {
   @Input() files: TreeElement[]
   @Input() workspace: string | undefined
   @ViewChild('contextMenu') cm: ContextMenu
@@ -25,8 +25,8 @@ export class TreeComponent implements OnInit {
   selection: TreeElement[] = [] // Used for shift-key multi selection, as primeng tree does not support it for some reason.
   contextMenuItems: MenuItem[]
   draggedElements: TreeElement[]
-  activeIndents: number[] = []
   isHovering = false
+  activeIndent: ActiveIndent
 
   constructor(
     private state: StateService,
@@ -35,14 +35,25 @@ export class TreeComponent implements OnInit {
     private tabService: TabService,
     private cdRef: ChangeDetectorRef,
     private ngZone: NgZone
-  ) {}
+  ) {
+    super()
+  }
 
   ngOnInit(): void {
     this.contextMenuItems = this.getMenuItems()
+    this.initSelectedTabListener()
+  }
+
+  initSelectedTabListener(): void {
+    this.state
+      .getStatePart('selectedTab')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((tab) => {
+        this.activeIndent = tab.activeIndent
+      })
   }
 
   onSelectFile(event: { node: TreeElement; originalEvent: MouseEvent }): void {
-    console.log(event)
     const { node, originalEvent } = event
     const { shiftKey, metaKey } = originalEvent
     if (shiftKey) {
@@ -56,10 +67,6 @@ export class TreeComponent implements OnInit {
       }
     }
     this.selection = this.selectedFiles
-  }
-
-  getActiveIndents(): number[] {
-    return uniq(this.selectedFiles.map((file) => file.data.indents))
   }
 
   /**

@@ -4,7 +4,7 @@ import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil, tap } from 'rx
 import { AbstractComponent } from '../abstract/abstract-component'
 import { ElectronService } from '../core/services'
 import { allowedConfigKeys } from '../entities/file/constants'
-import { SearchPreference, SearchResult, Tab, TreeElement } from '../interfaces/Menu'
+import { SearchPreference, SearchResult, SelectedTab, Tab, TreeElement } from '../interfaces/Menu'
 import { SettingsService } from './settings.service'
 
 interface UpdatePayload {
@@ -14,7 +14,7 @@ interface UpdatePayload {
 export interface State {
   baseDir: string
   initialized: boolean
-  selectedTab: number
+  selectedTab: SelectedTab
   editorTheme: 'dark' | 'light'
   sideMenuWidth: number
   searchPreferences: SearchPreference[]
@@ -41,7 +41,10 @@ export class StateService extends AbstractComponent {
   initialState: State = {
     initialized: false,
     baseDir: '',
-    selectedTab: 0,
+    selectedTab: {
+      path: '',
+      index: 0,
+    },
     editorTheme: 'dark',
     sideMenuWidth: 20,
     searchResults: [],

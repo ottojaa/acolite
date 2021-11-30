@@ -1,4 +1,5 @@
 import { TreeNode } from 'primeng/api'
+import { SearchPreference, SelectedTab } from '../src/app/interfaces/Menu'
 
 export interface FileEntity {
   type: 'folder' | 'file'
@@ -17,8 +18,9 @@ export interface WorkspaceConfig {
   baseDir?: string
   tabs?: Tab[]
   sideMenuWidth?: number
-  selectedTab?: number
+  selectedTab?: SelectedTab
   editorTheme?: 'dark' | 'light'
+  searchPreferences?: SearchPreference[]
 }
 
 export interface AppConfig {

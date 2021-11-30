@@ -11,7 +11,6 @@ export class ShiftSelect {
   @HostListener('click', ['$event'])
   onClick(e: MouseEvent) {
     if (e.button == 0 && e.shiftKey) {
-      console.log(e)
     }
   }
 }

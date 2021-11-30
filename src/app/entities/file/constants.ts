@@ -24,4 +24,11 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
-export const allowedConfigKeys: (keyof State)[] = ['baseDir', 'tabs', 'sideMenuWidth', 'editorTheme', 'selectedTab']
+export const allowedConfigKeys: (keyof State)[] = [
+  'baseDir',
+  'tabs',
+  'sideMenuWidth',
+  'editorTheme',
+  'selectedTab',
+  'searchPreferences',
+]

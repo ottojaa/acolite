@@ -16,6 +16,7 @@
     </span>
     <div class="editor-border">
       <ngx-markdown-editor
+        id="ngx-markdown-editor-{{ tab.path }}"
         [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
         (contentChange)="onEditorContentChange()"
       ></ngx-markdown-editor>

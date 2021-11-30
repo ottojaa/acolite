@@ -15,7 +15,7 @@
     <textarea
       #editor
       (keydown)="handleKeydown($event)"
-      (contextmenu)="onRightClickTextArea($event)"
+      (contextmenu)="onRightClickTextArea()"
       [(ngModel)]="textContent"
       (ngModelChange)="onInputChange()"
       contentEditable

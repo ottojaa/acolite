@@ -22,7 +22,7 @@ import {
 } from '../actions'
 import { getFileEntityFromPath, getDeletedFileEntityMock } from '../utils'
 import { Document } from 'flexsearch'
-import { addToIndex, removeIndexes, updateIndex } from './store-events'
+import { addToIndex, removeIndexes, updateIndex, updateIndexesRecursive } from './store-events'
 import { Doc } from '../../src/app/interfaces/File'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
@@ -139,7 +139,7 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
     const rootDir = first(updatedRootDirectory)
 
     updateTabData(tabs, path, null, newPath)
-    updateIndex(newPath, index)
+    updateIndexesRecursive([newPath], index)
 
     event.sender.send(FileActionResponses.RenameSuccess, { rootDir, tabs })
   })
@@ -148,7 +148,7 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
 export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Document<Doc, true>) => {
   const { target, elementsToMove, rootDirectory, tabs } = action
   const newParentPath = target.data.filePath
-  const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'folder' ? -1 : 1))
+  const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'file' ? 1 : -1))
   const failedToMove = []
 
   const getNewPath = (currentPath: string, newParentPath: string) => {
@@ -174,7 +174,6 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
             reject(err)
           }
           updateTabPath(currentPath, newPath)
-          updateIndex(newPath, index)
           resolve()
         })
       })
@@ -189,6 +188,10 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
           return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
         })
 
+      updateIndexesRecursive(
+        elementsToAdd.map((el) => el.data.filePath),
+        index
+      )
       moveRecursive(elementsToAdd, elementsToDelete, [rootDirectory], { baseDir: rootDirectory.data.filePath })
       event.sender.send(FileActionResponses.MoveSuccess, { rootDirectory, tabs })
     })

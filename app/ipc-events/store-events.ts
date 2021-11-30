@@ -115,11 +115,46 @@ export const addToIndex = async (filePath: string, index: Document<Doc, true>) =
   await index.addAsync(ino, indexFile)
 }
 
+export const updateIndexesRecursive = (filePaths: string[], index: Document<Doc, true>) => {
+  const updateIndexes = (path: string) => {
+    if (!fs.lstatSync(path).isDirectory()) {
+      return
+    }
+
+    fs.readdirSync(path)
+      .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item))
+      .forEach((file) => {
+        const subpath = getJoinedPath([path, file])
+        if (fs.lstatSync(subpath).isDirectory()) {
+          updateIndexes(subpath)
+        } else {
+          updateIndex(subpath, index)
+        }
+      })
+  }
+  filePaths.forEach((path) => updateIndexes(path))
+}
+
 export const removeIndexes = async (inodes: number[], index: Document<Doc, true>) => {
   for (let node of inodes) {
     await index.removeAsync(node)
   }
 }
+
+export const getEmptyIndex = (): Document<Doc, true> => {
+  return new Document({
+    tokenize: 'full',
+    resolution: 1,
+    optimize: true,
+    document: {
+      id: 'id',
+      index: ['filePath', 'fileName', 'content', 'createdAt', 'modifiedAt', 'extension'],
+      store: true,
+    },
+  })
+}
+
+export const removeAllIndexes = (index: Document<Doc, true>) => {}
 
 const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
   return new Promise((resolve, reject) => {

@@ -141,6 +141,9 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       case 'editorTheme': {
         return validateEditorTheme(workspaceConfig)
       }
+      case 'searchPreferences': {
+        return validateSearchPreferences(workspaceConfig)
+      }
       default: {
         break
       }
@@ -201,6 +204,12 @@ const validateEditorTheme = (config: WorkspaceConfig) => {
 
 const validateSelectedTab = (config: WorkspaceConfig) => {
   const { tabs, selectedTab } = config
-  const isValid = tabs.findIndex((tab) => tab.data) > -1
+  const isValid = tabs.findIndex((tab) => tab.path === selectedTab.path) > -1
   return isValid ? selectedTab : 0
+}
+
+const validateSearchPreferences = (config: WorkspaceConfig) => {
+  const { searchPreferences } = config
+  const isValid = searchPreferences.every((preference) => preference.value)
+  return isValid ? searchPreferences : []
 }

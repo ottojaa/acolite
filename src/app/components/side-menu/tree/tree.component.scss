@@ -38,8 +38,15 @@
 
 :host ::ng-deep .p-treenode-label {
   height: 100%;
+  width: 100%;
   align-items: center;
   display: flex;
+  & > span {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+  }
 }
 
 :host ::ng-deep ul.p-treenode-children > .p-element > .p-treenode-leaf {
@@ -52,8 +59,13 @@
 
 :host ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
   box-shadow: none;
-  outline: 1px solid var(--buttonColor);
-  outline-offset: -1px;
+  &:not(:hover) {
+    outline: 1px solid var(--buttonColor);
+    outline-offset: -1px;
+  }
+  &:hover {
+    outline: none;
+  }
 }
 
 .workspace-title {
@@ -82,13 +94,21 @@
   }
 
   .row-container {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     .indent {
+      transition: all 300ms;
       border-right: var(--indent);
+      &.active {
+        border-right: 1px solid var(--buttonColor);
+        transition: all 300ms;
+      }
     }
-    .indentActive {
-      border-right: 1px solid rgb(187 180 180 / 87%);
+    &.active {
+      background-color: var(--buttonColorLowOpacity);
+      transition: background-color 300ms;
     }
   }
 }

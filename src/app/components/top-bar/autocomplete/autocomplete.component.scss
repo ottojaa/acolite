@@ -71,11 +71,11 @@
   }
 
   &.selected {
-    background: var(--buttonColor);
+    background: var(--buttonColorLowOpacity);
   }
 
   &:not(.selected):hover {
-    background-color: var(--buttonColor);
+    background-color: var(--buttonColorLowOpacity);
   }
 
   .top-row {

@@ -1,7 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
-import { filter, skipUntil, take } from 'rxjs/operators'
+import { filter, skipUntil, take, takeUntil } from 'rxjs/operators'
+import { AbstractComponent } from '../abstract/abstract-component'
 import { StateService } from '../services/state.service'
 import { ThemeService } from '../services/theme.service'
 
@@ -15,12 +16,14 @@ import { ThemeService } from '../services/theme.service'
     ]),
   ],
 })
-export class MainComponent implements OnInit {
+export class MainComponent extends AbstractComponent implements OnInit {
   initialized$: Observable<boolean>
   sideMenuWidth: number
   editorWidth: number
 
-  constructor(private themeService: ThemeService, public state: StateService) {}
+  constructor(private themeService: ThemeService, public state: StateService) {
+    super()
+  }
 
   ngOnInit(): void {
     this.initialized$ = this.state.getStatePart('initialized')
@@ -29,10 +32,9 @@ export class MainComponent implements OnInit {
   }
 
   initSplitterSizes(): void {
-    const initSuccess$ = this.initialized$.pipe(filter((initVal) => !!initVal))
     this.state
       .getStatePart('sideMenuWidth')
-      .pipe(skipUntil(initSuccess$), take(1))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((width) => {
         this.sideMenuWidth = width
         this.editorWidth = 100 - width

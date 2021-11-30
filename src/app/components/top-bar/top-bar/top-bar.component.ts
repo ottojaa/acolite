@@ -19,12 +19,9 @@ export class TopBarComponent implements OnInit {
     this.themeOptions = themes
   }
 
-  openThemeModal(): void {
-    console.log('clicked')
-  }
+  openThemeModal(): void {}
 
   search(event: CustomEvent): void {
     this.results = []
-    console.log(event)
   }
 }

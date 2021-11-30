@@ -1,24 +1,5 @@
 [
   {
-    "name": "Light grey pink",
-    "styles": {
-      "primary": "#37393E",
-      "secondary": "#2F3136",
-      "topbarBg": "#37393E",
-      "dropdownmenuBg": "#28313a",
-      "textHighlight": "#56DB80",
-      "textHighlightBg": "#c53457a6",
-      "buttonColor": "#c53457",
-      "accent": "#00000021",
-      "editorBg1": "#2F3136",
-      "editorBg2": "#1B2026",
-      "iconColor": "#8d2d49",
-      "gutterBg": "#3496c5",
-      "contrast": "#fafafa",
-      "indent": "1px solid rgba(77, 77, 77, 0.608)"
-    }
-  },
-  {
     "name": "Dark blue green",
     "styles": {
       "primary": "#1B2026",
@@ -37,6 +18,26 @@
       "gutterBg": "#3496c5",
       "contrast": "#fafafa",
       "contrastActive": "#111213",
+      "indent": "1px solid rgba(77, 77, 77, 0.608)"
+    }
+  },
+  {
+    "name": "Light grey pink",
+    "styles": {
+      "primary": "#37393E",
+      "secondary": "#2F3136",
+      "topbarBg": "#37393E",
+      "dropdownmenuBg": "#28313a",
+      "textHighlight": "#56DB80",
+      "textHighlightBg": "#c53457a6",
+      "buttonColor": "#c53457",
+      "buttonColorLowOpacity": "#c5345761",
+      "accent": "#00000021",
+      "editorBg1": "#2F3136",
+      "editorBg2": "#1B2026",
+      "iconColor": "#8d2d49",
+      "gutterBg": "#3496c5",
+      "contrast": "#fafafa",
       "indent": "1px solid rgba(77, 77, 77, 0.608)"
     }
   }

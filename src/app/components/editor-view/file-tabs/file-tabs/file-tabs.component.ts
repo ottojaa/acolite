@@ -1,21 +1,13 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core'
 import { MenuItem } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Observable } from 'rxjs'
-import { takeUntil, tap } from 'rxjs/operators'
+import { map, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
-import { Tab } from '../../../../interfaces/Menu'
+import { SelectedTab, Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
 import { TabService } from '../../../../services/tab.service'
+import { MatTabChangeEvent } from '@angular/material/tabs'
 
 @Component({
   selector: 'app-file-tabs',
@@ -36,14 +28,15 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
   ngOnInit(): void {
     this.selectedTab$ = this.state.getStatePart('selectedTab').pipe(
       takeUntil(this.destroy$),
-      tap((selectedTab) => this.scrollSelectedTabIntoView(selectedTab))
+      tap((selectedTab) => this.scrollSelectedTabIntoView(selectedTab)),
+      map((selectedTab) => selectedTab.index)
     )
   }
 
-  scrollSelectedTabIntoView(tabIdx: number): void {
+  scrollSelectedTabIntoView(tab: SelectedTab): void {
     setTimeout(() => {
       const els = Array.from(document.querySelectorAll('.mat-tab-label'))
-      const selectedTab = els[tabIdx]
+      const selectedTab = els[tab?.index]
       if (selectedTab) {
         selectedTab.scrollIntoView({ behavior: 'smooth' })
       }
@@ -54,8 +47,12 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
     this.tabService.closeTab(filePath)
   }
 
-  onSelectTab(event: { index: number }): void {
-    this.state.updateState$.next({ key: 'selectedTab', payload: event.index })
+  onSelectTab(event: MatTabChangeEvent): void {
+    const selectedTab = this.state.getStatePartValue('selectedTab')
+    const newSelectedTab = this.tabService.getSelectedTabEntityFromIndex(event.index)
+    if (newSelectedTab.path !== selectedTab.path) {
+      this.state.updateState$.next({ key: 'selectedTab', payload: newSelectedTab })
+    }
   }
 
   trackByPath(_index: number, tab: Tab): string {

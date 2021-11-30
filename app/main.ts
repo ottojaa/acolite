@@ -21,7 +21,7 @@ import {
   readAndSendTabData,
   openFileLocation,
 } from './ipc-events/file-events'
-import { initAppState, searchFiles, updateStore } from './ipc-events/store-events'
+import { getEmptyIndex, initAppState, searchFiles, updateStore } from './ipc-events/store-events'
 import { Doc } from '../src/app/interfaces/File'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
@@ -41,7 +41,6 @@ let index: Document<Doc, true>
 function createWindow(): BrowserWindow {
   const electronScreen = screen
 
-  console.log(__dirname)
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,
@@ -130,6 +129,7 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         break
       }
       case FolderActions.ReadDir: {
+        index = getEmptyIndex()
         readAndSendMenuItemsFromBaseDirectory(event, payload, index)
         break
       }
@@ -186,16 +186,7 @@ try {
 
   startIPCChannelListeners()
 
-  index = new Document({
-    tokenize: 'full',
-    resolution: 1,
-    optimize: true,
-    document: {
-      id: 'id',
-      index: ['filePath', 'fileName', 'content', 'createdAt', 'modifiedAt', 'extension'],
-      store: true,
-    },
-  })
+  index = getEmptyIndex()
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

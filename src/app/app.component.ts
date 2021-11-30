@@ -7,6 +7,7 @@ import { ThemeService } from './services/theme.service'
 import { State, StateService, StateUpdate } from './services/state.service'
 import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/actions'
 import { Router } from '@angular/router'
+import { TabService } from './services/tab.service'
 
 type IPCEvent = Electron.IpcMessageEvent
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
     private electronService: ElectronService,
     private translate: TranslateService,
     private themeService: ThemeService,
+    private tabService: TabService,
     public state: StateService,
     public router: Router,
     public dialogService: AppDialogService,
@@ -154,7 +156,6 @@ export class AppComponent implements OnInit {
             { key: 'rootDirectory', payload: rootDir },
             { key: 'tabs', payload: tabs },
           ]
-          console.log(response)
           this.state.updateMulti$.next(payload)
           break
         }
@@ -191,7 +192,8 @@ export class AppComponent implements OnInit {
             tabs.push(response)
           }
 
-          const selectedTab = tabIdx === -1 ? tabs.length - 1 : tabIdx
+          const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
+          const selectedTab = this.tabService.getSelectedTabEntityFromIndex(selectedTabIndex)
           const payload: StateUpdate<State>[] = [
             { key: 'tabs', payload: tabs },
             { key: 'selectedTab', payload: selectedTab },

@@ -20,9 +20,16 @@ export interface FileEntity {
 
 export type TreeElement = TreeNode<FileEntity>
 
-export interface TabState {
-  selectedTab: number
-  tabs: Tab[]
+export interface ActiveIndent {
+  activeParent: string
+  activeNode: string
+  indent: number
+}
+
+export interface SelectedTab {
+  path: string
+  index: number
+  activeIndent?: ActiveIndent
 }
 
 export interface Tab {

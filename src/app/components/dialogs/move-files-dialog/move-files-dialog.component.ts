@@ -73,7 +73,6 @@ export class MoveFilesDialogComponent implements OnInit {
     const { baseDir, rootDirectory, tabs } = this.state.getStateParts(['baseDir', 'rootDirectory', 'tabs'])
     const paths = Object.values(this.pathsToBeMoved).reduce((acc, curr) => acc.concat(curr), [])
     const filesToBeMoved = selectedFiles.filter((el) => paths.includes(el.data.filePath))
-    console.log(filesToBeMoved)
 
     this.electronService.moveFilesRequest({
       target,

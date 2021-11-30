@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
 import { MenuItem } from 'primeng/api'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap, take, takeUntil } from 'rxjs/operators'
@@ -11,6 +11,7 @@ import { StateService } from '../../../../services/state.service'
   selector: 'app-text-editor',
   templateUrl: './text-editor.component.html',
   styleUrls: ['./text-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextEditorComponent extends AbstractComponent implements OnInit {
   @Input() tab: Tab

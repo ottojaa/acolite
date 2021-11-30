@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, NgZone, ViewChild } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { debounceTime, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../abstract/abstract-component'
@@ -12,6 +12,7 @@ import { TabService } from '../../../services/tab.service'
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent extends AbstractComponent {
   @ViewChild('searchbar') searchbar: ElementRef
@@ -35,7 +36,7 @@ export class AutocompleteComponent extends AbstractComponent {
     })
   }
 
-  onOpenDrop(event: MouseEvent, state: boolean) {
+  onOpenDrop(event: Event, state: boolean) {
     const target = event.target as HTMLElement
     if (!target.classList.contains('keyboard-navigation-item')) {
       this.openDrop = state
@@ -56,7 +57,7 @@ export class AutocompleteComponent extends AbstractComponent {
         .pipe(take(1))
         .subscribe((data) => {
           if (data) {
-            this.dialogService.openToast('Updated succesfully', 'success')
+            this.dialogService.openToast('Search preferences updated', 'success')
           }
         })
     })

@@ -4,8 +4,8 @@
   </div>
   <p-tree
     [value]="files"
-    droppableNodes="true"
-    draggableNodes="true"
+    [droppableNodes]="true"
+    [draggableNodes]="true"
     expanded="true"
     selectionMode="multiple"
     [validateDrop]="true"
@@ -19,9 +19,19 @@
     (onNodeContextMenuSelect)="onRightClick($event)"
   >
     <ng-template let-node pTemplate="file">
-      <span class="row-container">
-        <ng-container *ngFor="let e of [].constructor(node.data.indents)">
-          <div class="indent"></div>
+      <span
+        class="row-container"
+        [ngClass]="{
+          active: node.data.filePath === activeIndent?.activeNode
+        }"
+      >
+        <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
+          <div
+            class="indent"
+            [ngClass]="{
+              active: node.data.parentPath.includes(activeIndent?.activeParent) && i + 1 === activeIndent.indent
+            }"
+          ></div>
         </ng-container>
 
         <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()">
@@ -33,8 +43,13 @@
 
     <ng-template let-node pTemplate="folder">
       <span class="row-container" (click)="expand($event, node)">
-        <ng-container *ngFor="let e of [].constructor(node.data.indents)">
-          <div class="indent"></div>
+        <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
+          <div
+            class="indent"
+            [ngClass]="{
+              active: node.data.parentPath.includes(activeIndent?.activeParent) && i + 1 === activeIndent.indent
+            }"
+          ></div>
         </ng-container>
         <mat-icon [ngClass]="{ empty: !node.children.length }">
           {{ node.expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}</mat-icon

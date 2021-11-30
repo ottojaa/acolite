@@ -19,10 +19,11 @@ export const folderStructureToMenuItems = (
 const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
   if (isFolder(element) && element.data.type === 'folder') {
     const { data, children } = element
-    const treeNode = {
+    const treeNode: TreeElement = {
       label: getBaseName(data.filePath),
       type: MenuItemTypes.Folder,
       key: data.filePath,
+      expanded: true,
       leaf: false,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,

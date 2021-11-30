@@ -91,7 +91,6 @@ export class SearchBuilderDialogComponent implements OnInit {
     if (itemIdx > -1) {
       optionItems[itemIdx].range = event
     }
-    console.log(this.listItems)
   }
 
   getListItems(): ListItem[] {
