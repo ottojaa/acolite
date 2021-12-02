@@ -4,6 +4,7 @@
 @import '~primeng/resources/themes/arya-green/theme.css';
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import '../src/variables.scss';
+@import './github-markdown.css';
 
 body,
 body .p-component {
@@ -31,11 +32,15 @@ body ::-webkit-scrollbar {
   width: 5px;
   height: 3px;
   border-radius: 5px;
+  scrollbar-width: 5px;
 }
 
 body ::-webkit-scrollbar-thumb {
   background: #dcdadad6;
   visibility: hidden;
+}
+body ::-webkit-scrollbar-track {
+  width: 5px;
 }
 
 body .mat-dialog-container {
@@ -102,10 +107,12 @@ body .mat-option {
 }
 body .mat-option.mat-active {
   color: var(--contrast);
+  background: var(--buttonColorLowOpacity) !important;
 }
 
 body .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
   color: var(--contrast);
+  background: var(--primary);
 }
 body .mat-select-panel {
   background: var(--primary);

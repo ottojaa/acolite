@@ -60,7 +60,6 @@ export interface Tab {
   extension: string
   textContent: string
   deleted?: boolean
-  data?: {
-    lastUpdated?: Date
-  }
+  createdAt?: Date
+  modifiedAt?: Date
 }

@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core'
-import { MarkdownEditorComponent } from '@mdefy/ngx-markdown-editor'
+import { MarkdownEditorComponent, Options } from '@mdefy/ngx-markdown-editor'
 import { MarkdownService } from 'ngx-markdown'
-import { Subject } from 'rxjs'
-import { debounceTime, skip, switchMap, take, takeUntil } from 'rxjs/operators'
+import { interval, Subject, timer } from 'rxjs'
+import { debounceTime, skip, startWith, switchMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
+import hljs from 'highlight.js/lib/common'
+import { getDistance } from '../../../../../../app/date-and-time-helpers'
 
 @Component({
   selector: 'app-markdown-editor',
   templateUrl: './markdown-editor.component.html',
   styleUrls: ['./markdown-editor.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownEditorViewComponent extends AbstractComponent implements OnInit {
   @Input() tab: Tab
@@ -23,9 +24,12 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
   public autoSave$ = new Subject()
+  lastUpdated: string
   textContent: string
   isChecked: boolean
   initialized$ = new Subject<boolean>()
+  lastUpdated$ = new Subject()
+  editorOptions: Options
 
   constructor(
     public state: StateService,
@@ -40,6 +44,8 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     this.initAutoSave()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
+    this.initUpdateTimeListener()
+    this.editorOptions = this.getDefaultOptions()
   }
 
   onEditorContentChange(): void {
@@ -48,6 +54,20 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     }
     this.textContent = this.ngxMde.mde.cm.getValue()
     this.autoSave$.next()
+  }
+
+  getDefaultOptions(): Options {
+    return {
+      highlightTokens: true,
+    }
+  }
+
+  initUpdateTimeListener(): void {
+    interval(2500)
+      .pipe(startWith(0))
+      .subscribe(() => {
+        this.lastUpdated = getDistance(this.tab.modifiedAt)
+      })
   }
 
   /**
@@ -84,6 +104,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       )
       .subscribe((tabs) => {
         this.updateContent(tabs, this.tab.path, this.textContent)
+        this.lastUpdated = getDistance(this.tab.modifiedAt)
       })
   }
 
@@ -94,9 +115,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       .subscribe((data) => (this.isChecked = data === 'light'))
   }
 
-  /**
-   * The default NgxMarkdown preview renders checkboxes as disabled by default and overall is quite wonky
-   */
   initMarkdownDefaultBehaviorOverride(): void {
     this.markdownService.renderer.listitem = (text: string) => {
       if (/^\s*\[[x ]\]\s*/.test(text)) {
@@ -107,6 +125,10 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       } else {
         return '<li>' + text + '</li>'
       }
+    }
+    this.markdownService.renderer.code = (code: string) => {
+      const highlighted = hljs.highlightAuto(code)
+      return `<pre><code>${highlighted.value}</code></pre>`
     }
   }
 

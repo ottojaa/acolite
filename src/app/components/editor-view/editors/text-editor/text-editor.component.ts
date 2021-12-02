@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
 import { MenuItem } from 'primeng/api'
-import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, switchMap, take, takeUntil } from 'rxjs/operators'
+import { interval, Subject } from 'rxjs'
+import { debounceTime, distinctUntilChanged, startWith, switchMap, take, takeUntil } from 'rxjs/operators'
+import { getDistance } from '../../../../../../app/date-and-time-helpers'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { Tab } from '../../../../interfaces/Menu'
@@ -11,7 +12,6 @@ import { StateService } from '../../../../services/state.service'
   selector: 'app-text-editor',
   templateUrl: './text-editor.component.html',
   styleUrls: ['./text-editor.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextEditorComponent extends AbstractComponent implements OnInit {
   @Input() tab: Tab
@@ -19,6 +19,7 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
   isChecked: boolean
   textContent: string
   rand = new Date()
+  lastUpdated: string
   autoSave$ = new Subject()
   currentSelection: any
   menuItems: MenuItem[]
@@ -31,6 +32,7 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
     this.textContent = this.tab.textContent
     this.menuItems = this.getMenuItems()
     this.initAutoSave()
+    this.initUpdateTimeListener()
     this.initThemeListener()
   }
 
@@ -44,6 +46,7 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
       )
       .subscribe((tabs) => {
         this.updateContent(tabs, this.tab.path, this.textContent)
+        this.lastUpdated = getDistance(this.tab.modifiedAt)
       })
   }
 
@@ -57,6 +60,14 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
   updateContent(tabs: Tab[], path: string, content: string): void {
     const payload = { tabs, path, content }
     this.electronService.updateFileContent(payload)
+  }
+
+  initUpdateTimeListener(): void {
+    interval(2500)
+      .pipe(startWith(0))
+      .subscribe(() => {
+        this.lastUpdated = getDistance(this.tab.modifiedAt)
+      })
   }
 
   onInputChange(): void {

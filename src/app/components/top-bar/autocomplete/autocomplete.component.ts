@@ -86,7 +86,7 @@ export class AutocompleteComponent extends AbstractComponent {
       this.openDrop = true
     }
 
-    const baseDir = this.state.getStatePartValue('baseDir')
-    this.electronService.searchFiles({ searchOpts: { content: value, baseDir } })
+    const { baseDir, searchPreferences } = this.state.getStateParts(['baseDir', 'searchPreferences'])
+    this.electronService.searchFiles({ searchOpts: { content: value, baseDir, searchPreferences } })
   }
 }

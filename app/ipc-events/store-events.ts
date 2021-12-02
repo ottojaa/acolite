@@ -1,4 +1,4 @@
-import { SearchResult, Tab, TreeElement } from '../../src/app/interfaces/Menu'
+import { SearchPreference, SearchResult, TreeElement } from '../../src/app/interfaces/Menu'
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
@@ -7,13 +7,13 @@ import { StoreResponses, SearchQuery, SearchResponses, UpdateStore } from '../ac
 import { getRootDirectory } from '../utils'
 import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
-import { allowedConfigKeys } from '../../src/app/entities/file/constants'
-import { AppConfig, WorkspaceConfig } from '../electron-interfaces'
+import { AppConfig } from '../electron-interfaces'
 import {
   getDefaultConfigJSON,
   validateAppConfig,
   updateSelectedWorkspaceConfig,
 } from '../config-helpers/config-helpers'
+import { formatDate } from '../date-and-time-helpers'
 
 export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -63,19 +63,107 @@ export const initAppState = (event: IpcMainEvent, configPath: string, index: Doc
 
 export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index: Document<Doc, true>) => {
   const { searchOpts } = query
-  const { content, baseDir } = searchOpts
-  const searchResult = await index.searchAsync(content, { enrich: true })
-  const mappedResult = searchResult.map((res) => res.result)
-  const uniqueElements = uniqBy(
-    mappedResult.reduce((acc: SearchResult[], curr: any) => acc.concat([...curr.map((el) => el.doc)]), []),
-    'filePath'
-  )
+  const { content, baseDir, searchPreferences } = searchOpts
 
   const replacePath = (pathToReplace: string) => {
     return pathToReplace.replace(getJoinedPath([baseDir, getPathSeparator()]), '')
   }
 
-  const mappedResults = uniqueElements.map((file) => {
+  const getSearchPayload = (searchPreferences: SearchPreference[]) => {
+    const indexedFields = ['content', 'filePath', 'fileName', 'extension']
+    const selectedOptions = searchPreferences.filter((preference) => preference.selected)
+
+    if (!selectedOptions.length) {
+      return { enrich: true }
+    }
+
+    return selectedOptions.reduce(
+      (acc: { index: string[]; enrich: boolean }, curr: SearchPreference) => {
+        if (indexedFields.includes(curr.value)) {
+          acc.index.push(curr.value)
+        }
+        return acc
+      },
+      { index: [], enrich: true }
+    )
+  }
+
+  const getFilteredResults = (searchResults: SearchResult[], searchPreferences: SearchPreference[]) => {
+    const resultFilters = ['createdAt', 'modifiedAt']
+    const dateRangePreferences = searchPreferences.filter(
+      (preference) => resultFilters.includes(preference.value) && preference.selected
+    )
+
+    if (!dateRangePreferences.length) {
+      return searchResults
+    }
+
+    const isDateInsideRange = (date: Date, range: { start?: Date; end?: Date }) => {
+      const { start, end } = range
+
+      const formattedDate = formatDate(date)
+      const formattedStart = formatDate(start)
+      const formattedEnd = formatDate(end)
+
+      if (!formattedStart && !end) {
+        return true
+      }
+      if (formattedStart && end) {
+        return formattedDate >= formattedStart && formattedDate <= formattedEnd
+      }
+      if (!formattedStart && end) {
+        return formattedDate <= formattedEnd
+      }
+      if (formattedStart && !end) {
+        return formattedDate >= formattedStart
+      }
+
+      return true
+    }
+
+    return searchResults.filter((result) => {
+      return dateRangePreferences.some((preference) => {
+        const checkIsInRange = () => {
+          switch (preference.value) {
+            case 'createdAt': {
+              return isDateInsideRange(result.createdAt, preference.range)
+            }
+            case 'modifiedAt': {
+              return isDateInsideRange(result.modifiedAt, preference.range)
+            }
+            default: {
+              return true
+            }
+          }
+        }
+
+        return checkIsInRange()
+      })
+    })
+
+    /* const createdAtFilter = dateRangePreferences.find((pref) => pref.value === 'createdAt')
+    const modifiedAtFilter = dateRangePreferences.find((pref) => pref.value === 'modifiedAt')
+
+    return searchResults.filter((res) => {
+      const isInCreatedAtRange = createdAtFilter.range ? isDateInsideRange(res.createdAt, createdAtFilter.range) : true
+      const isInModifiedAtRange = modifiedAtFilter.range
+        ? isDateInsideRange(res.modifiedAt, modifiedAtFilter.range)
+        : true
+
+      return isInCreatedAtRange || isInModifiedAtRange
+    }) */
+  }
+
+  const searchPayload = getSearchPayload(searchPreferences)
+  const searchResult = await index.searchAsync(content, searchPayload)
+  const mappedResult = searchResult.map((res) => res.result)
+  const uniqueElements = uniqBy(
+    mappedResult.reduce((acc: SearchResult[], curr: any) => acc.concat([...curr.map((el) => el.doc)]), []),
+    'filePath'
+  )
+  const filteredResults = getFilteredResults(uniqueElements, searchPreferences)
+
+  const mappedResults = filteredResults.map((file) => {
     file.highlightContentText = getHighlightContentText(file.content, content)
     file.highlightTitleText = getHighlightText(file.fileName, content)
     file.highlightPathText = getHighlightText(replacePath(file.filePath), content)

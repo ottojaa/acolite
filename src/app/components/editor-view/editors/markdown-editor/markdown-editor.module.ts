@@ -5,7 +5,6 @@ import { MarkdownEditorViewComponent } from './markdown-editor.component'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatInputModule } from '@angular/material/input'
-import { MarkedOptions } from 'ngx-markdown'
 
 @NgModule({
   declarations: [MarkdownEditorViewComponent],
@@ -15,16 +14,6 @@ import { MarkedOptions } from 'ngx-markdown'
     MarkdownEditorModule.forRoot({
       previewConfig: {
         sanitize: SecurityContext.NONE,
-        markedOptions: {
-          provide: MarkedOptions,
-          useValue: {
-            gfm: true,
-            breaks: false,
-            pedantic: false,
-            smartLists: true,
-            smartypants: false,
-          },
-        },
       },
     }),
     MatSlideToggleModule,

@@ -3,6 +3,16 @@ import { FormGroup, FormControl } from '@angular/forms'
 import { takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../abstract/abstract-component'
 
+interface DateRange {
+  start?: Date
+  end?: Date
+}
+
+interface ISODateRange {
+  start?: string
+  end?: string
+}
+
 @Component({
   selector: 'app-date-range-picker',
   templateUrl: './date-range-picker.component.html',
@@ -21,7 +31,7 @@ export class DateRangePickerComponent extends AbstractComponent implements OnIni
 
   ngOnInit(): void {
     this.initForm()
-    this.range.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: { start: Date; end: Date }) => {
+    this.range.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: DateRange) => {
       this.dateRangeChange.emit(data)
     })
   }

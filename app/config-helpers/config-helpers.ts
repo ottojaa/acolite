@@ -170,9 +170,8 @@ const validateTabs = (config: WorkspaceConfig) => {
       extension: getExtensionSplit(path),
       path,
       textContent: content,
-      data: {
-        lastUpdated: fileStats.mtime,
-      },
+      createdAt: fileStats.birthtime,
+      modifiedAt: fileStats.mtime,
     }
   }
   return config.tabs.map((tab) => getTabData(tab.path)).filter((tab) => !!tab)

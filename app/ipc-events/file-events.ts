@@ -38,9 +38,8 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
       extension: getExtensionSplit(filePath),
       path: filePath,
       textContent: content,
-      data: {
-        lastUpdated: fileStats.mtime,
-      },
+      modifiedAt: fileStats.mtime,
+      createdAt: fileStats.birthtime,
     }
     event.sender.send(FileActionResponses.ReadSuccess, tabData)
   })
@@ -74,10 +73,7 @@ const updateTabData = (tabs: Tab[], oldTabPath: string, newContent?: string, new
     tabs[tabIdx] = {
       ...tabs[tabIdx],
       fileName: newName,
-      data: {
-        ...tabs[tabIdx].data,
-        lastUpdated: fileStats.mtime,
-      },
+      modifiedAt: fileStats.mtime,
     }
 
     if (newContent) {

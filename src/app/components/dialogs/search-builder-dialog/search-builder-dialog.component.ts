@@ -89,7 +89,7 @@ export class SearchBuilderDialogComponent implements OnInit {
     const optionItems = this.listItems.filter(this.isOptionItem)
     const itemIdx = optionItems.findIndex((item) => item.value === value)
     if (itemIdx > -1) {
-      optionItems[itemIdx].range = event
+      if (event.start) optionItems[itemIdx].range = event
     }
   }
 
@@ -127,7 +127,7 @@ export class SearchBuilderDialogComponent implements OnInit {
       },
       {
         type: 'item',
-        value: 'lastUpdated',
+        value: 'modifiedAt',
         text: 'Last modified date',
         selected: false,
         range: {

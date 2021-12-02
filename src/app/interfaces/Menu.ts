@@ -38,9 +38,8 @@ export interface Tab {
   extension: string
   textContent: string
   deleted?: boolean
-  data?: {
-    lastUpdated?: Date
-  }
+  modifiedAt?: Date
+  createdAt?: Date
 }
 
 export interface AppConfig {
@@ -56,8 +55,8 @@ export interface SearchResult {
   content: string
   filePath: string
   iconName: string | undefined
-  createdDate: string
-  modifiedDate: string
+  createdAt: Date
+  modifiedAt: Date
   highlightContentText?: string | undefined
   highlightTitleText?: string | undefined
   highlightPathText?: string | undefined

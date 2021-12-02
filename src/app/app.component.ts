@@ -220,6 +220,35 @@ export class AppComponent implements OnInit {
 
   initialiseApp(response: Partial<State>): void {
     const initialState = this.state.initialState
+
+    const mapIsoString = () => {
+      if (response.searchPreferences?.length) {
+        const convertIsoStringToDate = (range: { start?: string; end?: string }) => {
+          const { start, end } = range
+          let payload = {
+            start: undefined,
+            end: undefined,
+          }
+
+          if (start) {
+            payload.start = new Date(start)
+          }
+          if (end) {
+            payload.end = new Date(end)
+          }
+          return payload
+        }
+
+        response.searchPreferences = response.searchPreferences.map((pref) => {
+          if (pref.range) {
+            pref.range = convertIsoStringToDate(<any>pref.range)
+          }
+          return pref
+        })
+      }
+    }
+    mapIsoString()
+
     this.state.state$.next({ ...initialState, ...response, initialized: true })
 
     if (!this.state.getStatePartValue('baseDir')) {

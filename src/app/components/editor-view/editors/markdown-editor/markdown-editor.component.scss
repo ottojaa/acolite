@@ -137,6 +137,9 @@ ngx-markdown-editor {
   }
   .ngx-markdown-editor-preview > .preview-wrapper {
     border-left: 1px solid #ffffff24;
+    &::-webkit-scrollbar-thumb {
+      visibility: visible;
+    }
   }
   .CodeMirror-scroll {
     color: $markdown-color-dark;
@@ -170,6 +173,9 @@ ngx-markdown-editor {
   }
   .ngx-markdown-editor-preview > .preview-wrapper {
     border-left: 1px solid #0000002b;
+  }
+  .ngx-markdown-editor-preview::-webkit-scrollbar-thumb {
+    visibility: visible;
   }
   .CodeMirror-scroll {
     color: $markdown-color-light;

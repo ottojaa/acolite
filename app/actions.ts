@@ -1,4 +1,4 @@
-import { Tab, TreeElement } from '../src/app/interfaces/Menu'
+import { SearchPreference, Tab, TreeElement } from '../src/app/interfaces/Menu'
 
 export type UpdateActionPayload =
   | ReadDirectory
@@ -111,9 +111,8 @@ export interface SearchQuery {
 
 interface SearchOptions {
   content?: string
-  modifiedAt?: string
   baseDir?: string
-  createdAt?: string
+  searchPreferences: SearchPreference[]
 }
 
 export enum FolderActions {

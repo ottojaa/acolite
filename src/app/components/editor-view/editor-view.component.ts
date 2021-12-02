@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
-import { delay, takeUntil } from 'rxjs/operators'
+import { takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { FileEntity } from '../../interfaces/File'
 import { Tab } from '../../interfaces/Menu'

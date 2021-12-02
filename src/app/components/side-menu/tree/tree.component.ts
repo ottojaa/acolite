@@ -40,7 +40,6 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.contextMenuItems = this.getMenuItems()
     this.initSelectedTabListener()
   }
 
@@ -106,8 +105,8 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     node.expanded = !node.expanded
   }
 
-  onRightClick(_event: { node: TreeElement }): void {
-    this.contextMenuItems = [...this.getMenuItems()]
+  onRightClick(event: { node: TreeElement }): void {
+    this.contextMenuItems = [...this.getMenuItems(event.node)]
     this.cdRef.detectChanges()
   }
 
@@ -143,8 +142,9 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     })
   }
 
-  createNewFolder(filePath: string): void {
+  createNewFolder(node: TreeElement): void {
     const baseDir = this.state.state$.value.baseDir
+    const { filePath } = node.data
 
     this.dialogService
       .openFolderNameDialog(filePath)
@@ -198,15 +198,15 @@ export class TreeComponent extends AbstractComponent implements OnInit {
       .subscribe(() => (this.draggedElements = null))
   }
 
-  openNewFileDialog(): void {
-    const { filePath } = this.selectedFiles[0].data
+  openNewFileDialog(node: TreeElement): void {
+    const { filePath } = node.data
     this.ngZone.run(() => {
       this.dialogService.openNewFileCreationDialog(filePath).pipe(take(1)).subscribe()
     })
   }
 
-  openRenameFileDialog(): void {
-    const { filePath } = this.selectedFiles[0].data
+  openRenameFileDialog(node: TreeElement): void {
+    const { filePath } = node.data
     this.ngZone.run(() => {
       this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
     })
@@ -227,8 +227,18 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   /**
    * Menuitems declared here instead of a separate class / component as otherwise we need to pass a component reference to it
    */
-  getMenuItems(): MenuItem[] {
+  getMenuItems(baseItem: TreeElement): MenuItem[] {
+    const isFolder = (node: TreeElement) => node.data.type === 'folder'
     let baseItems = [
+      {
+        label: 'Rename',
+        command: (_event) => this.openRenameFileDialog(baseItem),
+      },
+      {
+        label: 'Show in folder',
+        command: () => this.tabService.openTabInFileLocation(baseItem.data.filePath),
+      },
+      { separator: true },
       {
         label: this.isMultipleSelected(this.selectedFiles) ? 'Delete files' : 'Delete file',
         icon: 'pi pi-trash',
@@ -236,43 +246,22 @@ export class TreeComponent extends AbstractComponent implements OnInit {
         command: (_event) => this.openDeleteFilesDialog(),
       },
     ]
-
-    const singleSelected = !this.isMultipleSelected(this.selectedFiles)
-    const folderSelected = this.isFolderSelected(this.selectedFiles)
-
-    if (singleSelected || folderSelected) {
-      let additionalItems = []
-
-      if (folderSelected) {
-        additionalItems.push(
-          {
-            label: 'New file',
-            command: () => this.openNewFileDialog(),
-          },
-          {
-            label: 'New folder',
-            command: () => this.createNewFolder(this.selectedFiles[0].data.filePath),
-          }
-        )
-      }
-      if (singleSelected) {
-        additionalItems.push(
-          {
-            label: 'Rename',
-            command: (_event) => this.openRenameFileDialog(),
-          },
-          {
-            label: 'Show in folder',
-            command: () => this.tabService.openTabInFileLocation(this.selectedFiles[0].data.filePath),
-          }
-        )
-      }
-      baseItems = [...additionalItems, { separator: true }, ...baseItems]
+    if (isFolder(baseItem)) {
+      const additionalItems = [
+        {
+          label: 'New file',
+          command: () => this.openNewFileDialog(baseItem),
+        },
+        {
+          label: 'New folder',
+          command: () => this.createNewFolder(baseItem),
+        },
+      ]
+      baseItems = [...additionalItems, ...baseItems]
     }
 
     return baseItems
   }
-
   isMultipleSelected(selectedFiles: TreeNode<FileEntity>[]): boolean {
     return selectedFiles?.length > 1
   }

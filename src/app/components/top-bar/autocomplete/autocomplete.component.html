@@ -38,23 +38,14 @@
                   ></p>
                 </div>
                 <div class="bottom-row">
-                  <p [innerHtml]="file.highlightContentText ? file.highlightContentText : file.content"></p>
+                  <blockquote
+                    [ngClass]="file.highlightContentText || file.content ? 'show' : 'hide'"
+                    [innerHtml]="file.highlightContentText ? file.highlightContentText : file.content"
+                  ></blockquote>
                 </div>
               </div>
             </div>
           </div>
-          <!--  <ng-container *ngIf="file.iconName; else filler">
-            <img
-              *ngIf="file.iconName"
-              class="icon-width"
-              src="../../../../assets/icons/file-extension-icons/{{
-                file.iconName
-              }}.svg"
-            />
-          </ng-container>
-          <ng-template #filler>
-            <div class="icon-width"></div>
-          </ng-template> -->
         </li>
       </ng-container>
     </ul>
