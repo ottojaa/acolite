@@ -39,6 +39,7 @@ export class DateRangePickerComponent extends AbstractComponent implements OnIni
   initForm(): any {
     const { start, end } = this.dateRange
 
+    console.log(this.dateRange)
     if (start || end) {
       this.range = new FormGroup({
         start: new FormControl(start),

@@ -23,7 +23,6 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
       label: getBaseName(data.filePath),
       type: MenuItemTypes.Folder,
       key: data.filePath,
-      expanded: true,
       leaf: false,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,

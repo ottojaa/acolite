@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core'
+import { ElementRef, Injectable, NgZone } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Observable } from 'rxjs'
@@ -35,10 +35,13 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openSearchBuilder(): Observable<string | undefined> {
+  openSearchBuilder(elRef: ElementRef): Observable<string | undefined> {
     const ref = this.dialog.open(SearchBuilderDialogComponent, {
-      hasBackdrop: true,
+      hasBackdrop: false,
       width: '450px',
+      data: {
+        positionRelativeToElement: elRef,
+      },
     })
     return ref.afterClosed().pipe(take(1))
   }

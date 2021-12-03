@@ -140,18 +140,6 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
         return checkIsInRange()
       })
     })
-
-    /* const createdAtFilter = dateRangePreferences.find((pref) => pref.value === 'createdAt')
-    const modifiedAtFilter = dateRangePreferences.find((pref) => pref.value === 'modifiedAt')
-
-    return searchResults.filter((res) => {
-      const isInCreatedAtRange = createdAtFilter.range ? isDateInsideRange(res.createdAt, createdAtFilter.range) : true
-      const isInModifiedAtRange = modifiedAtFilter.range
-        ? isDateInsideRange(res.modifiedAt, modifiedAtFilter.range)
-        : true
-
-      return isInCreatedAtRange || isInModifiedAtRange
-    }) */
   }
 
   const searchPayload = getSearchPayload(searchPreferences)
@@ -163,10 +151,23 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   )
   const filteredResults = getFilteredResults(uniqueElements, searchPreferences)
 
+  const defaultHighlights = {
+    fileName: true,
+    filePath: true,
+    content: true,
+  }
+
+  const shouldHighlight = searchPreferences.length
+    ? searchPreferences.reduce((acc, curr) => {
+        acc[curr.value] = curr.selected
+        return acc
+      }, defaultHighlights)
+    : defaultHighlights
+
   const mappedResults = filteredResults.map((file) => {
-    file.highlightContentText = getHighlightContentText(file.content, content)
-    file.highlightTitleText = getHighlightText(file.fileName, content)
-    file.highlightPathText = getHighlightText(replacePath(file.filePath), content)
+    file.highlightContentText = shouldHighlight['content'] ? getHighlightContentText(file.content, content) : ''
+    file.highlightTitleText = shouldHighlight['fileName'] ? getHighlightText(file.fileName, content) : ''
+    file.highlightPathText = shouldHighlight['filePath'] ? getHighlightText(replacePath(file.filePath), content) : ''
 
     return file
   })

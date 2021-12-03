@@ -3,23 +3,34 @@
     <!-- Search Input -->
 
     <div class="searchbar" #searchbar>
-      <mat-icon>search</mat-icon>
+      <div class="icon-container">
+        <mat-icon>search</mat-icon>
+      </div>
       <input
         type="text"
+        style="margin-left: 1rem"
         placeholder="Search for files"
         [(ngModel)]="searchQuery"
         (ngModelChange)="search()"
         (click)="onOpenDrop($event, true)"
         (clickOutside)="onOpenDrop($event, false)"
-        [exclude]="'.input-search'"
       />
-      <mat-icon class="search-builder" (click)="openSearchBuilder()">tune</mat-icon>
+      <div class="search-builder" [matMenuTriggerFor]="menu">
+        <mat-icon (click)="openSearchBuilder()">tune</mat-icon>
+      </div>
     </div>
+
+    <mat-menu #menu="matMenu" xPosition="before">
+      <div (click)="$event.stopPropagation()">
+        <app-search-builder-dialog></app-search-builder-dialog>
+      </div>
+    </mat-menu>
 
     <!-- Dropdown Menu -->
     <ul *ngIf="openDrop" id="drop-down-list" class="drop-down" keyboardNavigationList>
       <ng-container *ngFor="let file of searchResults$ | async; let i = index; trackBy: trackByPath">
         <li role="option" keyboardNavigationItem (click)="onSelectItem(file)">
+          <div class="meta-data">Last modified {{ file.modifiedAt | date: 'short' }}</div>
           <div class="separator-el">
             <div class="list-item-information">
               <div class="icon-container">

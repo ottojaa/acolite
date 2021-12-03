@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core'
 import { MenuItem } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Observable } from 'rxjs'
@@ -13,6 +13,7 @@ import { MatTabChangeEvent } from '@angular/material/tabs'
   selector: 'app-file-tabs',
   templateUrl: './file-tabs.component.html',
   styleUrls: ['./file-tabs.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileTabsComponent extends AbstractComponent implements OnInit {
   @Input() tabs: Tab[]

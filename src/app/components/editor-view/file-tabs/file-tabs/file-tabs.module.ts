@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FileTabsComponent } from './file-tabs.component'
 import { MatTabsModule } from '@angular/material/tabs'
@@ -20,5 +20,6 @@ import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/mar
     ContextMenuModule,
     MarkdownEditorContainerModule,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FileTabsModule {}

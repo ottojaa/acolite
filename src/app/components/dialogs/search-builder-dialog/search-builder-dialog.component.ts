@@ -1,9 +1,10 @@
 import { trigger, style, transition, animate } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
-import { MatDialogRef } from '@angular/material/dialog'
 import { omit } from 'lodash'
+import { Subject } from 'rxjs'
+import { debounceTime, takeUntil, tap } from 'rxjs/operators'
+import { AbstractComponent } from '../../../abstract/abstract-component'
 import { SearchPreference } from '../../../interfaces/Menu'
-import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 
 interface SeparatorItem {
@@ -42,29 +43,28 @@ type ListItem = SeparatorItem | LabelItem | OptionItem
     ]),
   ],
 })
-export class SearchBuilderDialogComponent implements OnInit {
+export class SearchBuilderDialogComponent extends AbstractComponent implements OnInit {
   listItems: ListItem[]
+  debouncedSave$ = new Subject()
 
   get atLeastOneSearchOptionSelected(): boolean {
     const searchOptions = ['filePath', 'fileName', 'content']
+
     return this.listItems
       .filter(this.isOptionItem)
       .filter((item) => searchOptions.includes(item.value))
       .some((item) => item.selected)
   }
 
-  constructor(
-    public dialogRef: MatDialogRef<SearchBuilderDialogComponent>,
-    public state: StateService,
-    public dialogService: AppDialogService
-  ) {}
+  constructor(public state: StateService) {
+    super()
+  }
 
   ngOnInit(): void {
     this.listItems = this.getListItems()
-  }
-
-  onCancelClick(): void {
-    this.dialogRef.close()
+    this.debouncedSave$.pipe(takeUntil(this.destroy$), debounceTime(100)).subscribe(() => {
+      this.onSave()
+    })
   }
 
   isOptionItem(item: ListItem): item is OptionItem {
@@ -75,22 +75,20 @@ export class SearchBuilderDialogComponent implements OnInit {
     return this.listItems.filter(this.isOptionItem).map((el) => omit(el, ['text', 'type']))
   }
 
-  onSaveClick(): void {
-    if (this.atLeastOneSearchOptionSelected) {
-      const preferences = this.getSearchPreferencesFromListItems()
-      this.state.updateState$.next({ key: 'searchPreferences', payload: preferences })
-      this.dialogRef.close(true)
-    } else {
-      this.dialogService.openToast(`At least one 'search by' option must be selected!`, 'info')
-    }
-  }
-
   onDateRangeChange(event: { start: Date; end: Date }, value: string): void {
     const optionItems = this.listItems.filter(this.isOptionItem)
     const itemIdx = optionItems.findIndex((item) => item.value === value)
     if (itemIdx > -1) {
-      if (event.start) optionItems[itemIdx].range = event
+      if (event.start) {
+        optionItems[itemIdx].range = event
+      }
+      this.debouncedSave$.next()
     }
+  }
+
+  onSave(): void {
+    const preferences = this.getSearchPreferencesFromListItems()
+    this.state.updateState$.next({ key: 'searchPreferences', payload: preferences })
   }
 
   getListItems(): ListItem[] {
@@ -98,24 +96,24 @@ export class SearchBuilderDialogComponent implements OnInit {
     const items: ListItem[] = [
       {
         type: 'label',
-        label: 'Search by',
+        label: 'Search',
       },
       {
         type: 'item',
         value: 'fileName',
-        text: 'File name',
+        text: 'Name',
         selected: true,
       },
       {
         type: 'item',
         value: 'content',
-        text: 'File content',
+        text: 'Text content',
         selected: true,
       },
       {
         type: 'item',
         value: 'filePath',
-        text: 'File path',
+        text: 'Path',
         selected: true,
       },
       {
@@ -123,7 +121,7 @@ export class SearchBuilderDialogComponent implements OnInit {
       },
       {
         type: 'label',
-        label: 'Filter results',
+        label: 'Filter',
       },
       {
         type: 'item',

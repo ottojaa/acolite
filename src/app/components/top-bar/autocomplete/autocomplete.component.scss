@@ -37,6 +37,17 @@
   &.selected > .separator-el:after {
     visibility: hidden;
   }
+  &:hover > .meta-data {
+    visibility: visible;
+  }
+}
+
+.meta-data {
+  visibility: hidden;
+  position: absolute;
+  top: 5px;
+  color: #ffffffbf;
+  right: 5px;
 }
 
 .keyboard-navigation-item {
@@ -169,9 +180,12 @@
   background: var(--secondary);
   color: var(--contrast);
 
-  padding: 0 1rem;
+  .icon-container {
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+  }
   mat-icon {
-    margin-right: 0.5rem;
     opacity: 0.8;
     transform: scale(0.8);
   }
@@ -184,7 +198,11 @@
     outline: none;
   }
   .search-builder {
+    padding: 0 1rem;
     cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 
   box-shadow: $box-shadow;
@@ -222,4 +240,10 @@
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   margin: 0;
+}
+
+::ng-deep .mat-menu-panel {
+  margin-top: 0.2rem;
+  max-width: 1000px !important;
+  background: var(--primary);
 }

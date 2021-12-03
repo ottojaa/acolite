@@ -19,10 +19,15 @@
       "@variables": ["./src/variables.scss"]
     }
   },
-  "include": ["src/**/*.d.ts"],
   "exclude": ["node_modules"],
   "angularCompilerOptions": {
+    "strictTemplates": true,
     "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
+    "annotateForClosureCompiler": true,
+    "strictInjectionParameters": true,
+    "skipTemplateCodegen": false,
+    "preserveWhitespaces": true,
+    "skipMetadataEmit": false,
+    "disableTypeScriptVersionCheck": true
   }
 }

@@ -10,7 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatListModule } from '@angular/material/list'
 import { MatDatepickerModule } from '@angular/material/datepicker'
 import { DateRangePickerModule } from '../../common/date-range-picker/date-range-picker.module'
-import { MatNativeDateModule } from '@angular/material/core'
+import { MatIconModule } from '@angular/material/icon'
 
 @NgModule({
   declarations: [SearchBuilderDialogComponent],
@@ -27,6 +27,7 @@ import { MatNativeDateModule } from '@angular/material/core'
     MatInputModule,
     MatDatepickerModule,
     DateRangePickerModule,
+    MatIconModule,
   ],
   providers: [MatDialog],
 })

@@ -63,7 +63,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   }
 
   initUpdateTimeListener(): void {
-    interval(2500)
+    interval(1000)
       .pipe(startWith(0))
       .subscribe(() => {
         this.lastUpdated = getDistance(this.tab.modifiedAt)

@@ -163,6 +163,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   dragStart(node: TreeElement): void {
+    console.log('hehe')
     const nodeIdx = this.selectedFiles.findIndex((file) => file.data.filePath === node.data.filePath)
     if (nodeIdx === -1) {
       this.selectedFiles.push(node)
@@ -171,7 +172,9 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     this.draggedElements = this.selectedFiles
   }
 
-  dragEnd(): void {}
+  dragEnd(): void {
+    console.log('hehe')
+  }
 
   onDragEnter(event: Event): void {
     this.isHovering = true

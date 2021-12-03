@@ -1,31 +1,23 @@
-<h1 mat-dialog-title>Search options</h1>
-<div mat-dialog-content class="mat-typography">
-  <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let item of listItems">
-      <div *ngIf="item.type === 'label'" class="label">
-        <span>{{ item.label }}</span>
+<mat-list role="list">
+  <mat-list-item role="listitem" *ngFor="let item of listItems">
+    <div *ngIf="item.type === 'label'" class="label">
+      <span>{{ item.label }}</span>
+    </div>
+
+    <div *ngIf="item.type === 'separator'" class="separator"></div>
+
+    <div *ngIf="item.type === 'item'" class="item-container">
+      <span class="item-content">
+        {{ item.text }}
+        <mat-slide-toggle [(ngModel)]="item.selected" (ngModelChange)="debouncedSave$.next()"></mat-slide-toggle>
+      </span>
+
+      <div class="datepickers" *ngIf="item.range && item.selected">
+        <app-date-range-picker
+          [dateRange]="item.range"
+          (dateRangeChange)="onDateRangeChange($event, item.value)"
+        ></app-date-range-picker>
       </div>
-
-      <div *ngIf="item.type === 'separator'" class="separator"></div>
-
-      <div *ngIf="item.type === 'item'" class="item-container">
-        <span class="item-content">
-          {{ item.text }}
-          <mat-slide-toggle [(ngModel)]="item.selected"></mat-slide-toggle>
-        </span>
-
-        <div class="datepickers" *ngIf="item.range && item.selected" [@grow]>
-          <app-date-range-picker
-            [dateRange]="item.range"
-            (dateRangeChange)="onDateRangeChange($event, item.value)"
-          ></app-date-range-picker>
-        </div>
-      </div>
-    </mat-list-item>
-  </mat-list>
-</div>
-
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancelClick()">Cancel</button>
-  <button mat-button (click)="onSaveClick()">Save</button>
-</mat-dialog-actions>
+    </div>
+  </mat-list-item>
+</mat-list>
