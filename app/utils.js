@@ -27,7 +27,7 @@ var getFileEntityFromPath = function (filePath) {
     var getIcon = function (extension) { return extension + '.svg'; };
     var fileExtension = isFolder ? null : getExtension(filePath);
     var icon = isFolder ? null : getIcon(fileExtension);
-    return __assign({ filePath: filePath, ino: fileInfo.ino, parentPath: (0, file_utils_1.getDirName)(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
+    return __assign({ filePath: filePath, ino: fileInfo.ino, parentPath: file_utils_1.getDirName(filePath), type: isFolder ? 'folder' : 'file', size: fileInfo.size, createdAt: fileInfo.birthtime, modifiedAt: fileInfo.mtime }, (!isFolder && { fileExtension: fileExtension, icon: icon }));
 };
 exports.getFileEntityFromPath = getFileEntityFromPath;
 /**
@@ -37,7 +37,7 @@ var getDeletedFileEntityMock = function (filePath) {
     return {
         filePath: filePath,
         ino: 0,
-        parentPath: (0, file_utils_1.getDirName)(filePath),
+        parentPath: file_utils_1.getDirName(filePath),
         type: 'file',
         size: 0,
         createdAt: new Date(),
@@ -46,8 +46,8 @@ var getDeletedFileEntityMock = function (filePath) {
 };
 exports.getDeletedFileEntityMock = getDeletedFileEntityMock;
 var getMenuItemsFromBaseDirectory = function (baseDir) {
-    var treeStructure = (0, exports.getTreeStructureFromBaseDirectory)(baseDir);
-    return (0, menu_utils_1.folderStructureToMenuItems)(baseDir, treeStructure);
+    var treeStructure = exports.getTreeStructureFromBaseDirectory(baseDir);
+    return menu_utils_1.folderStructureToMenuItems(baseDir, treeStructure);
 };
 exports.getMenuItemsFromBaseDirectory = getMenuItemsFromBaseDirectory;
 var getTreeStructureFromBaseDirectory = function (baseDir) {
@@ -56,7 +56,7 @@ var getTreeStructureFromBaseDirectory = function (baseDir) {
     var getDirectories = function (fileEntity) {
         return fs
             .readdirSync(fileEntity.filePath)
-            .map(function (name) { return (0, path_1.join)(fileEntity.filePath, name); })
+            .map(function (name) { return path_1.join(fileEntity.filePath, name); })
             .filter(isDirectory)
             .map(exports.getFileEntityFromPath);
     };
@@ -64,7 +64,7 @@ var getTreeStructureFromBaseDirectory = function (baseDir) {
     var getFiles = function (fileEntity) {
         return fs
             .readdirSync(fileEntity.filePath)
-            .map(function (name) { return (0, path_1.join)(fileEntity.filePath, name); })
+            .map(function (name) { return path_1.join(fileEntity.filePath, name); })
             .filter(isFile)
             .filter(function (item) { return !/(^|\/)\.[^\/\.]/g.test(item); }) // Filter hidden files such as .DS_Store
             .map(exports.getFileEntityFromPath);
@@ -81,7 +81,7 @@ var getTreeStructureFromBaseDirectory = function (baseDir) {
         });
         return files.concat(getFiles(file));
     };
-    var rootFolder = (0, exports.getFileEntityFromPath)(directoryPath);
+    var rootFolder = exports.getFileEntityFromPath(directoryPath);
     return getFilesRecursively(rootFolder);
 };
 exports.getTreeStructureFromBaseDirectory = getTreeStructureFromBaseDirectory;
@@ -98,9 +98,9 @@ var patchCollectionBy = function (collection, newEl, key) {
 };
 exports.patchCollectionBy = patchCollectionBy;
 var getRootDirectory = function (baseDir) {
-    var menuItems = (0, exports.getMenuItemsFromBaseDirectory)(baseDir);
-    var rootEntity = (0, exports.getFileEntityFromPath)(baseDir);
-    return __assign(__assign({}, (0, menu_utils_1.getTreeNodeFromFileEntity)(rootEntity)), { children: menuItems });
+    var menuItems = exports.getMenuItemsFromBaseDirectory(baseDir);
+    var rootEntity = exports.getFileEntityFromPath(baseDir);
+    return __assign(__assign({}, menu_utils_1.getTreeNodeFromFileEntity(rootEntity)), { children: menuItems });
 };
 exports.getRootDirectory = getRootDirectory;
 //# sourceMappingURL=utils.js.map

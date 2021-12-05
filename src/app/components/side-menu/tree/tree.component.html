@@ -22,7 +22,8 @@
       <span
         class="row-container"
         [ngClass]="{
-          active: node.data.filePath === activeIndent?.activeNode
+          active: node.data.filePath === activeIndent?.activeNode,
+          dragging: isDragging
         }"
       >
         <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
@@ -42,7 +43,7 @@
     </ng-template>
 
     <ng-template let-node pTemplate="folder">
-      <span class="row-container" (click)="expand($event, node)">
+      <span class="row-container" (click)="expand($event, node)" [ngClass]="{ dragging: isDragging }">
         <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
           <div
             class="indent"

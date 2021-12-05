@@ -5,6 +5,7 @@
   &:hover::-webkit-scrollbar-thumb {
     visibility: visible !important;
   }
+
   .p-tree .p-tree-container .p-treenode {
     padding: 0;
     border-radius: 0;
@@ -85,6 +86,10 @@
     visibility: visible !important;
   }
 
+  .row-container.dragging:hover {
+    padding: 1rem;
+  }
+
   .row-container {
     width: 100%;
     height: 100%;
@@ -94,7 +99,7 @@
       transition: all 300ms;
       border-right: var(--indent);
       &.active {
-        border-right: 1px solid var(--buttonColorLowOpacity);
+        border-right: 3px solid var(--buttonColor);
         transition: all 300ms;
       }
     }
@@ -115,13 +120,6 @@
   display: block;
   flex: 1;
   min-height: 3rem;
-}
-
-.dragging {
-  background: var(--buttonColor);
-  opacity: 0.5;
-  border-radius: 5px;
-  transition: background-color 300ms ease-in;
 }
 
 .node-row {

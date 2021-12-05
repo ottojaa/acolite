@@ -15,7 +15,6 @@ import { SearchBuilderDialogComponent } from '../../dialogs/search-builder-dialo
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent extends AbstractComponent {
   @ViewChild('searchbar', { read: ElementRef, static: false }) searchbar: MatMenu
@@ -26,14 +25,7 @@ export class AutocompleteComponent extends AbstractComponent {
   dialogOpen: boolean = false
   debouncedSearch$ = new Subject<string>()
 
-  constructor(
-    private electronService: ElectronService,
-    private matDialog: MatDialog,
-    private state: StateService,
-    private tabService: TabService,
-    private dialogService: AppDialogService,
-    private zone: NgZone
-  ) {
+  constructor(private electronService: ElectronService, private state: StateService, private tabService: TabService) {
     super()
     this.searchResults$ = this.state.getStatePart('searchResults')
     this.debouncedSearch$.pipe(takeUntil(this.destroy$), debounceTime(20)).subscribe(() => {

@@ -1,7 +1,18 @@
-import { ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  Input,
+  NgZone,
+  OnInit,
+  ViewChild,
+} from '@angular/core'
 import { uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
+import { Tree } from 'primeng/tree'
+import { fromEvent } from 'rxjs/internal/observable/fromEvent'
 import { take, takeUntil } from 'rxjs/operators'
 import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/directory-utils'
 import { AbstractComponent } from '../../../abstract/abstract-component'
@@ -15,17 +26,20 @@ import { TabService } from '../../../services/tab.service'
   selector: 'app-tree',
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreeComponent extends AbstractComponent implements OnInit {
   @Input() files: TreeElement[]
   @Input() workspace: string | undefined
   @ViewChild('contextMenu') cm: ContextMenu
+  @ViewChild('pTree') pTree: Tree
 
   selectedFiles: TreeElement[] = []
   selection: TreeElement[] = [] // Used for shift-key multi selection, as primeng tree does not support it for some reason.
   contextMenuItems: MenuItem[]
   draggedElements: TreeElement[]
   isHovering = false
+  isDragging = false
   activeIndent: ActiveIndent
 
   constructor(
@@ -49,6 +63,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((tab) => {
         this.activeIndent = tab.activeIndent
+        this.cdRef.detectChanges()
       })
   }
 
@@ -163,7 +178,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   dragStart(node: TreeElement): void {
-    console.log('hehe')
+    this.isDragging = true
     const nodeIdx = this.selectedFiles.findIndex((file) => file.data.filePath === node.data.filePath)
     if (nodeIdx === -1) {
       this.selectedFiles.push(node)
@@ -173,11 +188,18 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   dragEnd(): void {
-    console.log('hehe')
+    this.isDragging = false
+  }
+
+  test(event: DragEvent): void {
+    event.stopPropagation()
+    event.stopImmediatePropagation()
+    event.preventDefault()
   }
 
   onDragEnter(event: Event): void {
     this.isHovering = true
+
     event.preventDefault()
   }
 
