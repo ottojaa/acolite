@@ -19,7 +19,6 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
   isChecked: boolean
   textContent: string
   rand = new Date()
-  lastUpdated: string
   autoSave$ = new Subject()
   currentSelection: any
   menuItems: MenuItem[]
@@ -32,7 +31,6 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
     this.textContent = this.tab.textContent
     this.menuItems = this.getMenuItems()
     this.initAutoSave()
-    this.initUpdateTimeListener()
     this.initThemeListener()
   }
 
@@ -46,7 +44,6 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
       )
       .subscribe((tabs) => {
         this.updateContent(tabs, this.tab.path, this.textContent)
-        this.lastUpdated = getDistance(this.tab.modifiedAt)
       })
   }
 
@@ -60,14 +57,6 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
   updateContent(tabs: Tab[], path: string, content: string): void {
     const payload = { tabs, path, content }
     this.electronService.updateFileContent(payload)
-  }
-
-  initUpdateTimeListener(): void {
-    interval(1000)
-      .pipe(startWith(0))
-      .subscribe(() => {
-        this.lastUpdated = getDistance(this.tab.modifiedAt)
-      })
   }
 
   onInputChange(): void {

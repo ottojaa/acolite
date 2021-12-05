@@ -11,14 +11,13 @@ $toolbar-bg-light: white;
 .editor-container {
   height: 100%;
   width: 100%;
-  padding: 1rem 2rem 3rem;
+  padding: 1rem 2rem 0;
 
   .elevation {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    box-shadow: $box-shadow-elevation;
     .top-bar {
       width: 100%;
       color: white;
@@ -36,16 +35,11 @@ $toolbar-bg-light: white;
         display: flex;
         flex-direction: column;
       }
-      &.dark-theme {
-        background-color: var(--topbarBg);
-        border: $app-border;
-      }
+
       &.light-theme {
-        background-color: $toolbar-bg-light;
-        border: $app-border;
         p,
         span {
-          color: #424242;
+          color: #c5c2c2;
         }
       }
       .last-saved {
@@ -66,8 +60,8 @@ $toolbar-bg-light: white;
 }
 
 ngx-markdown-editor {
-  min-height: 78vh;
-  max-height: 78vh;
+  min-height: 80vh;
+  max-height: 80vh;
 }
 
 :host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
@@ -81,21 +75,27 @@ ngx-markdown-editor {
 :host ::ng-deep .ngx-markdown-editor-toolbar {
   background-color: var(--secondary);
   padding: 0 0.8rem 0.5rem;
+  box-shadow: $box-shadow-elevation;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 :host ::ng-deep .CodeMirror {
-  border-radius: 0 !important;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+  background: var(--editorBg1);
 }
 
 :host ::ng-deep .ngx-markdown-editor-wrapper > :first-child {
-  border: none;
-  border-radius: 0;
+  border: none !important;
 }
 
 :host ::ng-deep .ngx-markdown-editor-wrapper {
-  border: $app-border;
+  box-shadow: $box-shadow-elevation;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
 }
 
 :host ::ng-deep ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
@@ -109,8 +109,10 @@ ngx-markdown-editor {
   }
   .ngx-markdown-editor-toolbar {
     background-color: var(--mdStatusToolbarBg);
-    border-left: $app-border;
-    border-right: $app-border;
+    mat-icon {
+      color: white;
+      opacity: 0.9;
+    }
   }
   .cm-header {
     color: #8c8cff;
@@ -158,6 +160,9 @@ ngx-markdown-editor {
   }
   .ngx-markdown-editor-toolbar {
     background-color: $toolbar-bg-light;
+    mat-icon {
+      color: black;
+    }
   }
   .mat-button-base,
   .mat-form-field-label,

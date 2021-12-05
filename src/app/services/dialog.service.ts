@@ -1,6 +1,7 @@
 import { ElementRef, Injectable, NgZone } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { TagEditorComponent } from 'app/components/top-bar/tag-editor/tag-editor.component'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
@@ -32,6 +33,11 @@ export class AppDialogService {
 
   openFolderNameDialog(filePath: string): Observable<string | undefined> {
     const ref = this.dialog.open(FolderCreationDialogComponent, { data: filePath, hasBackdrop: true })
+    return ref.afterClosed().pipe(take(1))
+  }
+
+  openTagEditor(): Observable<string | undefined> {
+    const ref = this.dialog.open(TagEditorComponent)
     return ref.afterClosed().pipe(take(1))
   }
 

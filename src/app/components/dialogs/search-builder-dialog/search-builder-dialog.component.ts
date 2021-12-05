@@ -107,7 +107,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
       {
         type: 'item',
         value: 'content',
-        text: 'Text content',
+        text: 'Content',
         selected: true,
       },
       {

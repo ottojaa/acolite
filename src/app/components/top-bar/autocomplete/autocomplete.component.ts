@@ -55,28 +55,6 @@ export class AutocompleteComponent extends AbstractComponent {
     return item.filePath
   }
 
-  openSearchBuilder(): void {
-    /* if (this.dialogOpen) {
-      this.dialogOpen = false
-      this.matDialog.closeAll()
-      return
-    }
-
-    this.dialogOpen = true
-
-    this.zone.run(() => {
-      this.dialogService
-        .openSearchBuilder(this.searchbar)
-        .pipe(take(1))
-        .subscribe((data) => {
-          this.dialogOpen = false
-          if (data) {
-            this.dialogService.openToast('Search preferences updated', 'success')
-          }
-        })
-    }) */
-  }
-
   onSelectItem<T extends { filePath: string }>(file: T) {
     this.tabService.openNewTab(file.filePath)
     this.openDrop = false

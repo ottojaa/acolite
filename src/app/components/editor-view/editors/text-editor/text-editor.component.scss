@@ -24,15 +24,10 @@ $toolbar-bg-light: #ffffffeb;
   color: white;
   display: flex;
   flex-direction: row;
-  box-shadow: $box-shadow;
   padding: 0.5rem 0.8rem;
-  background-color: var(--topbarBg);
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  border-left: $app-border;
-  border-right: $app-border;
-  border-top: $app-border;
 
   p {
     margin: 0;
@@ -41,16 +36,11 @@ $toolbar-bg-light: #ffffffeb;
     display: flex;
     flex-direction: column;
   }
-  &.dark-theme {
-    background-color: var(--topbarBg);
-    border-bottom: $app-border;
-  }
+
   &.light-theme {
-    background-color: $toolbar-bg-light;
-    border-bottom: $app-border;
     p,
     span {
-      color: #424242;
+      color: #c0c0c0;
     }
   }
   .last-saved {
@@ -91,30 +81,23 @@ $toolbar-bg-light: #ffffffeb;
   border: none;
 
   textarea {
-    padding: 1rem;
+    padding: 2rem;
     width: 100%;
     height: 100%;
     overflow-y: scroll;
     box-shadow: $box-shadow;
-    border: $app-border;
+    border: none;
     outline: none;
-    font-family: $font-family;
     resize: none;
+    font-family: $font-family;
+    border-radius: 10px;
   }
-  &.dark-theme {
-    background: $container-bg-dark;
-
-    textarea {
-      background: var(--editorBg1);
-      color: $textarea-color-dark;
-    }
+  &.dark-theme textarea {
+    background: var(--editorBg1);
+    color: $textarea-color-dark;
   }
-  &.light-theme {
-    background: $container-bg-light;
-
-    textarea {
-      background: $textarea-bg-light;
-      color: $textarea-color-light;
-    }
+  &.light-theme textarea {
+    background: $textarea-bg-light;
+    color: $textarea-color-light;
   }
 }

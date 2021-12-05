@@ -24,11 +24,9 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
   public autoSave$ = new Subject()
-  lastUpdated: string
   textContent: string
   isChecked: boolean
   initialized$ = new Subject<boolean>()
-  lastUpdated$ = new Subject()
   editorOptions: Options
 
   constructor(
@@ -44,7 +42,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     this.initAutoSave()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
-    this.initUpdateTimeListener()
     this.editorOptions = this.getDefaultOptions()
   }
 
@@ -60,14 +57,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     return {
       highlightTokens: true,
     }
-  }
-
-  initUpdateTimeListener(): void {
-    interval(1000)
-      .pipe(startWith(0))
-      .subscribe(() => {
-        this.lastUpdated = getDistance(this.tab.modifiedAt)
-      })
   }
 
   /**
@@ -104,7 +93,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       )
       .subscribe((tabs) => {
         this.updateContent(tabs, this.tab.path, this.textContent)
-        this.lastUpdated = getDistance(this.tab.modifiedAt)
       })
   }
 
