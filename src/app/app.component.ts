@@ -182,8 +182,11 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.UpdateSuccess: {
+          const bookmarks = this.state.getStatePartValue('bookmarks')
           this.state.updateState$.next({ key: 'tabs', payload: response })
           this.electronService.getRecentlyModified()
+          this.electronService.getBookmarked({ bookmarks })
+
           break
         }
         case FileActionResponses.ReadSuccess: {

@@ -1,5 +1,8 @@
 @import '../../../../variables.scss';
 
+:host {
+  height: 7rem;
+}
 :host ::ng-deep .p-inputtext {
   background: var(--primary);
   opacity: 1;
@@ -28,7 +31,6 @@ p-autocomplete {
 .topbar {
   display: flex;
   justify-content: space-between;
-  min-height: 7rem;
   align-items: center;
   padding: 1rem;
   border-left: $app-border;

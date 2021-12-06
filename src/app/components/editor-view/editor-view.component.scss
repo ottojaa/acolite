@@ -1,11 +1,13 @@
 :host {
-  height: auto;
-  overflow-y: scroll;
+  height: calc(100% - 9rem);
+
   &:hover::-webkit-scrollbar-thumb {
     visibility: visible;
   }
 }
-
+.editor-view {
+  height: 100%;
+}
 .min-width {
   min-width: 800px;
 }
