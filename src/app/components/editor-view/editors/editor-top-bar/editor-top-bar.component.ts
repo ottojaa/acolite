@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core'
 import { AbstractComponent } from 'app/abstract/abstract-component'
 import { ElectronService } from 'app/core/services'
 import { Tab } from 'app/interfaces/Menu'
+import { AppDialogService } from 'app/services/dialog.service'
 import { StateService } from 'app/services/state.service'
 import { takeUntil } from 'rxjs/operators'
 
@@ -16,7 +17,7 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
   isChecked: boolean
   isBookmarked: boolean
 
-  constructor(private state: StateService, private electronService: ElectronService) {
+  constructor(private state: StateService, private electronService: ElectronService, private dialog: AppDialogService) {
     super()
   }
 
@@ -46,20 +47,25 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
     this.state.updateState$.next({ key: 'editorTheme', payload: theme })
   }
 
-  toggleBookmark(path: string): void {
+  toggleBookmark(tab: Tab): void {
+    const { path, fileName } = tab
     const bookmarks = this.state.getStatePartValue('bookmarks')
     const tabIdx = bookmarks.indexOf(path)
 
-    const updateBookmarks = (updated: string[]) => {
+    const updateBookmarks = (updated: string[], showToast: boolean) => {
       this.state.updateState$.next({ key: 'bookmarks', payload: updated })
       this.electronService.getBookmarked({ bookmarks: updated })
+
+      if (showToast) {
+        this.dialog.openToast(`Bookmarked ${fileName}`, 'success', 2000)
+      }
     }
     if (tabIdx > -1) {
       const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== path)
-      updateBookmarks(updatedBookmarks)
+      updateBookmarks(updatedBookmarks, false)
     } else {
       const updatedBookmarks = [...bookmarks, path]
-      updateBookmarks(updatedBookmarks)
+      updateBookmarks(updatedBookmarks, true)
     }
   }
 }

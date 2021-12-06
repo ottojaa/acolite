@@ -5,6 +5,6 @@
 
   <div class="editor-settings">
     <mat-slide-toggle id="theme-toggle" [(ngModel)]="isChecked" (ngModelChange)="onChangeTheme()"></mat-slide-toggle>
-    <mat-icon (click)="toggleBookmark(tab.path)">{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+    <mat-icon (click)="toggleBookmark(tab)">{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
   </div>
 </span>

@@ -198,7 +198,6 @@ export class AppComponent implements OnInit {
           const payload: StateUpdate<State>[] = [
             { key: 'tabs', payload: tabs },
             { key: 'selectedTab', payload: selectedTab },
-            { key: 'forceDashboard', payload: false },
           ]
 
           this.state.updateMulti$.next(payload)

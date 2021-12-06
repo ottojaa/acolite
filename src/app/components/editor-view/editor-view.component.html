@@ -1,6 +1,6 @@
 <div class="editor-view">
   <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
-    <ng-container *ngIf="!(forceDashboard$ | async) && tabs?.length; else showDefault">
+    <ng-container *ngIf="(selectedTab$ | async) && tabs?.length; else showDefault">
       <app-file-tabs [tabs]="tabs"></app-file-tabs>
     </ng-container>
 

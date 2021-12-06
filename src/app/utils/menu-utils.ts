@@ -139,9 +139,6 @@ export const addIndents = (items: TreeElement[], baseDir: string): void => {
  * Updates the menuitem and its (possible) descendants by replacing the old filePaths / parentPaths with the new one
  */
 export const getUpdatedFilePathsRecursive = (item: TreeElement, newPath: string, oldPath: string): TreeElement => {
-  if (item.data.filePath.includes(oldPath)) {
-    console.log(item)
-  }
   item.data.filePath = item.data.filePath.replace(oldPath, newPath)
   item.data.parentPath = item.data.parentPath.replace(oldPath, newPath)
 

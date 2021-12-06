@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core'
-import { FileEntity } from 'app/interfaces/Menu'
+import { FileEntity, SearchResult } from 'app/interfaces/Menu'
 
 @Component({
   selector: 'app-file-cards',
@@ -7,7 +7,7 @@ import { FileEntity } from 'app/interfaces/Menu'
   styleUrls: ['./file-cards.component.scss'],
 })
 export class FileCardsComponent {
-  @Input() files: FileEntity[]
+  @Input() files: SearchResult[]
   @Input() viewInit: boolean
   @Input() title: string
 }

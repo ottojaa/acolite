@@ -21,7 +21,7 @@ export class FileCardComponent implements OnInit {
     // this.generateCanvasContent()
   }
 
-  openInNewTab(file: FileEntity): void {
+  openInNewTab(file: SearchResult): void {
     this.tabService.openNewTab(file.filePath)
   }
 }

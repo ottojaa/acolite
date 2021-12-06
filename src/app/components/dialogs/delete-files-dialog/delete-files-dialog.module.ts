@@ -7,6 +7,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatIconModule } from '@angular/material/icon'
+import { IconModule } from 'app/components/common/icon/icon.module'
 
 @NgModule({
   declarations: [DeleteFilesDialogComponent],
@@ -20,6 +21,7 @@ import { MatIconModule } from '@angular/material/icon'
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
+    IconModule,
   ],
   providers: [MatDialog],
 })

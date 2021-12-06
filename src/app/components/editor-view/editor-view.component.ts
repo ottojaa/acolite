@@ -2,9 +2,9 @@ import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { Observable } from 'rxjs'
-import { startWith, take } from 'rxjs/operators'
+import { map, startWith, take } from 'rxjs/operators'
 import { StoreResponses } from '../../../../app/actions'
-import { FileEntity, Tab } from '../../interfaces/Menu'
+import { FileEntity, SearchResult, SelectedTab, Tab } from '../../interfaces/Menu'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
 
@@ -27,23 +27,21 @@ import { TabService } from '../../services/tab.service'
 })
 export class EditorViewComponent implements OnInit {
   tabs$: Observable<Tab[]>
-  forceDashboard$: Observable<boolean>
+  selectedTab$: Observable<string>
 
-  recentlyModified: FileEntity[]
-  bookmarked: FileEntity[]
+  recentlyModified: SearchResult[]
+  bookmarked: SearchResult[]
 
-  viewInit: boolean = false
   recentlyModifiedInit = false
   bookmarksInit = false
   contrastColor: string
 
   constructor(private state: StateService, public tabService: TabService, public electronService: ElectronService) {
-    this.electronService.on(StoreResponses.GetRecentlyModifiedSuccess, (_ipcEvent: any, files: FileEntity[]) => {
-      console.log(files)
+    this.electronService.on(StoreResponses.GetRecentlyModifiedSuccess, (_ipcEvent: any, files: SearchResult[]) => {
       this.recentlyModified = [...files]
       this.recentlyModifiedInit = true
     })
-    this.electronService.on(StoreResponses.GetBookmarkedFilesSuccess, (_ipcEvent: any, files: FileEntity[]) => {
+    this.electronService.on(StoreResponses.GetBookmarkedFilesSuccess, (_ipcEvent: any, files: SearchResult[]) => {
       this.bookmarked = [...files]
       this.bookmarksInit = true
     })
@@ -59,6 +57,6 @@ export class EditorViewComponent implements OnInit {
         this.electronService.getRecentlyModified()
       })
     this.tabs$ = this.state.getStatePart('tabs')
-    this.forceDashboard$ = this.state.getStatePart('forceDashboard')
+    this.selectedTab$ = this.state.getStatePart('selectedTab').pipe(map((selectedTab) => selectedTab.path))
   }
 }

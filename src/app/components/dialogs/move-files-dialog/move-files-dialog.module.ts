@@ -7,6 +7,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
+import { IconModule } from 'app/components/common/icon/icon.module'
 
 @NgModule({
   declarations: [MoveFilesDialogComponent],
@@ -20,6 +21,7 @@ import { MatInputModule } from '@angular/material/input'
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
+    IconModule,
   ],
   providers: [MatDialog],
 })

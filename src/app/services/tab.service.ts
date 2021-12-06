@@ -16,15 +16,12 @@ export class TabService {
 
     if (tabIdx > -1 && tabIdx !== selectedTab.index) {
       const newTab = this.getSelectedTabEntityFromIndex(tabIdx)
-      const payload: StateUpdate<State>[] = [
-        { key: 'selectedTab', payload: newTab },
-        { key: 'forceDashboard', payload: false },
-      ]
+      const payload: StateUpdate<State>[] = [{ key: 'selectedTab', payload: newTab }]
       this.state.updateMulti$.next(payload)
     } else if (tabIdx === -1) {
       this.electronService.readFileRequest({ filePath })
     } else {
-      this.state.updateState$.next({ key: 'forceDashboard', payload: false })
+      this.state.updateState$.next({ key: 'selectedTab', payload: { index: null, path: null } })
     }
   }
 
