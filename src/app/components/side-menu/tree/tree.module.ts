@@ -9,6 +9,7 @@ import { TreeComponent } from './tree.component'
 import { FileCreationModule } from '../../dialogs/file-creation/file-creation.module'
 import { MatIconModule } from '@angular/material/icon'
 import { ShiftSelect } from './shift-select-directive'
+import { IconModule } from 'app/components/common/icon/icon.module'
 
 @NgModule({
   declarations: [TreeComponent, ShiftSelect],
@@ -22,6 +23,7 @@ import { ShiftSelect } from './shift-select-directive'
     FileCreationModule,
     MatIconModule,
     DragDropModule,
+    IconModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

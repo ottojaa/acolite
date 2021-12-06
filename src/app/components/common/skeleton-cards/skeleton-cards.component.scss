@@ -1,0 +1,23 @@
+:host ::ng-deep {
+  .skeleton-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+    margin-top: 3rem;
+    height: 294px;
+
+    .skeleton-name > .p-component {
+      padding: 1rem;
+      margin: 1rem 1.5rem;
+    }
+    .skeleton-card > .p-component {
+      padding: 1rem;
+      margin: 1rem;
+    }
+    .skeleton-date > .p-component {
+      padding: 1rem;
+      margin: 1.5rem;
+    }
+  }
+}

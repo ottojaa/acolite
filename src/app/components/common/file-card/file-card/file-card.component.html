@@ -1,18 +1,16 @@
 <div class="card-header">
-  <h2 class="contrast-text">{{ file.name }}</h2>
+  <h2 class="contrast-text">{{ file.fileName }}</h2>
 </div>
 
-<p-card [style]="{ width: '300px', height: '175px' }" styleClass="p-card-shadow">
-  <div class="image-container">
-    <img [src]="imageUrl" width="280px" height="150px" />
-  </div>
+<p-card [style]="{ width: '300px', height: '175px' }" (click)="openInNewTab(file)">
+  <app-icon [extension]="file.extension" [scale]="4"></app-icon>
 </p-card>
 
 <div class="chips-container padding">
   <mat-chip-list aria-label="File tags">
-    <div *ngFor="let tag of file.tags">
+    <!-- <div *ngFor="let tag of file.tags">
       <mat-chip [style.background-color]="tag.bg" [style.color]="tag.color">{{ tag.name }}</mat-chip>
-    </div>
+    </div> -->
   </mat-chip-list>
 </div>
-<p class="padding-horizontal last-modified-text">Last updated 3 days ago</p>
+<p class="padding-horizontal last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>

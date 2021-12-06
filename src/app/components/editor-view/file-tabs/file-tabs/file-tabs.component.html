@@ -15,7 +15,7 @@
               [ngClass]="tab.deleted ? 'deleted-tab-title' : ''"
               (contextmenu)="onRightClick($event, tab)"
             >
-              <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ tab.extension }}.svg" />
+              <app-icon [extension]="tab.extension"></app-icon>
               <span class="tab-name">{{ tab.fileName }}</span>
               <mat-icon class="close-button" (click)="onCloseTab(tab.path)">close</mat-icon>
             </div>

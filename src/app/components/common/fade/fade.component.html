@@ -1,0 +1,28 @@
+<div
+  *ngIf="show && !noContent"
+  class="fade"
+  [@state]="state"
+  (@state.start)="animationStarted()"
+  (@state.done)="animationDone($event)"
+>
+  <ng-content select="[content]"></ng-content>
+</div>
+
+<div
+  *ngIf="!show && !noContent && !animating"
+  [@state]="loaderState"
+  (@state.start)="animationStarted()"
+  (@state.done)="animationDone($event)"
+>
+  <ng-content select="[loader]"></ng-content>
+</div>
+
+<div
+  class="no-content"
+  *ngIf="noContent && !animating"
+  [@state]="noContentState"
+  (@state.start)="animationStarted()"
+  (@state.done)="animationDone($event)"
+>
+  <ng-content select="[noContent]"></ng-content>
+</div>

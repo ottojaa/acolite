@@ -63,11 +63,6 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
     this.autoSave$.next(this.textContent)
   }
 
-  onChangeTheme(): void {
-    const theme = this.isChecked ? 'light' : 'dark'
-    this.state.updateState$.next({ key: 'editorTheme', payload: theme })
-  }
-
   handleKeydown(event: any) {
     if (event.key == 'Tab') {
       event.preventDefault()

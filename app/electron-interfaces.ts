@@ -21,6 +21,7 @@ export interface WorkspaceConfig {
   selectedTab?: SelectedTab
   editorTheme?: 'dark' | 'light'
   searchPreferences?: SearchPreference[]
+  bookmarks?: string[]
 }
 
 export interface AppConfig {

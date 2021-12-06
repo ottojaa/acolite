@@ -7,6 +7,7 @@ import { MatRippleModule } from '@angular/material/core'
 import { TextEditorModule } from '../../editors/text-editor/text-editor.module'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/markdown-editor.module'
+import { IconModule } from 'app/components/common/icon/icon.module'
 
 @NgModule({
   declarations: [FileTabsComponent],
@@ -19,6 +20,7 @@ import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/mar
     TextEditorModule,
     ContextMenuModule,
     MarkdownEditorContainerModule,
+    IconModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

@@ -8,6 +8,7 @@ import { RoundedIconButtonModule } from '../../common/rounded-icon-button/rounde
 import { ThemeSwitcherModule } from '../theme-switcher/theme-switcher.module'
 import { FormsModule } from '@angular/forms'
 import { AutocompleteModule } from '../autocomplete/autocomplete.module'
+import { MatTooltipModule } from '@angular/material/tooltip'
 
 @NgModule({
   declarations: [TopBarComponent],
@@ -21,6 +22,7 @@ import { AutocompleteModule } from '../autocomplete/autocomplete.module'
     SharedModule,
     InputTextModule,
     RoundedIconButtonModule,
+    MatTooltipModule,
   ],
 })
 export class TopBarModule {

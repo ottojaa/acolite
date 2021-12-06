@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser'
+import { BrowserModule, DomSanitizer } from '@angular/platform-browser'
 import { CUSTOM_ELEMENTS_SCHEMA, LOCALE_ID, NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { HttpClientModule, HttpClient } from '@angular/common/http'
@@ -28,6 +28,8 @@ import { ChangeDirectoryDialogModule } from './components/dialogs/change-directo
 import { SettingsService } from './services/settings.service'
 import '@angular/common/locales/global/en-GB'
 import { SearchBuilderDialogModule } from './components/dialogs/search-builder-dialog/search-builder-dialog.module'
+import { MatIconRegistry } from '@angular/material/icon'
+import { FormatDistancePipe } from './components/pipes/format-distance.pipe'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -66,6 +68,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   ],
   providers: [
     AppDialogService,
+    FormatDistancePipe,
     MatDialog,
     {
       provide: LOCALE_ID,
@@ -76,4 +79,8 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(iconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
+    iconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl('./assets/mdi.svg'))
+  }
+}

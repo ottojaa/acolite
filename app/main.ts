@@ -21,7 +21,14 @@ import {
   readAndSendTabData,
   openFileLocation,
 } from './ipc-events/file-events'
-import { getEmptyIndex, initAppState, searchFiles, updateStore } from './ipc-events/store-events'
+import {
+  getBookmarkedFiles,
+  getEmptyIndex,
+  getRecentlyModified,
+  initAppState,
+  searchFiles,
+  updateStore,
+} from './ipc-events/store-events'
 import { Doc } from '../src/app/interfaces/File'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
@@ -106,6 +113,8 @@ const IPCChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
+  StoreActions.GetRecentlyModified,
+  StoreActions.GetBookmarkedFiles,
   SearchActions.Query,
 ]
 
@@ -171,6 +180,14 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
       }
       case SearchActions.Query: {
         searchFiles(event, payload, index)
+        break
+      }
+      case StoreActions.GetRecentlyModified: {
+        getRecentlyModified(event, index)
+        break
+      }
+      case StoreActions.GetBookmarkedFiles: {
+        getBookmarkedFiles(event, index, payload)
         break
       }
     }

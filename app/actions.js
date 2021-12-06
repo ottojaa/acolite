@@ -35,6 +35,8 @@ var StoreActions;
     StoreActions["InitApp"] = "init-app";
     StoreActions["GetStore"] = "read-store";
     StoreActions["UpdateStore"] = "update-store";
+    StoreActions["GetRecentlyModified"] = "get-recently-modified";
+    StoreActions["GetBookmarkedFiles"] = "get-bookmarked-files";
 })(StoreActions = exports.StoreActions || (exports.StoreActions = {}));
 var SearchActions;
 (function (SearchActions) {
@@ -66,6 +68,10 @@ var StoreResponses;
     StoreResponses["UpdateStoreFailure"] = "update-store-failure";
     StoreResponses["InitAppSuccess"] = "init-app-success";
     StoreResponses["InitAppFailure"] = "init-app-failure";
+    StoreResponses["GetRecentlyModifiedSuccess"] = "get-recently-modified-success";
+    StoreResponses["GetRecentlyModifiedFailure"] = "get-recently-modified-failure";
+    StoreResponses["GetBookmarkedFilesSuccess"] = "get-bookmarked-success";
+    StoreResponses["GetBookmarkedFilesFailure"] = "get-bookmarked-failure";
 })(StoreResponses = exports.StoreResponses || (exports.StoreResponses = {}));
 var SearchResponses;
 (function (SearchResponses) {

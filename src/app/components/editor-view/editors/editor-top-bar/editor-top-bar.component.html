@@ -1,0 +1,10 @@
+<span class="top-bar" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
+  ><span class="last-saved">
+    <h4 style="opacity: 0.7; margin-left: 10px">Last updated {{ tab.modifiedAt | date: 'medium' }}</h4>
+  </span>
+
+  <div class="editor-settings">
+    <mat-slide-toggle id="theme-toggle" [(ngModel)]="isChecked" (ngModelChange)="onChangeTheme()"></mat-slide-toggle>
+    <mat-icon (click)="toggleBookmark(tab.path)">{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+  </div>
+</span>

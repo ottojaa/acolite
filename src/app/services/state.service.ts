@@ -18,6 +18,8 @@ export interface State {
   editorTheme: 'dark' | 'light'
   sideMenuWidth: number
   searchPreferences: SearchPreference[]
+  forceDashboard: boolean
+  bookmarks: string[]
   searchResults: SearchResult[]
   tabs: Tab[]
   rootDirectory: TreeElement
@@ -47,7 +49,9 @@ export class StateService extends AbstractComponent {
     },
     editorTheme: 'dark',
     sideMenuWidth: 20,
+    forceDashboard: false,
     searchResults: [],
+    bookmarks: [],
     tabs: [],
     rootDirectory: {},
     searchPreferences: [],

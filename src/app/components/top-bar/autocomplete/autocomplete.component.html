@@ -30,11 +30,11 @@
     <ul *ngIf="openDrop" id="drop-down-list" class="drop-down" keyboardNavigationList>
       <ng-container *ngFor="let file of searchResults$ | async; let i = index; trackBy: trackByPath">
         <li role="option" keyboardNavigationItem (click)="onSelectItem(file)">
-          <div class="meta-data">Last modified {{ file.modifiedAt | date: 'short' }}</div>
+          <div class="meta-data">Last modified {{ file.modifiedAt | formatDistance }} ago</div>
           <div class="separator-el">
             <div class="list-item-information">
               <div class="icon-container">
-                <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ file.extension }}.svg" />
+                <app-icon [extension]="file.extension" [scale]="'1.1'"></app-icon>
               </div>
 
               <div class="information-container">

@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
 
 @NgModule({
   declarations: [TextEditorComponent],
@@ -22,6 +23,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
     MatInputModule,
     ContextMenuModule,
     MatSlideToggleModule,
+    EditorTopBarModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

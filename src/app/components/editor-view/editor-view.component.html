@@ -1,17 +1,21 @@
 <div class="editor-view">
   <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
-    <ng-container *ngIf="tabs?.length; else showDefault">
+    <ng-container *ngIf="!(forceDashboard$ | async) && tabs?.length; else showDefault">
       <app-file-tabs [tabs]="tabs"></app-file-tabs>
     </ng-container>
 
     <ng-template #showDefault>
-      <div class="file-cards">
-        <ng-container *ngFor="let file of files">
-          <span class="file-card-container">
-            <app-file-card [file]="file"></app-file-card>
-          </span>
-        </ng-container>
-      </div>
+      <app-file-cards
+        [title]="'Recently updated'"
+        [files]="recentlyModified"
+        [viewInit]="recentlyModifiedInit && bookmarksInit"
+      ></app-file-cards>
+
+      <app-file-cards
+        [title]="'Bookmarks'"
+        [files]="bookmarked"
+        [viewInit]="recentlyModifiedInit && bookmarksInit"
+      ></app-file-cards>
     </ng-template>
   </div>
 </div>

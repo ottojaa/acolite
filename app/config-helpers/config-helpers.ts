@@ -1,6 +1,5 @@
 import * as fs from 'fs'
-import { first, reject } from 'lodash'
-import { resolve } from 'path/posix'
+import { first } from 'lodash'
 import { allowedConfigKeys } from '../../src/app/entities/file/constants'
 import { getBaseName, getExtensionSplit } from '../../src/app/utils/file-utils'
 import { WorkspaceConfig, AppConfig, Tab } from '../electron-interfaces'
@@ -144,6 +143,9 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       case 'searchPreferences': {
         return validateSearchPreferences(workspaceConfig)
       }
+      case 'bookmarks': {
+        return validateBookmarks(workspaceConfig)
+      }
       default: {
         break
       }
@@ -211,4 +213,8 @@ const validateSearchPreferences = (config: WorkspaceConfig) => {
   const { searchPreferences } = config
   const isValid = searchPreferences.every((preference) => preference.value)
   return isValid ? searchPreferences : []
+}
+
+const validateBookmarks = (config: WorkspaceConfig) => {
+  return config.bookmarks?.filter((bookmark) => fs.existsSync(bookmark))
 }

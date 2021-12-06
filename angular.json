@@ -25,7 +25,11 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              { "glob": "mdi.svg", "input": "./node_modules/@mdi/angular-material", "output": "./assets" }
+            ],
             "styles": [
               "src/styles.scss",
               "node_modules/primeng/resources/themes/bootstrap4-dark-purple/theme.css",

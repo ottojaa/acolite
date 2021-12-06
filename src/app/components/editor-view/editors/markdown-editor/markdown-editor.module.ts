@@ -5,6 +5,7 @@ import { MarkdownEditorViewComponent } from './markdown-editor.component'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatInputModule } from '@angular/material/input'
+import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
 
 @NgModule({
   declarations: [MarkdownEditorViewComponent],
@@ -20,6 +21,7 @@ import { MatInputModule } from '@angular/material/input'
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
+    EditorTopBarModule,
   ],
 })
 export class MarkdownEditorContainerModule {}

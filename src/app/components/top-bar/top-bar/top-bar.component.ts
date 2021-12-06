@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core'
+import { StateService } from 'app/services/state.service'
 import { MenuItem } from 'primeng/api'
 import themes from '../../../../assets/themes/theme-options.json'
 import { ThemeOption } from '../../../interfaces/Theme'
@@ -13,15 +14,13 @@ export class TopBarComponent implements OnInit {
   results: any[]
   themeOptions: ThemeOption[]
 
-  constructor() {}
+  constructor(public state: StateService) {}
 
   ngOnInit() {
     this.themeOptions = themes
   }
 
-  openThemeModal(): void {}
-
-  search(event: CustomEvent): void {
-    this.results = []
+  forceDashboard(): void {
+    this.state.updateState$.next({ key: 'forceDashboard', payload: true })
   }
 }

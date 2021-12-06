@@ -1,0 +1,49 @@
+:host {
+  width: 100%;
+}
+.top-bar {
+  color: white;
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem 0.8rem;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+
+  p {
+    margin: 0;
+  }
+  .editor-settings {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &.light-theme {
+    p,
+    span {
+      color: #c0c0c0;
+    }
+  }
+  .last-saved {
+    h4,
+    h3 {
+      margin: 0;
+    }
+    display: flex;
+    align-items: center;
+  }
+  mat-icon {
+    color: var(--buttonColor);
+    margin-left: 10px;
+    transform: scale(1.1);
+    cursor: pointer;
+  }
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: #cccccc;
+}
+
+:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+  background-color: white;
+}

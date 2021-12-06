@@ -36,7 +36,7 @@
         </ng-container>
 
         <span class="node-row" pDraggable="droppable" (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()">
-          <img class="icon" src="../../../../assets/icons/file-extension-icons/{{ node.data.icon }}" />
+          <app-icon [extension]="node.data.fileExtension"></app-icon>
           <p>{{ node.label }}</p>
         </span>
       </span>

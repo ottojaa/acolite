@@ -40,7 +40,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   ngOnInit(): void {
     this.initSelectedTabListener()
     this.initAutoSave()
-    this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
     this.editorOptions = this.getDefaultOptions()
   }
@@ -94,13 +93,6 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       .subscribe((tabs) => {
         this.updateContent(tabs, this.tab.path, this.textContent)
       })
-  }
-
-  initThemeListener(): void {
-    this.state
-      .getStatePart('editorTheme')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => (this.isChecked = data === 'light'))
   }
 
   initMarkdownDefaultBehaviorOverride(): void {

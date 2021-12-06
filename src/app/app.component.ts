@@ -183,6 +183,7 @@ export class AppComponent implements OnInit {
         }
         case FileActionResponses.UpdateSuccess: {
           this.state.updateState$.next({ key: 'tabs', payload: response })
+          this.electronService.getRecentlyModified()
           break
         }
         case FileActionResponses.ReadSuccess: {
@@ -197,6 +198,7 @@ export class AppComponent implements OnInit {
           const payload: StateUpdate<State>[] = [
             { key: 'tabs', payload: tabs },
             { key: 'selectedTab', payload: selectedTab },
+            { key: 'forceDashboard', payload: false },
           ]
 
           this.state.updateMulti$.next(payload)

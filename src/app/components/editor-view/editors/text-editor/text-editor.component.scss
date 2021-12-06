@@ -20,47 +20,6 @@ $toolbar-bg-light: #ffffffeb;
   border-radius: 5px;
 }
 
-.top-bar {
-  color: white;
-  display: flex;
-  flex-direction: row;
-  padding: 0.5rem 0.8rem;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-
-  p {
-    margin: 0;
-  }
-  .editor-settings {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &.light-theme {
-    p,
-    span {
-      color: #c0c0c0;
-    }
-  }
-  .last-saved {
-    h4,
-    h3 {
-      margin: 0;
-    }
-    display: flex;
-    align-items: center;
-  }
-}
-
-:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-  background-color: #cccccc;
-}
-
-:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
-  background-color: white;
-}
-
 .editor-container {
   width: 100%;
   height: 100%;

@@ -3,11 +3,11 @@ import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
 import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../../src/app/utils/file-utils'
-import { StoreResponses, SearchQuery, SearchResponses, UpdateStore } from '../actions'
+import { StoreResponses, SearchQuery, SearchResponses, UpdateStore, GetBookmarkedFiles } from '../actions'
 import { getRootDirectory } from '../utils'
 import { Document } from 'flexsearch'
 import { Doc } from '../../src/app/interfaces/File'
-import { AppConfig } from '../electron-interfaces'
+import { AppConfig, FileEntity } from '../electron-interfaces'
 import {
   getDefaultConfigJSON,
   validateAppConfig,
@@ -44,7 +44,6 @@ export const initAppState = (event: IpcMainEvent, configPath: string, index: Doc
           return {}
         }
         const selectedWorkspaceData = validatedConfig.workspaces.find((workspace) => workspace.baseDir === baseDir)
-
         const state = { ...selectedWorkspaceData, rootDirectory: getRootDirectory(baseDir) }
         addFilesToIndex(state.rootDirectory.children, index)
 
@@ -175,6 +174,31 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   event.sender.send(SearchResponses.QuerySuccess, mappedResults)
 }
 
+export const getRecentlyModified = (
+  event: IpcMainEvent,
+  index: Document<Doc, true> & { store?: Record<string, FileEntity> }
+) => {
+  const storeItems = Object.values(index.store)
+  const itemSubset = storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, 10)
+
+  event.sender.send(StoreResponses.GetRecentlyModifiedSuccess, itemSubset)
+}
+
+export const getBookmarkedFiles = (
+  event: IpcMainEvent,
+  index: Document<Doc, true> & { store?: Record<string, FileEntity> },
+  payload: GetBookmarkedFiles
+) => {
+  const { bookmarks } = payload
+  const storeItems = Object.values(index.store)
+  const itemSubset = storeItems
+    .filter((item) => bookmarks.includes(item.filePath))
+    .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
+    .slice(0, 10)
+
+  event.sender.send(StoreResponses.GetBookmarkedFilesSuccess, itemSubset)
+}
+
 export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, true>) => {
   const files = flattenTreeStructure(treeStruct)
   files.forEach((file) => {
@@ -242,8 +266,6 @@ export const getEmptyIndex = (): Document<Doc, true> => {
     },
   })
 }
-
-export const removeAllIndexes = (index: Document<Doc, true>) => {}
 
 const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
   return new Promise((resolve, reject) => {

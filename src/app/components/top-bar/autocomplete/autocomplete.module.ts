@@ -9,10 +9,12 @@ import { SharedModule } from 'primeng/api'
 import { KeyboardEventsModule } from '../../directives/keyboard-events/keyboard-events.module'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatIconModule } from '@angular/material/icon'
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'
+import { MatDialogModule } from '@angular/material/dialog'
 import { MatMenuModule } from '@angular/material/menu'
-import { SearchBuilderDialogComponent } from '../../dialogs/search-builder-dialog/search-builder-dialog.component'
 import { SearchBuilderDialogModule } from '../../dialogs/search-builder-dialog/search-builder-dialog.module'
+import { IconModule } from 'app/components/common/icon/icon.module'
+import { FormatDistancePipe } from 'app/components/pipes/format-distance.pipe'
+import { FormatDistanceModule } from 'app/components/pipes/format-distance.module'
 
 @NgModule({
   declarations: [AutocompleteComponent],
@@ -30,8 +32,9 @@ import { SearchBuilderDialogModule } from '../../dialogs/search-builder-dialog/s
     BrowserAnimationsModule,
     MatIconModule,
     MatMenuModule,
+    IconModule,
+    FormatDistanceModule,
   ],
-  providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AutocompleteModule {}

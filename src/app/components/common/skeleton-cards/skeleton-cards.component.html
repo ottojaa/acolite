@@ -1,0 +1,15 @@
+<div class="skeleton-container">
+  <ng-container *ngFor="let e of cardArr">
+    <div class="custom-skeleton">
+      <div>
+        <div>
+          <p-skeleton class="skeleton-name" width="10rem" class="skeleton-name"></p-skeleton>
+        </div>
+      </div>
+      <p-skeleton class="skeleton-card" width="300px" height="150px"></p-skeleton>
+      <div>
+        <p-skeleton class="skeleton-date" width="15rem" height="2rem"></p-skeleton>
+      </div>
+    </div>
+  </ng-container>
+</div>

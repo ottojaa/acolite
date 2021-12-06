@@ -1,10 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
+import { ElectronService } from 'app/core/services'
 import { Observable } from 'rxjs'
-import { takeUntil } from 'rxjs/operators'
-import { AbstractComponent } from '../../abstract/abstract-component'
-import { FileEntity } from '../../interfaces/File'
-import { Tab } from '../../interfaces/Menu'
+import { startWith, take } from 'rxjs/operators'
+import { StoreResponses } from '../../../../app/actions'
+import { FileEntity, Tab } from '../../interfaces/Menu'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
 
@@ -18,56 +18,47 @@ import { TabService } from '../../services/tab.service'
         style({ opacity: 0, transform: 'translateX(-20px)' }),
         animate('300ms 0ms ease-in-out', style({ opacity: 1, transform: 'translateX(0)' })),
       ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateX(0)' }),
+        animate('300ms 0ms ease-in-out', style({ opacity: 0, transform: 'translateX(-20px)' })),
+      ]),
     ]),
   ],
 })
-export class EditorViewComponent extends AbstractComponent implements OnInit {
-  files: FileEntity[]
+export class EditorViewComponent implements OnInit {
   tabs$: Observable<Tab[]>
-  initialized$: Observable<boolean>
+  forceDashboard$: Observable<boolean>
+
+  recentlyModified: FileEntity[]
+  bookmarked: FileEntity[]
+
+  viewInit: boolean = false
+  recentlyModifiedInit = false
+  bookmarksInit = false
   contrastColor: string
 
-  constructor(private state: StateService, public tabService: TabService) {
-    super()
+  constructor(private state: StateService, public tabService: TabService, public electronService: ElectronService) {
+    this.electronService.on(StoreResponses.GetRecentlyModifiedSuccess, (_ipcEvent: any, files: FileEntity[]) => {
+      console.log(files)
+      this.recentlyModified = [...files]
+      this.recentlyModifiedInit = true
+    })
+    this.electronService.on(StoreResponses.GetBookmarkedFilesSuccess, (_ipcEvent: any, files: FileEntity[]) => {
+      this.bookmarked = [...files]
+      this.bookmarksInit = true
+    })
   }
 
   ngOnInit(): void {
-    this.tabs$ = this.state.getStatePart('tabs').pipe(takeUntil(this.destroy$))
-    this.files = this.getMockFiles()
-  }
-
-  getMockFiles(): FileEntity[] {
-    const file1: FileEntity = {
-      name: 'gitlab-ci.yml',
-      extension: 'ts',
-      filePath: '/random/',
-      tags: [
-        { name: 'git', bg: '#e0e0e0', color: 'black' },
-        { name: 'code-snippets', bg: '#ff3407', color: 'white' },
-        { name: 'work', bg: '#17b74f', color: 'white' },
-        { name: 'project', bg: 'black', color: 'white' },
-      ],
-      iconName: '',
-      type: 'file',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditateneque quas! ',
-      createdDate: '05.05.2021',
-      modifiedDate: '06.06.2021',
-    }
-    const file2: FileEntity = {
-      name: 'random-text.md',
-      extension: 'ts',
-      filePath: '/random/',
-      tags: [{ name: 'random', bg: '#e0e0e0', color: 'black' }],
-      iconName: '',
-      type: 'file',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditateneque quas!',
-      createdDate: '12.01.2020',
-      modifiedDate: '06.06.2021',
-    }
-    const secondaryFiles = Array.from(Array(5)).map(() => file2)
-
-    return [file1, ...secondaryFiles]
+    this.state
+      .getStatePart('initialized')
+      .pipe(take(1))
+      .subscribe(() => {
+        const bookmarks = this.state.getStatePartValue('bookmarks')
+        this.electronService.getBookmarked({ bookmarks })
+        this.electronService.getRecentlyModified()
+      })
+    this.tabs$ = this.state.getStatePart('tabs')
+    this.forceDashboard$ = this.state.getStatePart('forceDashboard')
   }
 }

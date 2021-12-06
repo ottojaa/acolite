@@ -13,6 +13,7 @@ import {
   DeleteFiles,
   FileActions,
   FolderActions,
+  GetBookmarkedFiles,
   MoveFiles,
   OpenFileLocation,
   ReadDirectory,
@@ -25,7 +26,7 @@ import {
   UpdateFileContent,
 } from '../../../../../app/actions'
 import { AppConfig } from '../../../interfaces/Menu'
-import { omit, pick } from 'lodash'
+import { pick } from 'lodash'
 import { allowedConfigKeys } from '../../../entities/file/constants'
 
 type OmitActionType<T> = Omit<T, 'type'>
@@ -125,6 +126,8 @@ export class ElectronService {
     this.send(FileActions.Update, payload)
   }
 
+  // Store actions
+
   searchFiles(payload: OmitActionType<SearchQuery>): void {
     this.send(SearchActions.Query, payload)
   }
@@ -136,6 +139,14 @@ export class ElectronService {
 
   initApp(): void {
     this.send(StoreActions.InitApp, {})
+  }
+
+  getRecentlyModified(): void {
+    this.send(StoreActions.GetRecentlyModified, {})
+  }
+
+  getBookmarked(payload: OmitActionType<GetBookmarkedFiles>): void {
+    this.send(StoreActions.GetBookmarkedFiles, payload)
   }
 
   addActionType<T extends OmitActionType<UpdateActionPayload>>(

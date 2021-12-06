@@ -1,23 +1,9 @@
 :host {
   height: 100%;
-}
-
-.file-cards {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  width: 100%;
-}
-
-.file-card-container {
-  padding: 1rem;
-}
-
-.files-header {
-  display: flex;
-  justify-content: center;
-  color: var(--contrast);
+  overflow-y: scroll;
+  &:hover::-webkit-scrollbar-thumb {
+    visibility: visible;
+  }
 }
 
 .min-width {

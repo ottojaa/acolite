@@ -1,6 +1,11 @@
 <div class="topbar">
   <div class="filler">
-    <img src="../../../../assets/icons/acolite-logo-white.png" width="110px" />
+    <img
+      (click)="forceDashboard()"
+      [matTooltip]="'Show dashboard'"
+      src="../../../../assets/icons/acolite-logo-white.png"
+      width="110px"
+    />
   </div>
   <app-autocomplete></app-autocomplete>
   <div class="topbar-end">

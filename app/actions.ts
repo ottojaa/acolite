@@ -16,6 +16,8 @@ export type UpdateActionPayload =
   | InitApp
   | SearchQuery
   | OpenFileLocation
+  | GetRecentlyModified
+  | GetBookmarkedFiles
 
 export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
 
@@ -84,6 +86,14 @@ export interface SetDefaultDir {
   type: FolderActions.SetDefaultDir
 }
 
+export interface GetRecentlyModified {
+  type: StoreActions.GetRecentlyModified
+}
+
+export interface GetBookmarkedFiles {
+  type: StoreActions.GetBookmarkedFiles
+  bookmarks: string[]
+}
 export interface ChooseDir {
   type: FolderActions.ChooseDir
 }
@@ -148,6 +158,8 @@ export enum StoreActions {
   InitApp = 'init-app',
   GetStore = 'read-store',
   UpdateStore = 'update-store',
+  GetRecentlyModified = 'get-recently-modified',
+  GetBookmarkedFiles = 'get-bookmarked-files',
 }
 
 export enum SearchActions {
@@ -179,6 +191,10 @@ export enum StoreResponses {
   UpdateStoreFailure = 'update-store-failure',
   InitAppSuccess = 'init-app-success',
   InitAppFailure = 'init-app-failure',
+  GetRecentlyModifiedSuccess = 'get-recently-modified-success',
+  GetRecentlyModifiedFailure = 'get-recently-modified-failure',
+  GetBookmarkedFilesSuccess = 'get-bookmarked-success',
+  GetBookmarkedFilesFailure = 'get-bookmarked-failure',
 }
 
 export enum SearchResponses {

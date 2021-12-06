@@ -12,9 +12,7 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
     const ext = path.extname(filename || '').split('.')
     return ext[ext.length - 1]
   }
-  const getIcon = (extension: string) => extension + '.svg'
   const fileExtension = isFolder ? null : getExtension(filePath)
-  const icon = isFolder ? null : getIcon(fileExtension)
 
   return {
     filePath,
@@ -24,7 +22,7 @@ export const getFileEntityFromPath = (filePath: string): FileEntity => {
     size: fileInfo.size,
     createdAt: fileInfo.birthtime,
     modifiedAt: fileInfo.mtime,
-    ...(!isFolder && { fileExtension, icon }),
+    ...(!isFolder && { fileExtension }),
   }
 }
 

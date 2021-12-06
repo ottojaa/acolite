@@ -49,6 +49,8 @@
     "@electron/remote": "1.2.0",
     "@mdefy/markdown-editor-core": "1.0.1",
     "@mdefy/ngx-markdown-editor": "11.1.0",
+    "@mdi/angular-material": "6.5.95",
+    "@mdi/font": "6.5.95",
     "@types/codemirror": "5.60.5",
     "@types/flexsearch": "0.7.2",
     "angular-split": "5.0.0",
