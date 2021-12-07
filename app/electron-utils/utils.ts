@@ -1,9 +1,9 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { join } from 'path'
-import { FileEntity, TreeElement } from '../src/app/interfaces/Menu'
-import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from '../src/app/utils/menu-utils'
-import { getDirName } from '../src/app/utils/file-utils'
+import { FileEntity, TreeElement } from '../electron-interfaces'
+import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-utils'
+import { getDirName } from './file-utils'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)

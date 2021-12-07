@@ -45,11 +45,9 @@ export class EditorViewComponent implements OnInit {
     })
     this.electronService.on(StoreResponses.GetBookmarkedFilesSuccess, (_ipcEvent: any, files: SearchResult[]) => {
       this.bookmarked = [...files]
-      console.log('HEPS')
       setTimeout(() => {
         this.bookmarksInit = true
       }, 300)
-      this.bookmarksInit = true
     })
   }
 

@@ -1,7 +1,7 @@
 @import '../../../../../variables.scss';
 
 :host ::ng-deep .p-card {
-  background-color: var(--background-tertiary);
+  background-color: var(--backgroundTertiary);
   transition: all 0.25s linear;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
   cursor: pointer;

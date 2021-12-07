@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { TooltipPosition } from '@angular/material/tooltip'
 
 @Component({
   selector: 'app-rounded-icon-button',
@@ -9,7 +10,7 @@ export class RoundedIconButtonComponent {
   @Input() icon: string
   @Input() tooltip: string
   @Input() scale? = 1
-  @Input() position? = 'right'
+  @Input() position?: TooltipPosition = 'right'
   @Output() onClick: EventEmitter<void> = new EventEmitter()
 
   className: string

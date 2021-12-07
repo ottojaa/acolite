@@ -1,4 +1,4 @@
-import { SearchPreference, Tab, TreeElement } from '../src/app/interfaces/Menu'
+import { SearchPreference, Tab, TreeElement } from './electron-interfaces'
 
 export type UpdateActionPayload =
   | ReadDirectory

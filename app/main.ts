@@ -4,7 +4,6 @@ import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
 import { FileActions, FolderActions, SearchActions, StoreActions, StoreResponses, UpdateActionPayload } from './actions'
-import { getJoinedPath } from '../src/app/utils/file-utils'
 import { Document } from 'flexsearch'
 import {
   createNewDirectory,
@@ -29,7 +28,8 @@ import {
   searchFiles,
   updateStore,
 } from './ipc-events/store-events'
-import { Doc } from '../src/app/interfaces/File'
+import { getJoinedPath } from './electron-utils/file-utils'
+import { Doc } from './electron-interfaces'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
 // Initialize remote module
@@ -53,7 +53,7 @@ function createWindow(): BrowserWindow {
     x: 0,
     y: 0,
     show: false,
-    icon: getJoinedPath([__dirname, 'acolite.ico']),
+    icon: getJoinedPath([__dirname, 'acolite-logo-ellipse.png']),
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: serve ? true : false,

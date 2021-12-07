@@ -1,19 +1,17 @@
-import { SearchPreference, SearchResult, TreeElement } from '../../src/app/interfaces/Menu'
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
-import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../../src/app/utils/file-utils'
 import { StoreResponses, SearchQuery, SearchResponses, UpdateStore, GetBookmarkedFiles } from '../actions'
-import { getRootDirectory } from '../utils'
 import { Document } from 'flexsearch'
-import { Doc } from '../../src/app/interfaces/File'
-import { AppConfig, FileEntity } from '../electron-interfaces'
+import { AppConfig, Doc, FileEntity, SearchPreference, SearchResult, TreeElement } from '../electron-interfaces'
 import {
   getDefaultConfigJSON,
   validateAppConfig,
   updateSelectedWorkspaceConfig,
 } from '../config-helpers/config-helpers'
 import { formatDate } from '../date-and-time-helpers'
+import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
+import { getRootDirectory } from '../electron-utils/utils'
 
 export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {

@@ -4,7 +4,7 @@
   height: 7rem;
 }
 :host ::ng-deep .p-inputtext {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
   opacity: 1;
   color: var(--contrast) !important;
 }
@@ -40,14 +40,14 @@ p-autocomplete {
 .input {
   width: '100%';
   color: black;
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }
 
 .autocomplete {
   border-radius: 0.5rem;
   height: 3rem;
   width: 60%;
-  background-color: var(--background-primary);
+  background-color: var(--backgroundPrimary);
   color: var(--contrast);
 }
 

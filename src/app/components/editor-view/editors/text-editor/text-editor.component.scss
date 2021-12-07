@@ -51,7 +51,7 @@ $toolbar-bg-light: #ffffffeb;
     border-radius: 10px;
   }
   &.dark-theme textarea {
-    background: var(--background-tertiary);
+    background: var(--backgroundTertiary);
     color: $textarea-color-dark;
   }
   &.light-theme textarea {

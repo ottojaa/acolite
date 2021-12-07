@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core'
-import { TreeNode } from 'primeng/api'
 import { ElectronService } from '../core/services'
 import { SelectedTab, Tab, TreeElement } from '../interfaces/Menu'
-import { getBaseName, getDirName, getPathSeparator } from '../utils/file-utils'
+import { getDirName, getPathSeparator } from '../utils/file-utils'
 import { State, StateService, StateUpdate } from './state.service'
 
 @Injectable({
@@ -84,9 +83,7 @@ export class TabService {
     const { tabs, baseDir } = this.state.getStateParts(['tabs', 'baseDir'])
     const selectedTab = tabs[index]
     if (selectedTab) {
-      setTimeout(() => {
-        this.expandNodeRecursive(this.state.value.rootDirectory, selectedTab.path)
-      })
+      this.expandNodeRecursive(this.state.value.rootDirectory, selectedTab.path)
 
       return { path: tabs[index].path, index, activeIndent: this.getActiveIndent(baseDir, selectedTab.path) }
     } else {

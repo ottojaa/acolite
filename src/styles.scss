@@ -14,7 +14,7 @@ body .p-component {
 }
 
 .mat-menu-content {
-  background: var(--background-tertiary);
+  background: var(--backgroundTertiary);
   color: var(--contrast);
 }
 
@@ -23,7 +23,7 @@ body,
 app-main {
   margin: 0;
   font-size: $base-font-size;
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
   width: 100%;
   height: 100%;
 }
@@ -44,7 +44,7 @@ body ::-webkit-scrollbar-track {
 }
 
 body .mat-dialog-container {
-  background-color: var(--background-primary);
+  background-color: var(--backgroundPrimary);
 
   color: var(--contrast);
   .mat-form-field-label,
@@ -102,7 +102,7 @@ body .p-contextmenu {
 }
 
 body .mat-option {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
   color: var(--contrast);
 }
 body .mat-option.mat-active {
@@ -112,10 +112,10 @@ body .mat-option.mat-active {
 
 body .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
   color: var(--contrast);
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }
 body .mat-select-panel {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
   color: var(--contrast);
 }
 
@@ -125,7 +125,7 @@ body .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
 }
 
 body .mat-select-content {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
   color: var(--contrast);
 }
 
@@ -154,7 +154,7 @@ body .mat-select-content {
 }
 
 body .topbar {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }
 
 body .p-tooltip {
@@ -165,7 +165,7 @@ body .p-tooltip {
 body .p-inputtext {
   opacity: 1;
   color: var(--contrast);
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }
 
 body .p-tree span {
@@ -180,5 +180,5 @@ body .p-tree,
 
 body .editor-view {
   width: 100%;
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }

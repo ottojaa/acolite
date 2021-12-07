@@ -73,7 +73,7 @@ ngx-markdown-editor {
 }
 
 :host ::ng-deep .ngx-markdown-editor-toolbar {
-  background-color: var(--background-secondary);
+  background-color: var(--backgroundSecondary);
   padding: 0 0.8rem 0.5rem;
   box-shadow: $box-shadow-elevation;
   border-top-left-radius: 10px;

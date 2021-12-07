@@ -178,7 +178,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background: var(--background-secondary);
+  background: var(--backgroundSecondary);
   color: var(--contrast);
 
   .icon-container {
@@ -235,7 +235,7 @@
 
 .drop-down {
   width: 100%;
-  background: var(--background-secondary);
+  background: var(--backgroundSecondary);
   border: none;
   border-spacing: 0;
   border-bottom-left-radius: 5px;
@@ -246,5 +246,5 @@
 ::ng-deep .mat-menu-panel {
   margin-top: 0.2rem;
   max-width: 1000px !important;
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }

@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
+import { IOutputAreaSizes } from 'angular-split'
 import { Observable } from 'rxjs'
 import { filter, skipUntil, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
@@ -41,8 +42,8 @@ export class MainComponent extends AbstractComponent implements OnInit {
       })
   }
 
-  onDragEnd(event: { sizes: number[] }): void {
+  onDragEnd(event: { sizes: IOutputAreaSizes }): void {
     const [sideMenuWidth, _editorWidth] = event.sizes
-    this.state.updateState$.next({ key: 'sideMenuWidth', payload: sideMenuWidth })
+    this.state.updateState$.next({ key: 'sideMenuWidth', payload: sideMenuWidth as number })
   }
 }

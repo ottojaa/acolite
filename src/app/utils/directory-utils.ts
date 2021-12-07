@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash'
-import { FilePathContainer } from '../src/app/interfaces/File'
-import { TreeElement } from '../src/app/interfaces/Menu'
-import { getBaseName, getDirName, getPathSeparator } from '../src/app/utils/file-utils'
+import { FilePathContainer } from '../interfaces/File'
+import { TreeElement } from '../interfaces/Menu'
+import { getBaseName, getDirName, getPathSeparator } from './file-utils'
 
 export const getPathsToBeModified = (selectedFiles: TreeElement[], target?: TreeElement): FilePathContainer => {
   const folders = selectedFiles.filter((el) => el.data.type === 'folder')

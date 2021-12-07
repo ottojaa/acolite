@@ -8,18 +8,13 @@ interface DateRange {
   end?: Date
 }
 
-interface ISODateRange {
-  start?: string
-  end?: string
-}
-
 @Component({
   selector: 'app-date-range-picker',
   templateUrl: './date-range-picker.component.html',
   styleUrls: ['./date-range-picker.component.scss'],
 })
 export class DateRangePickerComponent extends AbstractComponent implements OnInit {
-  @Input() dateRange: { start: Date; end: Date }
+  @Input() dateRange: DateRange
   @Output() dateRangeChange = new EventEmitter()
   maxDate = new Date()
 

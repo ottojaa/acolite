@@ -2,13 +2,12 @@ import { BrowserWindow, dialog, IpcMainEvent } from 'electron'
 import { first } from 'lodash'
 import * as path from 'path'
 import * as fs from 'fs'
-import { getUpdatedMenuItemsRecursive } from '../../src/app/utils/menu-utils'
-import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../actions'
-import { getFileEntityFromPath, getRootDirectory } from '../utils'
-import { addFilesToIndex, getEmptyIndex } from './store-events'
+import { addFilesToIndex } from './store-events'
 import { Document } from 'flexsearch'
-import { Doc } from '../../src/app/interfaces/File'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
+import { getFileEntityFromPath, getRootDirectory } from '../electron-utils/utils'
+import { getUpdatedMenuItemsRecursive } from '../electron-utils/menu-utils'
+import { CreateNewDirectory, Doc, FolderActionResponses, ReadDirectory } from '../electron-interfaces'
 
 export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
   const { directoryName, baseDir, rootDirectory, parentPath } = payload

@@ -2,10 +2,10 @@
   {
     "name": "Dark blue green",
     "styles": {
-      "background-primary": "#191d22",
-      "background-secondary": "#21252E",
-      "background-tertiary": "#171a1f",
-      "tab-bg-primary": "#1b1f25",
+      "backgroundPrimary": "#191d22",
+      "backgroundSecondary": "#21252E",
+      "backgroundTertiary": "#171a1f",
+      "tabBgPrimary": "#1b1f25",
       "dropdownmenuBg": "#252a35",
       "textHighlight": "#56DB80",
       "textHighlightBg": "#c53457a6",
@@ -26,10 +26,10 @@
   {
     "name": "Light grey pink",
     "styles": {
-      "background-primary": "#36393f",
-      "background-secondary": "#2f3136",
-      "background-tertiary": "#25272b",
-      "tab-bg-primary": "#26292d",
+      "backgroundPrimary": "#36393f",
+      "backgroundSecondary": "#2f3136",
+      "backgroundTertiary": "#25272b",
+      "tabBgPrimary": "#26292d",
       "dropdownmenuBg": "#2b2f33",
       "textHighlight": "#56DB80",
       "textHighlightBg": "#c53457a6",

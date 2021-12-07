@@ -22,7 +22,7 @@
 }
 
 ::ng-deep .mat-progress-bar-buffer {
-  background: var(--background-secondary);
+  background: var(--backgroundSecondary);
 }
 
 ::ng-deep .mat-progress-bar {
@@ -47,7 +47,7 @@
 
 .side-menu-topbar {
   height: 100%;
-  background-color: var(--background-tertiary);
+  background-color: var(--backgroundTertiary);
 
   .button-container {
     display: flex;

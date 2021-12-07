@@ -1,8 +1,7 @@
 import * as fs from 'fs'
 import { first } from 'lodash'
-import { allowedConfigKeys } from '../../src/app/entities/file/constants'
-import { getBaseName, getExtensionSplit } from '../../src/app/utils/file-utils'
-import { WorkspaceConfig, AppConfig, Tab } from '../electron-interfaces'
+import { WorkspaceConfig, AppConfig, Tab, allowedConfigKeys } from '../electron-interfaces'
+import { getBaseName, getExtensionSplit } from '../electron-utils/file-utils'
 
 export const getDefaultConfigJSON = (workspacePath?: string): string => {
   if (!workspacePath) {

@@ -16,7 +16,7 @@ $editor-view-width: calc(100% - 4.2rem);
 }
 
 .top-bar-split {
-  background: var(--background-primary);
+  background: var(--backgroundPrimary);
 }
 
 .side-menu-split {
@@ -30,7 +30,7 @@ $editor-view-width: calc(100% - 4.2rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--background-primary) !important;
+  background-color: var(--backgroundPrimary) !important;
 }
 
 .top-container {
@@ -53,7 +53,7 @@ $editor-view-width: calc(100% - 4.2rem);
     height: 92%;
   }
   .editor-split {
-    background: var(--background-secondary);
+    background: var(--backgroundSecondary);
   }
 }
 

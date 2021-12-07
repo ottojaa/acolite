@@ -1,7 +1,5 @@
 import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { FileActions } from '../../../../../app/actions'
-import { getPathsToBeModified } from '../../../../../app/directory-utils'
 import { ElectronService } from '../../../core/services'
 import { FilePathContainer } from '../../../interfaces/File'
 import { TreeElement } from '../../../interfaces/Menu'

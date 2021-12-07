@@ -2,13 +2,6 @@ import * as fs from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
-import { Tab, TreeElement } from '../../src/app/interfaces/Menu'
-import { getBaseName, getExtension, getDirName, getJoinedPath, getExtensionSplit } from '../../src/app/utils/file-utils'
-import {
-  getUpdatedMenuItemsRecursive,
-  getUpdatedFilePathsRecursive,
-  moveRecursive,
-} from '../../src/app/utils/menu-utils'
 import {
   ReadFile,
   FileActionResponses,
@@ -19,11 +12,13 @@ import {
   DeleteFiles,
   FileActions,
   OpenFileLocation,
-} from '../actions'
-import { getFileEntityFromPath, getDeletedFileEntityMock } from '../utils'
+} from '../electron-interfaces'
 import { Document } from 'flexsearch'
 import { addToIndex, removeIndexes, updateIndex, updateIndexesRecursive } from './store-events'
-import { Doc } from '../../src/app/interfaces/File'
+import { getBaseName, getDirName, getExtension, getExtensionSplit, getJoinedPath } from '../electron-utils/file-utils'
+import { Doc, Tab, TreeElement } from '../electron-interfaces'
+import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
+import { getDeletedFileEntityMock, getFileEntityFromPath } from '../electron-utils/utils'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath } = action
