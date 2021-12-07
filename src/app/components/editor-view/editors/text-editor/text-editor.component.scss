@@ -28,7 +28,6 @@ $toolbar-bg-light: #ffffffeb;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: var(--primary);
 }
 
 .area-container {
@@ -52,7 +51,7 @@ $toolbar-bg-light: #ffffffeb;
     border-radius: 10px;
   }
   &.dark-theme textarea {
-    background: var(--editorBg1);
+    background: var(--background-tertiary);
     color: $textarea-color-dark;
   }
   &.light-theme textarea {

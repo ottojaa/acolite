@@ -17,13 +17,13 @@ export class RenameFileDialogComponent {
   extension: string
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
 
-  @HostListener('window:keyup.Enter', ['$event'])
+  /* @HostListener('window:keyup.Enter', ['$event'])
   onEnter(_event: KeyboardEvent): void {
     if (this.fileName.invalid) {
       return
     }
     this.onRenameClick()
-  }
+  } */
 
   constructor(
     public dialogRef: MatDialogRef<RenameFileDialogComponent>,

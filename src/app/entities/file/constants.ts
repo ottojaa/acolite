@@ -10,7 +10,7 @@ export const nameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäö
 
 export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'file-image-outline', acceptedExtensions: ['jpg', 'jpeg', 'png', 'img'], color: '#65ff87' },
-  { name: 'file-document-outline', acceptedExtensions: ['txt', 'text'], color: '#a4c4ff' },
+  { name: 'file-document-outline', acceptedExtensions: ['txt', 'text'], color: '#68c6f3' },
   { name: 'language-markdown', acceptedExtensions: ['mdown', 'markdown', 'md'], color: 'white' },
   { name: 'file-word-outline', acceptedExtensions: ['doc', 'docx'], color: 'deepskyblue' },
   { name: 'file-powerpoint-outline', acceptedExtensions: ['ppt', 'pptx', 'pps'], color: '#C03314' },

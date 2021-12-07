@@ -52,49 +52,4 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       })
     )
   }
-
-  openChangeWorkspaceDialog(): void {
-    this.dialogService.openChangeWorkspaceDialog().subscribe()
-  }
-
-  createNewFolder(): void {
-    const baseDir = this.state.state$.value.baseDir
-
-    this.zone.run(() => {
-      this.dialogService
-        .openFolderNameDialog(baseDir)
-        .pipe(take(1))
-        .subscribe((name: string) => {
-          if (name && baseDir) {
-            const rootDirectory = this.state.getStatePartValue('rootDirectory')
-            this.electronService.createNewFolderRequest({ directoryName: name, baseDir, rootDirectory })
-          }
-        })
-    })
-  }
-
-  expandAll() {
-    this.state.value.rootDirectory.children.forEach((node) => {
-      this.expandRecursive(node, true)
-    })
-  }
-
-  collapseAll() {
-    this.state.value.rootDirectory.children.forEach((node) => {
-      this.expandRecursive(node, false)
-    })
-  }
-
-  private expandRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand
-    if (node.children) {
-      node.children.forEach((childNode) => {
-        this.expandRecursive(childNode, isExpand)
-      })
-    }
-  }
-
-  navigateToDirectorySelection(): void {
-    this.router.navigate(['base-dir'])
-  }
 }

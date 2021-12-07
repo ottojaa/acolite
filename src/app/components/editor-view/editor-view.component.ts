@@ -2,9 +2,9 @@ import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { Observable } from 'rxjs'
-import { map, startWith, take } from 'rxjs/operators'
+import { map, take } from 'rxjs/operators'
 import { StoreResponses } from '../../../../app/actions'
-import { FileEntity, SearchResult, SelectedTab, Tab } from '../../interfaces/Menu'
+import { SearchResult, Tab } from '../../interfaces/Menu'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
 
@@ -39,10 +39,16 @@ export class EditorViewComponent implements OnInit {
   constructor(private state: StateService, public tabService: TabService, public electronService: ElectronService) {
     this.electronService.on(StoreResponses.GetRecentlyModifiedSuccess, (_ipcEvent: any, files: SearchResult[]) => {
       this.recentlyModified = [...files]
-      this.recentlyModifiedInit = true
+      setTimeout(() => {
+        this.recentlyModifiedInit = true
+      }, 300)
     })
     this.electronService.on(StoreResponses.GetBookmarkedFilesSuccess, (_ipcEvent: any, files: SearchResult[]) => {
       this.bookmarked = [...files]
+      console.log('HEPS')
+      setTimeout(() => {
+        this.bookmarksInit = true
+      }, 300)
       this.bookmarksInit = true
     })
   }

@@ -8,6 +8,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 export class RoundedIconButtonComponent {
   @Input() icon: string
   @Input() tooltip: string
+  @Input() scale? = 1
+  @Input() position? = 'right'
   @Output() onClick: EventEmitter<void> = new EventEmitter()
 
   className: string

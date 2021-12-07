@@ -1,17 +1,18 @@
 .container {
-  padding: 0.3rem;
   border: none;
   background: none;
+  opacity: 0.8;
+  transform: scale(1);
   &:hover {
-    background: var(--buttonColor);
-    transition: background-color 300ms;
+    opacity: 1;
+    transform: scale(1.2);
+    transition: all 300ms;
   }
 }
 mat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem !important;
-  color: var(--contrast);
+  color: var(--iconColor);
   cursor: pointer;
 }

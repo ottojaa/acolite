@@ -198,6 +198,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   onDragEnter(event: Event): void {
+    console.log(event)
     this.isHovering = true
 
     event.preventDefault()

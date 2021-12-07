@@ -2,9 +2,10 @@
   {
     "name": "Dark blue green",
     "styles": {
-      "primary": "#1B2026",
-      "secondary": "#21252E",
-      "topbarBg": "#171a1f",
+      "background-primary": "#191d22",
+      "background-secondary": "#21252E",
+      "background-tertiary": "#171a1f",
+      "tab-bg-primary": "#1b1f25",
       "dropdownmenuBg": "#252a35",
       "textHighlight": "#56DB80",
       "textHighlightBg": "#c53457a6",
@@ -15,7 +16,7 @@
       "editorBg1": "#21252E",
       "editorBg2": "#1B2026",
       "mdStatusToolbarBg": "#171b20ad",
-      "iconColor": "#8d2d49",
+      "iconColor": "#18e8b8",
       "gutterBg": "#3496c5",
       "contrast": "#fafafa",
       "contrastActive": "#111213",
@@ -25,9 +26,10 @@
   {
     "name": "Light grey pink",
     "styles": {
-      "primary": "#37393E",
-      "secondary": "#2F3136",
-      "topbarBg": "#202225",
+      "background-primary": "#36393f",
+      "background-secondary": "#2f3136",
+      "background-tertiary": "#25272b",
+      "tab-bg-primary": "#26292d",
       "dropdownmenuBg": "#2b2f33",
       "textHighlight": "#56DB80",
       "textHighlightBg": "#c53457a6",
@@ -37,7 +39,7 @@
       "accent": "#00000021",
       "editorBg1": "#2F3136",
       "editorBg2": "#1B2026",
-      "iconColor": "#8d2d49",
+      "iconColor": "#ff1055",
       "gutterBg": "#3496c5",
       "contrast": "#fafafa",
       "indent": "1px solid rgba(77, 77, 77, 0.608)"

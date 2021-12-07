@@ -9,6 +9,7 @@ import { AngularSplitModule } from 'angular-split'
 import { PanelModule } from 'primeng/panel'
 import { BrowserModule } from '@angular/platform-browser'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
+import { ActionsMenuModule } from 'app/components/side-menu/actions-menu/actions-menu.module'
 
 @NgModule({
   declarations: [MainComponent],
@@ -22,6 +23,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner'
     PanelModule,
     BrowserModule,
     ProgressSpinnerModule,
+    ActionsMenuModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

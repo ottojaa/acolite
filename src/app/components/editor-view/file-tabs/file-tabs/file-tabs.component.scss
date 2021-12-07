@@ -46,7 +46,7 @@
 } */
 
 :host ::ng-deep .mat-tab-label {
-  background-color: var(--secondary);
+  background-color: var(--tab-bg-primary);
   border-right: $app-border;
   border-bottom: $app-border;
 
@@ -75,6 +75,7 @@
 .editor {
   height: 100%;
   width: 100%;
+  background: var(--background-secondary);
 }
 
 .close-button {

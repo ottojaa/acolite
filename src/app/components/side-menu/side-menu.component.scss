@@ -22,7 +22,7 @@
 }
 
 ::ng-deep .mat-progress-bar-buffer {
-  background: var(--secondary);
+  background: var(--background-secondary);
 }
 
 ::ng-deep .mat-progress-bar {
@@ -30,7 +30,11 @@
 }
 
 .side-menu-container {
+  height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  border-right: $app-border;
 }
 
 .mat-progress-bar {
@@ -42,17 +46,17 @@
 }
 
 .side-menu-topbar {
-  display: flex;
-  height: 4%;
-  flex-direction: column;
+  height: 100%;
+  background-color: var(--background-tertiary);
+
   .button-container {
     display: flex;
-    padding: 0.3rem 1rem;
-    background-color: var(--secondary);
-    box-shadow: $box-shadow;
+    flex-direction: column;
+  }
+  app-rounded-icon-button {
+    padding: 0.5rem 0.4rem;
   }
   .loader {
-    background-color: var(--secondary);
     height: 4px;
   }
 }

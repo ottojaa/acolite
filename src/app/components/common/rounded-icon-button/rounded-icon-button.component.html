@@ -1,3 +1,10 @@
-<button class="container" type="button" [matTooltip]="tooltip">
-  <mat-icon aria-hidden="false" aria-label="Example home icon" (click)="handleClick()">{{ icon }}</mat-icon>
+<button class="container" type="button" [matTooltip]="tooltip" [matTooltipPosition]="position">
+  <mat-icon
+    fontSet="material-icons-outlined"
+    aria-hidden="false"
+    aria-label="Example home icon"
+    [style.transform]="'scale(' + scale + ')'"
+    (click)="handleClick()"
+    >{{ icon }}</mat-icon
+  >
 </button>

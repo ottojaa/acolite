@@ -14,9 +14,13 @@ export interface Config {
 export const folderStructureToMenuItems = (
   baseDir: string,
   folderStruct: (TreeElement | FileEntity)[]
-): TreeNode<FileEntity>[] => folderStruct.map((descendant) => createMenuItemsRecursive(baseDir, descendant))
+): TreeNode<FileEntity>[] => folderStruct.map((descendant) => createMenuItemsRecursive(baseDir, descendant, null))
 
-const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
+const createMenuItemsRecursive = (
+  baseDir: string,
+  element: TreeElement | FileEntity,
+  parent: TreeElement
+): TreeNode => {
   if (isFolder(element) && element.data.type === 'folder') {
     const { data, children } = element
     const treeNode: TreeElement = {
@@ -24,7 +28,9 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
       type: MenuItemTypes.Folder,
       key: data.filePath,
       leaf: false,
-      children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
+      parent,
+      expanded: true,
+      children: children.map((child) => createMenuItemsRecursive(baseDir, child, element)),
       data,
     }
     treeNode.data.indents = calculateIndents(treeNode, baseDir)
@@ -33,6 +39,7 @@ const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEn
   } else if (isFile(element)) {
     const treeNode = getTreeNodeFromFileEntity(element)
     treeNode.data.indents = calculateIndents(treeNode, baseDir)
+    treeNode.parent = parent
 
     return treeNode
   }

@@ -4,7 +4,7 @@
   height: 7rem;
 }
 :host ::ng-deep .p-inputtext {
-  background: var(--primary);
+  background: var(--background-primary);
   opacity: 1;
   color: var(--contrast) !important;
 }
@@ -33,21 +33,21 @@ p-autocomplete {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-left: $app-border;
+
   border-bottom: $app-border;
 }
 
 .input {
   width: '100%';
   color: black;
-  background: var(--primary);
+  background: var(--background-primary);
 }
 
 .autocomplete {
   border-radius: 0.5rem;
   height: 3rem;
   width: 60%;
-  background-color: var(--primary);
+  background-color: var(--background-primary);
   color: var(--contrast);
 }
 

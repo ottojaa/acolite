@@ -1,22 +1,21 @@
 <ng-container *ngIf="initialized$ | async; else loading">
   <div class="app-container" @componentLoaded>
-    <as-split
-      direction="horizontal"
-      style="height: 100%"
-      class="as-horizontal"
-      [gutterSize]="1"
-      (dragEnd)="onDragEnd($event)"
-    >
-      <as-split-area class="side-menu-split" [size]="sideMenuWidth">
-        <app-side-menu></app-side-menu>
-      </as-split-area>
-      <as-split-area [size]="editorWidth">
-        <div class="editor-container">
-          <app-top-bar></app-top-bar>
-          <app-editor-view></app-editor-view>
-        </div>
-      </as-split-area>
-    </as-split>
+    <div class="top-container">
+      <app-actions-menu class="actions-menu"></app-actions-menu>
+
+      <div class="editor-view">
+        <app-top-bar class="topbar"></app-top-bar>
+        <as-split direction="horizontal" class="as-horizontal" [gutterSize]="1" (dragEnd)="onDragEnd($event)">
+          <as-split-area class="side-menu-split" [size]="sideMenuWidth">
+            <app-side-menu></app-side-menu>
+          </as-split-area>
+
+          <as-split-area [size]="editorWidth" class="editor-split">
+            <app-editor-view></app-editor-view>
+          </as-split-area>
+        </as-split>
+      </div>
+    </div>
   </div>
 </ng-container>
 

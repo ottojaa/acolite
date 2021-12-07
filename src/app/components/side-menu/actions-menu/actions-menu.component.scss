@@ -1,0 +1,21 @@
+@import 'src/variables.scss';
+
+:host {
+  background: var(--background-tertiary);
+}
+.actions-menu {
+  height: 100%;
+
+  .button-container {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: $app-border;
+
+    app-rounded-icon-button {
+      padding: 1.2rem 0.5rem;
+    }
+  }
+}

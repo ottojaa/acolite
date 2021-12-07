@@ -1,21 +1,22 @@
 @import '../../assets/themes/theme.scss';
 @import '../../variables.scss';
+
 .app-container {
   height: 100%;
 }
+
+$top-container-height: 7rem;
+$editor-container-height: calc(100% - 7rem);
+
+$actions-menu-width: 4.2rem;
+$editor-view-width: calc(100% - 4.2rem);
 
 .scroll-panel-container {
   min-width: 200px;
 }
 
 .top-bar-split {
-  background: var(--primary);
-}
-
-.editor-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  background: var(--background-primary);
 }
 
 .side-menu-split {
@@ -29,7 +30,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--secondary) !important;
+  background-color: var(--background-primary) !important;
+}
+
+.top-container {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+
+  .actions-menu {
+    width: $actions-menu-width;
+    height: 100%;
+  }
+  .topbar {
+    width: $actions-menu-width;
+    height: 7%;
+  }
+  .editor-view {
+    width: $editor-view-width;
+  }
+  .as-horizontal {
+    height: 92%;
+  }
+  .editor-split {
+    background: var(--background-secondary);
+  }
 }
 
 :host {

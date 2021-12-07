@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
+import { TreeNode } from 'primeng/api'
 import { ElectronService } from '../core/services'
-import { SelectedTab, Tab } from '../interfaces/Menu'
+import { SelectedTab, Tab, TreeElement } from '../interfaces/Menu'
 import { getBaseName, getDirName, getPathSeparator } from '../utils/file-utils'
 import { State, StateService, StateUpdate } from './state.service'
 
@@ -16,12 +17,9 @@ export class TabService {
 
     if (tabIdx > -1 && tabIdx !== selectedTab.index) {
       const newTab = this.getSelectedTabEntityFromIndex(tabIdx)
-      const payload: StateUpdate<State>[] = [{ key: 'selectedTab', payload: newTab }]
-      this.state.updateMulti$.next(payload)
+      this.update(newTab, tabs)
     } else if (tabIdx === -1) {
       this.electronService.readFileRequest({ filePath })
-    } else {
-      this.state.updateState$.next({ key: 'selectedTab', payload: { index: null, path: null } })
     }
   }
 
@@ -70,7 +68,7 @@ export class TabService {
     this.electronService.openFileLocationRequest({ filePath })
   }
 
-  update(selectedTab: SelectedTab, tabs: Tab[]): void {
+  update(selectedTab: SelectedTab, tabs: Tab[], expand?: boolean): void {
     const payload: StateUpdate<State>[] = [
       { key: 'selectedTab', payload: selectedTab },
       { key: 'tabs', payload: tabs },
@@ -86,11 +84,38 @@ export class TabService {
     const { tabs, baseDir } = this.state.getStateParts(['tabs', 'baseDir'])
     const selectedTab = tabs[index]
     if (selectedTab) {
+      setTimeout(() => {
+        this.expandNodeRecursive(this.state.value.rootDirectory, selectedTab.path)
+      })
+
       return { path: tabs[index].path, index, activeIndent: this.getActiveIndent(baseDir, selectedTab.path) }
     } else {
       console.error(`No tab at index ${index}`)
       return null
     }
+  }
+
+  expandNodeRecursive(root: TreeElement, path: string): any {
+    const expandParentRecursive = (parentNode: TreeElement) => {
+      if (parentNode) {
+        parentNode.expanded = true
+      }
+
+      if (parentNode?.parent) {
+        expandParentRecursive(parentNode.parent)
+      }
+    }
+    const findParentNodeRecursive = (currentNode: TreeElement, path: string) => {
+      for (const node of currentNode?.children) {
+        if (node.data.filePath === path) {
+          expandParentRecursive(node.parent)
+          return
+        } else if (node.children) {
+          findParentNodeRecursive(node, path)
+        }
+      }
+    }
+    findParentNodeRecursive(root, path)
   }
 
   getActiveIndent(rootPath: string, path: string) {
