@@ -6,28 +6,29 @@ import { ipcRenderer, webFrame } from 'electron'
 import * as remote from '@electron/remote'
 import * as childProcess from 'child_process'
 import * as fs from 'fs'
+import { pick } from 'lodash'
 import {
   ActionType,
-  CreateFile,
+  ReadDirectory,
   CreateNewDirectory,
+  CreateFile,
+  RenameFile,
   DeleteFiles,
+  MoveFiles,
+  ReadFile,
+  OpenFileLocation,
+  UpdateFileContent,
+  SearchQuery,
+  UpdateBookmarkedFiles,
+  UpdateActionPayload,
   FileActions,
   FolderActions,
-  GetBookmarkedFiles,
-  MoveFiles,
-  OpenFileLocation,
-  ReadDirectory,
-  ReadFile,
-  RenameFile,
   SearchActions,
-  SearchQuery,
   StoreActions,
-  UpdateActionPayload,
-  UpdateFileContent,
-} from '../../../../../app/actions'
-import { AppConfig } from '../../../interfaces/Menu'
-import { pick } from 'lodash'
-import { allowedConfigKeys } from '../../../entities/file/constants'
+  UpdateStore,
+} from '../../../../../app/shared/actions'
+import { AppConfig, WorkspaceConfig } from '../../../../../app/shared/interfaces'
+import { allowedConfigKeys } from '../../../../../app/shared/constants'
 
 type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({
@@ -132,9 +133,9 @@ export class ElectronService {
     this.send(SearchActions.Query, payload)
   }
 
-  updateStore(payload: OmitActionType<AppConfig>): void {
-    const filtered = pick(payload, allowedConfigKeys)
-    this.send(StoreActions.UpdateStore, filtered)
+  updateStore(payload: OmitActionType<UpdateStore>): void {
+    const filtered = pick(payload.state, allowedConfigKeys)
+    this.send(StoreActions.UpdateStore, { state: filtered })
   }
 
   initApp(): void {
@@ -145,8 +146,8 @@ export class ElectronService {
     this.send(StoreActions.GetRecentlyModified, {})
   }
 
-  getBookmarked(payload: OmitActionType<GetBookmarkedFiles>): void {
-    this.send(StoreActions.GetBookmarkedFiles, payload)
+  getBookmarked(payload: OmitActionType<UpdateBookmarkedFiles>): void {
+    this.send(StoreActions.UpdateBookmarkedFiles, payload)
   }
 
   addActionType<T extends OmitActionType<UpdateActionPayload>>(

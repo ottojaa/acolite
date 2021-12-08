@@ -1,25 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core'
-import canvasText from 'canvas-txt'
-import { fileExtensionIcons } from 'app/entities/file/constants'
-import { FileEntity, SearchResult } from 'app/interfaces/Menu'
 import { TabService } from 'app/services/tab.service'
+import { fileExtensionIcons } from '../../../../../../app/shared/constants'
+import { SearchResult } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-file-card',
   templateUrl: './file-card.component.html',
   styleUrls: ['./file-card.component.scss'],
 })
-export class FileCardComponent implements OnInit {
+export class FileCardComponent {
   @Input() file: SearchResult
 
   constructor(private tabService: TabService) {}
-
-  imageUrl: string
-  lorps = fileExtensionIcons
-
-  ngOnInit(): void {
-    // this.generateCanvasContent()
-  }
 
   openInNewTab(file: SearchResult): void {
     this.tabService.openNewTab(file.filePath)

@@ -1,5 +1,5 @@
 <div class="editor-view">
-  <div @componentLoaded *ngIf="tabs$ | async as tabs" class="tabs-container">
+  <div *ngIf="tabs$ | async as tabs" class="tabs-container">
     <ng-container *ngIf="(selectedTab$ | async) && tabs?.length; else showDefault">
       <app-file-tabs [tabs]="tabs"></app-file-tabs>
     </ng-container>
@@ -7,15 +7,11 @@
     <ng-template #showDefault>
       <app-file-cards
         [title]="'Recently updated'"
-        [files]="recentlyModified"
-        [viewInit]="recentlyModifiedInit && bookmarksInit"
+        [files]="recentlyModified$ | async"
+        [viewInit]="viewInit"
       ></app-file-cards>
 
-      <app-file-cards
-        [title]="'Bookmarks'"
-        [files]="bookmarked"
-        [viewInit]="recentlyModifiedInit && bookmarksInit"
-      ></app-file-cards>
+      <app-file-cards [title]="'Bookmarks'" [files]="bookmarked$ | async" [viewInit]="viewInit"></app-file-cards>
     </ng-template>
   </div>
 </div>

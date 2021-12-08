@@ -1,4 +1,4 @@
-import { State } from '../../services/state.service'
+import { State } from './interfaces'
 
 interface FileExtensionIcon {
   name: string
@@ -26,7 +26,7 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
-export const allowedConfigKeys: (keyof State)[] = [
+export const allowedConfigKeys: string[] = [
   'baseDir',
   'tabs',
   'sideMenuWidth',

@@ -3,7 +3,6 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
 import { IpcMainEvent } from 'electron/main'
-import { FileActions, FolderActions, SearchActions, StoreActions, StoreResponses, UpdateActionPayload } from './actions'
 import { Document } from 'flexsearch'
 import {
   createNewDirectory,
@@ -20,16 +19,10 @@ import {
   readAndSendTabData,
   openFileLocation,
 } from './ipc-events/file-events'
-import {
-  getBookmarkedFiles,
-  getEmptyIndex,
-  getRecentlyModified,
-  initAppState,
-  searchFiles,
-  updateStore,
-} from './ipc-events/store-events'
+import { getEmptyIndex, initAppState, searchFiles, updateBookmarkedFiles, updateStore } from './ipc-events/store-events'
 import { getJoinedPath } from './electron-utils/file-utils'
-import { Doc } from './electron-interfaces'
+import { FileActions, FolderActions, SearchActions, StoreActions, UpdateActionPayload } from './shared/actions'
+import { Doc } from './shared/interfaces'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
 // Initialize remote module
@@ -71,12 +64,8 @@ function createWindow(): BrowserWindow {
     win.loadURL('http://localhost:4200')
   } else {
     // Path when running electron executable
-    let pathIndex = './index.html'
-
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-      // Path when running electron in local folder
-      pathIndex = '../dist/index.html'
-    }
+    const pathExists = fs.existsSync(path.join(__dirname, '../dist/index.html'))
+    const pathIndex = pathExists ? '../dist/index.html' : './index.html'
 
     win.loadURL(
       url.format({
@@ -114,7 +103,7 @@ const IPCChannels = [
   StoreActions.InitApp,
   StoreActions.UpdateStore,
   StoreActions.GetRecentlyModified,
-  StoreActions.GetBookmarkedFiles,
+  StoreActions.UpdateBookmarkedFiles,
   SearchActions.Query,
 ]
 
@@ -182,12 +171,12 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         searchFiles(event, payload, index)
         break
       }
-      case StoreActions.GetRecentlyModified: {
+      /* case StoreActions.GetRecentlyModified: {
         getRecentlyModified(event, index)
         break
-      }
-      case StoreActions.GetBookmarkedFiles: {
-        getBookmarkedFiles(event, index, payload)
+      } */
+      case StoreActions.UpdateBookmarkedFiles: {
+        updateBookmarkedFiles(event, payload)
         break
       }
     }
@@ -211,6 +200,9 @@ try {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       app.quit()
+    }
+    if (process.env.NODE_ENV === 'production') {
+      console.log = () => {}
     }
   })
 

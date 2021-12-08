@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { StateService } from 'app/services/state.service'
 import { MenuItem } from 'primeng/api'
+import { ThemeOption } from '../../../../../app/shared/interfaces'
 import themes from '../../../../assets/themes/theme-options.json'
-import { ThemeOption } from '../../../interfaces/Theme'
 @Component({
   selector: 'app-top-bar',
   templateUrl: './top-bar.component.html',
@@ -21,6 +21,6 @@ export class TopBarComponent implements OnInit {
   }
 
   forceDashboard(): void {
-    this.state.updateState$.next({ key: 'selectedTab', payload: { index: null, path: null } })
+    this.state.updateState$.next([{ key: 'selectedTab', payload: { index: null, path: null } }])
   }
 }

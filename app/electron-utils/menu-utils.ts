@@ -1,5 +1,5 @@
 import { TreeNode } from 'primeng/api'
-import { FileEntity, MenuItemTypes, TreeElement } from '../electron-interfaces'
+import { TreeElement, FileEntity, MenuItemTypes } from '../shared/interfaces'
 import { getBaseName, getPathSeparator } from './file-utils'
 
 export type UpdateStrategy = 'create' | 'rename' | 'delete'
@@ -95,6 +95,13 @@ const updateItemByStrategy = (
   }
 }
 
+/**
+ *
+ * @param elementsToAdd elements to be added to the tree structure
+ * @param elementsToDelete elements to be removed from the tree structure (files that do not exist anymore)
+ * @param menuItems a directory's children
+ * @param config contains information about the user's folder configuration
+ */
 export const moveRecursive = (
   elementsToAdd: TreeElement[],
   elementsToDelete: TreeElement[],
@@ -102,7 +109,10 @@ export const moveRecursive = (
   config?: Config
 ): void => {
   for (let menuItem of menuItems) {
-    const toBeAdded = elementsToAdd.filter((el) => el.data.parentPath === menuItem.data.filePath)
+    const toBeAdded = elementsToAdd
+      .filter((el) => el.data.parentPath === menuItem.data.filePath)
+      .map((el) => ({ ...el, parent: menuItem }))
+
     const toBeDeleted = elementsToDelete
       .filter((el) => el.data.parentPath === menuItem.data.filePath)
       .map((x) => x.data.filePath)

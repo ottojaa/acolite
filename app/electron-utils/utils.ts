@@ -1,9 +1,9 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { join } from 'path'
-import { FileEntity, TreeElement } from '../electron-interfaces'
 import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-utils'
-import { getDirName } from './file-utils'
+import { getDirName, getPathSeparator } from './file-utils'
+import { FileEntity, State, TreeElement } from '../shared/interfaces'
+import { join } from 'path'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)
@@ -103,4 +103,51 @@ export const getRootDirectory = (baseDir: string): TreeElement => {
   const rootEntity = getFileEntityFromPath(baseDir)
 
   return { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
+}
+
+export const getSelectedTabEntityFromIndex = (state: State, index: number) => {
+  const { tabs, baseDir } = state
+  const selectedTab = tabs[index]
+  if (selectedTab) {
+    return { path: tabs[index].path, index, activeIndent: getActiveIndent(baseDir, selectedTab.path) }
+  } else {
+    console.error(`No tab at index ${index}`)
+    return null
+  }
+}
+
+export const expandNodeRecursive = (root: TreeElement, path: string) => {
+  const expandParentRecursive = (parentNode: TreeElement) => {
+    if (parentNode) {
+      parentNode.expanded = true
+    }
+
+    if (parentNode?.parent) {
+      expandParentRecursive(parentNode.parent)
+    }
+  }
+  const findParentNodeRecursive = (currentNode: TreeElement, path: string) => {
+    for (const node of currentNode?.children) {
+      if (node.data.filePath === path) {
+        expandParentRecursive(node.parent)
+        return
+      } else if (node.children) {
+        findParentNodeRecursive(node, path)
+      }
+    }
+  }
+  findParentNodeRecursive(root, path)
+}
+
+export const getActiveIndent = (rootPath: string, path: string) => {
+  if (!rootPath || !path) {
+    return undefined
+  }
+  const pathDiff = path.replace(rootPath, '')
+  const pathDepth = pathDiff.split(getPathSeparator()).length - 2
+  const parentPath = getDirName(path)
+  if (parentPath) {
+    return { activeParent: parentPath, activeNode: path, indent: pathDepth }
+  }
+  return null
 }

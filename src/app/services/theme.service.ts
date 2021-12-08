@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
-import { ThemeOption } from '../interfaces/Theme'
+import { ThemeOption } from '../../../app/shared/interfaces'
 import themes from '../../assets/themes/theme-options.json'
+
 @Injectable({
   providedIn: 'root',
 })

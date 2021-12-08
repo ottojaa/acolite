@@ -1,25 +1,16 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  HostListener,
-  Input,
-  NgZone,
-  OnInit,
-  ViewChild,
-} from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
 import { uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Tree } from 'primeng/tree'
-import { take, takeUntil } from 'rxjs/operators'
-import { getPathsToBeModified, pathContainerIsEmpty } from '../../../utils/directory-utils'
+import { take } from 'rxjs/operators'
 import { AbstractComponent } from '../../../abstract/abstract-component'
 import { ElectronService } from '../../../core/services'
-import { ActiveIndent, FileEntity, SelectedTab, TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { TabService } from '../../../services/tab.service'
+import { TreeElement, ActiveIndent, FileEntity } from '../../../../../app/shared/interfaces'
+import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/electron-utils/directory-utils'
 
 @Component({
   selector: 'app-tree',
@@ -30,16 +21,18 @@ import { TabService } from '../../../services/tab.service'
 export class TreeComponent extends AbstractComponent implements OnInit {
   @Input() files: TreeElement[]
   @Input() workspace: string | undefined
+  @Input() activeIndent: ActiveIndent
   @ViewChild('contextMenu') cm: ContextMenu
+  @ViewChild('contextMenuDropZone') cmDropZone: ContextMenu
   @ViewChild('pTree') pTree: Tree
 
   selectedFiles: TreeElement[] = []
   selection: TreeElement[] = [] // Used for shift-key multi selection, as primeng tree does not support it for some reason.
   contextMenuItems: MenuItem[]
+  dropZoneContextMenuItems: MenuItem[]
   draggedElements: TreeElement[]
   isHovering = false
   isDragging = false
-  activeIndent: ActiveIndent
 
   constructor(
     private state: StateService,
@@ -53,17 +46,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initSelectedTabListener()
-  }
-
-  initSelectedTabListener(): void {
-    this.state
-      .getStatePart('selectedTab')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((tab) => {
-        this.activeIndent = tab.activeIndent
-        this.cdRef.detectChanges()
-      })
+    this.dropZoneContextMenuItems = this.getDropZoneContextMenuItems()
   }
 
   onSelectFile(event: { node: TreeElement; originalEvent: MouseEvent }): void {
@@ -134,6 +117,11 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     this.selection = []
   }
 
+  onRightClickDropZone(event: MouseEvent): void {
+    console.log(this.dropZoneContextMenuItems)
+    this.cmDropZone.show(event)
+  }
+
   onDrop(event: { dragNode: TreeElement; dropNode: TreeElement }): void {
     const { dragNode, dropNode } = event
 
@@ -165,12 +153,10 @@ export class TreeComponent extends AbstractComponent implements OnInit {
       .pipe(take(1))
       .subscribe((name: string) => {
         if (name) {
-          const rootDirectory = this.state.getStatePartValue('rootDirectory')
           this.electronService.createNewFolderRequest({
             directoryName: name,
-            baseDir,
-            rootDirectory,
             parentPath: filePath,
+            state: this.state.value,
           })
         }
       })
@@ -286,6 +272,24 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     }
 
     return baseItems
+  }
+
+  getDropZoneContextMenuItems(): MenuItem[] {
+    const baseItem = this.state.getStatePartValue('rootDirectory')
+    return [
+      {
+        label: 'New file',
+        command: () => this.openNewFileDialog(baseItem),
+      },
+      {
+        label: 'New folder',
+        command: () => this.createNewFolder(baseItem),
+      },
+      {
+        label: 'Show in folder',
+        command: () => this.tabService.openTabInFileLocation(baseItem.data.filePath),
+      },
+    ]
   }
   isMultipleSelected(selectedFiles: TreeNode<FileEntity>[]): boolean {
     return selectedFiles?.length > 1

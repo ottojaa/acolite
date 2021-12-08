@@ -1,16 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { isEqual } from 'lodash'
-import { TreeNode } from 'primeng/api'
 import { Observable } from 'rxjs'
-import { distinctUntilChanged, distinctUntilKeyChanged, filter, map, take, takeUntil, tap } from 'rxjs/operators'
+import { map, takeUntil, tap } from 'rxjs/operators'
+import { getBaseName } from '../../../../app/electron-utils/file-utils'
+import { removeExistingStyleClasses } from '../../../../app/electron-utils/menu-utils'
+import { TreeElement, ActiveIndent } from '../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
-import { TreeElement } from '../../interfaces/Menu'
 import { AppDialogService } from '../../services/dialog.service'
 import { StateService } from '../../services/state.service'
-import { getBaseName } from '../../utils/file-utils'
-import { removeExistingStyleClasses } from '../../utils/menu-utils'
 
 @Component({
   selector: 'app-side-menu',
@@ -21,6 +19,7 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   menuLoading: boolean = true
   files: TreeElement[]
   workspaceName: string
+  activeIndent$: Observable<ActiveIndent>
   files$: Observable<TreeElement[]>
 
   constructor(
@@ -35,6 +34,7 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.activeIndent$ = this.state.getStatePart('selectedTab').pipe(map((tab) => tab.activeIndent))
     this.files$ = this.state.getStatePart('rootDirectory').pipe(
       takeUntil(this.destroy$),
       tap((rootDir) => {

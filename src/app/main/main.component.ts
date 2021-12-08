@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, OnInit } from '@angular/core'
 import { IOutputAreaSizes } from 'angular-split'
 import { Observable } from 'rxjs'
-import { filter, skipUntil, take, takeUntil } from 'rxjs/operators'
+import { takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../abstract/abstract-component'
 import { StateService } from '../services/state.service'
 import { ThemeService } from '../services/theme.service'
@@ -13,7 +13,7 @@ import { ThemeService } from '../services/theme.service'
   styleUrls: ['./main.component.scss'],
   animations: [
     trigger('componentLoaded', [
-      transition(':enter', [style({ opacity: 0 }), animate('300ms', style({ opacity: 1 }))]),
+      transition(':enter', [style({ opacity: 0 }), animate('100ms', style({ opacity: 1 }))]),
     ]),
   ],
 })
@@ -44,6 +44,6 @@ export class MainComponent extends AbstractComponent implements OnInit {
 
   onDragEnd(event: { sizes: IOutputAreaSizes }): void {
     const [sideMenuWidth, _editorWidth] = event.sizes
-    this.state.updateState$.next({ key: 'sideMenuWidth', payload: sideMenuWidth as number })
+    this.state.updateState$.next([{ key: 'sideMenuWidth', payload: sideMenuWidth as number }])
   }
 }

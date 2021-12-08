@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { TagEditorComponent } from 'app/components/top-bar/tag-editor/tag-editor.component'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { FilePathContainer, TreeElement } from '../../../app/shared/interfaces'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
 import { ChangeDirectoryDialogComponent } from '../components/dialogs/change-directory-dialog/change-directory-dialog.component'
 import { DeleteFilesDialogComponent } from '../components/dialogs/delete-files-dialog/delete-files-dialog.component'
@@ -12,8 +13,6 @@ import { FolderCreationDialogComponent } from '../components/dialogs/folder-crea
 import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialog/move-files-dialog.component'
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
 import { SearchBuilderDialogComponent } from '../components/dialogs/search-builder-dialog/search-builder-dialog.component'
-import { FilePathContainer } from '../interfaces/File'
-import { TreeElement } from '../interfaces/Menu'
 
 @Injectable({
   providedIn: 'root',

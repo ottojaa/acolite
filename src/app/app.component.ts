@@ -4,14 +4,14 @@ import { TranslateService } from '@ngx-translate/core'
 import { APP_CONFIG } from '../environments/environment'
 import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
-import { State, StateService, StateUpdate } from './services/state.service'
-import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/actions'
+import { StateService, StateUpdate } from './services/state.service'
 import { Router } from '@angular/router'
 import { TabService } from './services/tab.service'
+import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/shared/actions'
+import { State } from '../../app/shared/interfaces'
 
 type IPCEvent = Electron.IpcMessageEvent
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -47,9 +47,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.themeService.setTheme('Dark blue green')
-    /*   if (this.state.getStatePartValue('baseDir')) {
-      this.readDir()
-    } */
   }
 
   initIPCMainListeners(): void {
@@ -80,6 +77,7 @@ export class AppComponent implements OnInit {
       StoreResponses.InitAppSuccess,
       StoreResponses.InitAppFailure,
       StoreResponses.UpdateStoreFailure,
+      StoreResponses.UpdateBookmarkedFilesSuccess,
       SearchResponses.QuerySuccess,
     ]
 
@@ -107,12 +105,10 @@ export class AppComponent implements OnInit {
         }
         // Folder actions
 
+        case FileActionResponses.CreateSuccess:
+        case FolderActionResponses.MakeDirectorySuccess:
         case FolderActionResponses.ReadDirectorySuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
-          break
-        }
-        case FolderActionResponses.MakeDirectorySuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          this.state.updateState$.next([{ key: 'rootDirectory', payload: response.rootDirectory }])
           break
         }
         case FolderActionResponses.ChooseDirectorySuccess: {
@@ -122,24 +118,24 @@ export class AppComponent implements OnInit {
           break
         }
         case FolderActionResponses.SetDefaultDirSuccess: {
-          this.state.updateState$.next({ key: 'baseDir', payload: response })
+          this.state.updateState$.next([{ key: 'baseDir', payload: response.baseDir }])
           this.readDir()
           break
         }
 
         // File actions
 
-        case FileActionResponses.CreateFailure: {
-          this.dialogService.openToast('File creation failed', 'failure')
-          break
-        }
         case FileActionResponses.MoveSuccess: {
           const { rootDirectory, tabs } = response
           const payload: StateUpdate<State>[] = [
             { key: 'rootDirectory', payload: rootDirectory },
             { key: 'tabs', payload: tabs },
           ]
-          this.state.updateMulti$.next(payload)
+          this.state.updateState$.next(payload)
+          break
+        }
+        case FileActionResponses.CreateFailure: {
+          this.dialogService.openToast('File creation failed', 'failure')
           break
         }
         case FileActionResponses.MoveFailure: {
@@ -151,16 +147,12 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.RenameSuccess: {
-          const { rootDir, tabs } = response
+          const { rootDirectory, tabs } = response
           const payload: StateUpdate<State>[] = [
-            { key: 'rootDirectory', payload: rootDir },
+            { key: 'rootDirectory', payload: rootDirectory },
             { key: 'tabs', payload: tabs },
           ]
-          this.state.updateMulti$.next(payload)
-          break
-        }
-        case FileActionResponses.CreateSuccess: {
-          this.state.updateState$.next({ key: 'rootDirectory', payload: response })
+          this.state.updateState$.next(payload)
           break
         }
         case FileActionResponses.DeleteFailure: {
@@ -168,12 +160,12 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.DeleteSuccess: {
-          const { rootDir, tabs } = response
+          const { rootDirectory, tabs } = response
           const payload: StateUpdate<State>[] = [
-            { key: 'rootDirectory', payload: rootDir },
+            { key: 'rootDirectory', payload: rootDirectory },
             { key: 'tabs', payload: tabs },
           ]
-          this.state.updateMulti$.next(payload)
+          this.state.updateState$.next(payload)
           this.dialogService.openToast('Delete success', 'success')
           break
         }
@@ -182,28 +174,19 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.UpdateSuccess: {
-          const bookmarks = this.state.getStatePartValue('bookmarks')
-          this.state.updateState$.next({ key: 'tabs', payload: response })
+          this.state.updateState$.next([{ key: 'tabs', payload: response.tabs }])
           this.electronService.getRecentlyModified()
-          this.electronService.getBookmarked({ bookmarks })
-
           break
         }
-        case FileActionResponses.ReadSuccess: {
-          const tabs = this.state.getStatePartValue('tabs')
-          const tabIdx = tabs.findIndex((tab) => tab.path === response.path)
-          if (tabIdx === -1) {
-            tabs.push(response)
-          }
 
-          const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
-          const selectedTab = this.tabService.getSelectedTabEntityFromIndex(selectedTabIndex)
+        case FileActionResponses.ReadSuccess: {
+          const { tabs, selectedTab } = response
           const payload: StateUpdate<State>[] = [
             { key: 'tabs', payload: tabs },
             { key: 'selectedTab', payload: selectedTab },
           ]
 
-          this.state.updateMulti$.next(payload)
+          this.state.updateState$.next(payload)
           break
         }
         case StoreResponses.UpdateStoreFailure: {
@@ -211,7 +194,12 @@ export class AppComponent implements OnInit {
           break
         }
         case SearchResponses.QuerySuccess: {
-          this.state.updateState$.next({ key: 'searchResults', payload: response })
+          this.state.updateState$.next([{ key: 'searchResults', payload: response.searchResults }])
+          break
+        }
+        case StoreResponses.UpdateBookmarkedFilesSuccess: {
+          this.state.updateState$.next([{ key: 'bookmarkedFiles', payload: response.bookmarkedFiles }])
+          console.log('suces')
           break
         }
         default: {
@@ -263,7 +251,7 @@ export class AppComponent implements OnInit {
   readDir(): void {
     const baseDir = this.state.getStatePartValue('baseDir')
     if (baseDir) {
-      this.electronService.readDirectoryRequest({ baseDir })
+      this.electronService.readDirectoryRequest({ state: this.state.value })
     }
   }
 }

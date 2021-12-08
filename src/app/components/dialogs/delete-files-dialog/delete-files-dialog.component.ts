@@ -1,10 +1,10 @@
 import { Component, Inject, NgZone } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { FilePathContainer } from '../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../core/services'
-import { FilePathContainer } from '../../../interfaces/File'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
-import { getBaseName } from '../../../utils/file-utils'
 import { RenameFileDialogComponent } from '../rename-file-dialog/rename-file-dialog.component'
 
 @Component({
@@ -58,14 +58,10 @@ export class DeleteFilesDialogComponent {
   }
 
   onDeleteClick(): void {
-    const { baseDir, rootDirectory, tabs } = this.state.getStateParts(['baseDir', 'rootDirectory', 'tabs'])
-
     this.electronService.deleteFilesRequest({
-      baseDir,
-      rootDirectory,
       directoryPaths: this.data.folders,
       filePaths: this.data.files,
-      tabs,
+      state: this.state.value,
     })
     this.dialogRef.close()
   }

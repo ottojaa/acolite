@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core'
+import { Component, Input, OnInit, ViewChild } from '@angular/core'
 import { MarkdownEditorComponent, Options } from '@mdefy/ngx-markdown-editor'
 import { MarkdownService } from 'ngx-markdown'
-import { interval, Subject, timer } from 'rxjs'
-import { debounceTime, skip, startWith, switchMap, take, takeUntil } from 'rxjs/operators'
+import { Subject } from 'rxjs'
+import { debounceTime, skip, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
-import { Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
 import hljs from 'highlight.js/lib/common'
-import { getDistance } from '../../../../../../app/date-and-time-helpers'
+import { Tab } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-markdown-editor',
@@ -88,11 +87,10 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       .pipe(
         takeUntil(this.destroy$),
         skip(1), // Skip the initial update caused by the initialization of the editor
-        debounceTime(1000),
-        switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
+        debounceTime(1000)
       )
-      .subscribe((tabs) => {
-        this.updateContent(tabs, this.tab.path, this.textContent)
+      .subscribe(() => {
+        this.updateContent(this.tab.path, this.textContent)
       })
   }
 
@@ -113,8 +111,8 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     }
   }
 
-  updateContent(tabs: Tab[], path: string, content: string): void {
-    const payload = { tabs, path, content }
+  updateContent(path: string, content: string): void {
+    const payload = { path, content, state: this.state.value }
     this.electronService.updateFileContent(payload)
   }
 

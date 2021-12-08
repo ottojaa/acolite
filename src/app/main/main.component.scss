@@ -30,7 +30,6 @@ $editor-view-width: calc(100% - 4.2rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--backgroundPrimary) !important;
 }
 
 .top-container {
@@ -43,14 +42,14 @@ $editor-view-width: calc(100% - 4.2rem);
     height: 100%;
   }
   .topbar {
-    width: $actions-menu-width;
+    width: 100%;
     height: 7%;
   }
   .editor-view {
     width: $editor-view-width;
   }
   .as-horizontal {
-    height: 92%;
+    height: 93%;
   }
   .editor-split {
     background: var(--backgroundSecondary);

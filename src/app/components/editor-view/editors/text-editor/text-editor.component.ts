@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { MenuItem } from 'primeng/api'
-import { interval, Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, startWith, switchMap, take, takeUntil } from 'rxjs/operators'
-import { getDistance } from '../../../../../../app/date-and-time-helpers'
+import { Subject } from 'rxjs'
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
+import { Tab } from '../../../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
-import { Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
 
 @Component({
@@ -35,16 +34,9 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
   }
 
   initAutoSave(): void {
-    this.autoSave$
-      .pipe(
-        takeUntil(this.destroy$),
-        debounceTime(1000),
-        distinctUntilChanged(),
-        switchMap(() => this.state.getStatePart('tabs').pipe(take(1)))
-      )
-      .subscribe((tabs) => {
-        this.updateContent(tabs, this.tab.path, this.textContent)
-      })
+    this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(1000), distinctUntilChanged()).subscribe(() => {
+      this.updateContent(this.tab.path, this.textContent)
+    })
   }
 
   initThemeListener(): void {
@@ -54,8 +46,8 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
       .subscribe((data) => (this.isChecked = data === 'light'))
   }
 
-  updateContent(tabs: Tab[], path: string, content: string): void {
-    const payload = { tabs, path, content }
+  updateContent(path: string, content: string): void {
+    const payload = { path, content, state: this.state.value }
     this.electronService.updateFileContent(payload)
   }
 

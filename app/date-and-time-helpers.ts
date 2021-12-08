@@ -1,6 +1,9 @@
-import { format, formatDistance } from 'date-fns'
+import { format, formatDistance, parseISO } from 'date-fns'
 
-export const formatDate = (date: Date) => {
+export const formatDate = (date: Date | string) => {
+  if (typeof date === 'string') {
+    return format(parseISO(date), 'yyyy-MM-dd')
+  }
   return format(date, 'yyyy-MM-dd')
 }
 

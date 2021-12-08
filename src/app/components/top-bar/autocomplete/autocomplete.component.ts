@@ -1,15 +1,12 @@
-import { ChangeDetectionStrategy, Component, ElementRef, NgZone, ViewChild } from '@angular/core'
-import { MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { Component, ElementRef, ViewChild } from '@angular/core'
 import { MatMenu } from '@angular/material/menu'
 import { Observable, Subject } from 'rxjs'
 import { debounceTime, take, takeUntil } from 'rxjs/operators'
+import { SearchResult } from '../../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../../abstract/abstract-component'
 import { ElectronService } from '../../../core/services'
-import { SearchResult } from '../../../interfaces/Menu'
-import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { TabService } from '../../../services/tab.service'
-import { SearchBuilderDialogComponent } from '../../dialogs/search-builder-dialog/search-builder-dialog.component'
 
 @Component({
   selector: 'app-autocomplete',
@@ -61,7 +58,7 @@ export class AutocompleteComponent extends AbstractComponent {
     const searchResults = this.state.getStatePartValue('searchResults')
     if (!value || value.length < 3) {
       if (searchResults.length) {
-        this.state.updateState$.next({ key: 'searchResults', payload: [] })
+        this.state.updateState$.next([{ key: 'searchResults', payload: [] }])
       }
       return
     }

@@ -2,11 +2,11 @@ import { Component, HostListener, Inject, NgZone, ViewChild } from '@angular/cor
 import { FormBuilder, FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { ElectronService } from '../../../core/services'
-import { nameValidationPattern } from '../../../entities/file/constants'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
-import { getBaseName, getJoinedPath } from '../../../utils/file-utils'
 import { MatSelect } from '@angular/material/select'
+import { nameValidationPattern } from '../../../../../app/shared/constants'
+import { getBaseName, getJoinedPath } from '../../../../../app/electron-utils/file-utils'
 
 @Component({
   selector: 'app-file-creation',
@@ -85,12 +85,11 @@ export class FileCreationComponent {
 
   onCreateClick(): void {
     const path = getJoinedPath([this.data, this.result])
-    const { rootDirectory } = this.state.state$.value
 
     this.electronService.createNewFileRequest({
       path,
-      rootDirectory,
       openFileAfterCreation: this.openFileAfterCreation,
+      state: this.state.value,
     })
     this.dialogRef.close()
   }

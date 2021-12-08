@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { ThemeOption } from '../../../interfaces/Theme'
+import { ThemeOption } from '../../../../../app/shared/interfaces'
 import { ThemeService } from '../../../services/theme.service'
 
 @Component({

@@ -29,14 +29,15 @@ app-main {
 }
 
 body ::-webkit-scrollbar {
-  width: 5px;
-  height: 3px;
+  width: 6px;
+  height: 6px;
   border-radius: 5px;
   scrollbar-width: 5px;
 }
 
 body ::-webkit-scrollbar-thumb {
-  background: #dcdadad6;
+  background: #a7a6a6a8;
+  border-radius: 5px;
   visibility: hidden;
 }
 body ::-webkit-scrollbar-track {

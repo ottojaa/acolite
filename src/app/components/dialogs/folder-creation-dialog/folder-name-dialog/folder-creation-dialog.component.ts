@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { nameValidationPattern } from '../../../../entities/file/constants'
+import { nameValidationPattern } from '../../../../../../app/shared/constants'
 
 @Component({
   selector: 'app-folder-creation-dialog',

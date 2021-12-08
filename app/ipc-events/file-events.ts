@@ -2,26 +2,27 @@ import * as fs from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
+import { Document } from 'flexsearch'
+import { addToIndex, removeIndexes, updateIndex, updateIndexesRecursive } from './store-events'
+import { getBaseName, getDirName, getExtension, getExtensionSplit, getJoinedPath } from '../electron-utils/file-utils'
+import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
+import { getDeletedFileEntityMock, getFileEntityFromPath, getSelectedTabEntityFromIndex } from '../electron-utils/utils'
 import {
   ReadFile,
-  FileActionResponses,
   UpdateFileContent,
   CreateFile,
   RenameFile,
   MoveFiles,
   DeleteFiles,
-  FileActions,
   OpenFileLocation,
-} from '../electron-interfaces'
-import { Document } from 'flexsearch'
-import { addToIndex, removeIndexes, updateIndex, updateIndexesRecursive } from './store-events'
-import { getBaseName, getDirName, getExtension, getExtensionSplit, getJoinedPath } from '../electron-utils/file-utils'
-import { Doc, Tab, TreeElement } from '../electron-interfaces'
-import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
-import { getDeletedFileEntityMock, getFileEntityFromPath } from '../electron-utils/utils'
+  FileActionResponses,
+  FileActions,
+} from '../shared/actions'
+import { Doc, Tab, TreeElement } from '../shared/interfaces'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
-  const { filePath } = action
+  const { filePath, state } = action
+  const { tabs } = state
   fs.readFile(filePath, 'utf-8', (err, content) => {
     if (err) {
       event.sender.send(FileActionResponses.ReadFailure)
@@ -36,12 +37,22 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
       modifiedAt: fileStats.mtime,
       createdAt: fileStats.birthtime,
     }
-    event.sender.send(FileActionResponses.ReadSuccess, tabData)
+
+    const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
+    if (tabIdx === -1) {
+      tabs.push(tabData)
+    }
+
+    const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
+    const selectedTab = getSelectedTabEntityFromIndex(state, selectedTabIndex)
+
+    event.sender.send(FileActionResponses.ReadSuccess, { tabs, selectedTab })
   })
 }
 
 export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
-  const { path, content } = action
+  const { path, content, state } = action
+  const { tabs } = state
 
   fs.writeFile(path, content, (err) => {
     if (err) {
@@ -49,12 +60,10 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
       return
     }
 
-    const tabs = action.tabs
-
     updateTabData(tabs, path, content)
     updateIndex(path, index)
 
-    event.sender.send(FileActionResponses.UpdateSuccess, tabs)
+    event.sender.send(FileActionResponses.UpdateSuccess, { tabs })
   })
 }
 
@@ -81,7 +90,8 @@ const updateTabData = (tabs: Tab[], oldTabPath: string, newContent?: string, new
 }
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
-  const { path, rootDirectory, openFileAfterCreation, content } = action
+  const { path, openFileAfterCreation, content, state } = action
+  const { rootDirectory } = state
   const textContent = content || ''
 
   fs.writeFile(path, textContent, (err) => {
@@ -97,16 +107,17 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
     const rootDir = first(updatedRootDirectory)
     addToIndex(path, index)
 
-    event.sender.send(FileActionResponses.CreateSuccess, rootDir)
+    event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
 
     if (openFileAfterCreation) {
-      readAndSendTabData(event, { filePath: path, type: FileActions.ReadFile })
+      readAndSendTabData(event, { state, filePath: path, type: FileActions.ReadFile })
     }
   })
 }
 
 export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Document<Doc, true>) => {
-  const { path, newName, rootDirectory, tabs } = action
+  const { path, newName, state } = action
+  const { rootDirectory, tabs } = state
   const parentDirectory = getDirName(path)
   const extension = getExtension(path)
   const newPath = getJoinedPath([parentDirectory, newName]) + extension
@@ -132,12 +143,13 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
     updateTabData(tabs, path, null, newPath)
     updateIndexesRecursive([newPath], index)
 
-    event.sender.send(FileActionResponses.RenameSuccess, { rootDir, tabs })
+    event.sender.send(FileActionResponses.RenameSuccess, { rootDirectory })
   })
 }
 
 export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Document<Doc, true>) => {
-  const { target, elementsToMove, rootDirectory, tabs } = action
+  const { target, elementsToMove, state } = action
+  const { rootDirectory, tabs } = state
   const newParentPath = target.data.filePath
   const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'file' ? 1 : -1))
   const failedToMove = []
@@ -193,7 +205,8 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
 }
 
 export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Document<Doc, true>) => {
-  const { directoryPaths, filePaths, baseDir, rootDirectory, tabs } = action
+  const { directoryPaths, filePaths, state } = action
+  const { baseDir, rootDirectory, tabs } = state
   const paths = [...directoryPaths, ...filePaths]
 
   // Gather all inode-values prior to deleting, so we can remove the files' indexes if the deletions were succesfull
@@ -244,7 +257,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
 
       const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
       const rootDir = first(updatedRootDirectory)
-      event.sender.send(FileActionResponses.DeleteSuccess, { rootDir, tabs })
+      event.sender.send(FileActionResponses.DeleteSuccess, { rootDirectory: rootDir, tabs })
     },
     (err) => {
       console.error(err)

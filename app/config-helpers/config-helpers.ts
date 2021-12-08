@@ -1,7 +1,8 @@
 import * as fs from 'fs'
-import { first } from 'lodash'
-import { WorkspaceConfig, AppConfig, Tab, allowedConfigKeys } from '../electron-interfaces'
+import { first, uniq } from 'lodash'
 import { getBaseName, getExtensionSplit } from '../electron-utils/file-utils'
+import { allowedConfigKeys } from '../shared/constants'
+import { WorkspaceConfig, AppConfig, Tab } from '../shared/interfaces'
 
 export const getDefaultConfigJSON = (workspacePath?: string): string => {
   if (!workspacePath) {
@@ -215,5 +216,6 @@ const validateSearchPreferences = (config: WorkspaceConfig) => {
 }
 
 const validateBookmarks = (config: WorkspaceConfig) => {
-  return config.bookmarks?.filter((bookmark) => fs.existsSync(bookmark))
+  const existing = config.bookmarks?.filter((bookmark) => fs.existsSync(bookmark))
+  return uniq(existing)
 }

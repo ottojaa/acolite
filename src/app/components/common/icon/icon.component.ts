@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { fileExtensionIcons } from 'app/entities/file/constants'
+import { fileExtensionIcons } from '../../../../../app/shared/constants'
 
 @Component({
   selector: 'app-icon',

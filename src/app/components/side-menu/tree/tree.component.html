@@ -68,6 +68,7 @@
     [ngClass]="{ dragging: isHovering }"
     (dragenter)="onDragEnter($event)"
     (dragleave)="onDragLeave($event)"
+    (contextmenu)="onRightClickDropZone($event)"
     pDroppable="droppable"
     (drop)="dropOutside($event)"
   >
@@ -80,3 +81,5 @@
   [triggerEvent]="'none'"
   (unselectFile)="onUnselectFile()"
 ></p-contextMenu>
+
+<p-contextMenu #contextMenuDropZone appendTo="body" [model]="dropZoneContextMenuItems"></p-contextMenu>

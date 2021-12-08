@@ -4,10 +4,11 @@ import { ContextMenu } from 'primeng/contextmenu'
 import { Observable } from 'rxjs'
 import { map, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
-import { SelectedTab, Tab } from '../../../../interfaces/Menu'
 import { StateService } from '../../../../services/state.service'
 import { TabService } from '../../../../services/tab.service'
 import { MatTabChangeEvent } from '@angular/material/tabs'
+import { Tab, SelectedTab } from '../../../../../../app/shared/interfaces'
+import { getSelectedTabEntityFromIndex } from '../../../../../../app/electron-utils/utils'
 
 @Component({
   selector: 'app-file-tabs',
@@ -49,10 +50,10 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
   }
 
   onSelectTab(event: MatTabChangeEvent): void {
-    const selectedTab = this.state.getStatePartValue('selectedTab')
-    const newSelectedTab = this.tabService.getSelectedTabEntityFromIndex(event.index)
+    const { selectedTab } = this.state.value
+    const newSelectedTab = getSelectedTabEntityFromIndex(this.state.value, event.index)
     if (newSelectedTab.path !== selectedTab.path) {
-      this.state.updateState$.next({ key: 'selectedTab', payload: newSelectedTab })
+      this.state.updateState$.next([{ key: 'selectedTab', payload: newSelectedTab }])
     }
   }
 

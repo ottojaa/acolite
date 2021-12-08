@@ -1,9 +1,7 @@
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
 import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
-import { StoreResponses, SearchQuery, SearchResponses, UpdateStore, GetBookmarkedFiles } from '../actions'
 import { Document } from 'flexsearch'
-import { AppConfig, Doc, FileEntity, SearchPreference, SearchResult, TreeElement } from '../electron-interfaces'
 import {
   getDefaultConfigJSON,
   validateAppConfig,
@@ -12,18 +10,22 @@ import {
 import { formatDate } from '../date-and-time-helpers'
 import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
+import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
+import { SearchQuery, UpdateBookmarkedFiles, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
 
-export const initAppState = (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
+export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
     const configExists = fs.existsSync(configPath)
 
+    // No config file, proceed to initial setup
     if (!configExists) {
       fs.writeFileSync(configPath, getDefaultConfigJSON())
-      event.sender.send(StoreResponses.InitAppSuccess)
+      event.sender.send(StoreResponses.InitAppSuccess, {})
     } else {
       const configBuffer = fs.readFileSync(configPath)
       const config: AppConfig = JSON.parse(configBuffer.toString())
 
+      // Invalid JSON, overwrite. nnecessary because JSON.parse would fail -> move the validity check to a separate validation func
       if (!isPlainObject(config)) {
         fs.writeFileSync(configPath, getDefaultConfigJSON())
       }
@@ -31,23 +33,28 @@ export const initAppState = (event: IpcMainEvent, configPath: string, index: Doc
       const configCopy = cloneDeep(config)
       const validatedConfig = validateAppConfig(config)
 
+      // If validated config is different from the current one, there was something wrong in it and we should overwrite with the validated one
       if (!isEqual(configCopy, validatedConfig)) {
         const updatedConfigJSON = JSON.stringify(validatedConfig, null, 2)
         fs.writeFileSync(configPath, updatedConfigJSON)
       }
 
-      const getWorkspaceData = () => {
+      // Searches the config json for a selected workspace, then appends state data with the persistent data from the config
+      const getWorkspaceData = async () => {
         const baseDir = validatedConfig.selectedWorkspace
         if (!baseDir) {
           return {}
         }
         const selectedWorkspaceData = validatedConfig.workspaces.find((workspace) => workspace.baseDir === baseDir)
-        const state = { ...selectedWorkspaceData, rootDirectory: getRootDirectory(baseDir) }
-        addFilesToIndex(state.rootDirectory.children, index)
+        const rootDirectory = getRootDirectory(baseDir)
 
+        await addFilesToIndexSynchronous(rootDirectory.children, index)
+
+        const dashboardConfig = getDashboardConfig(index, selectedWorkspaceData.bookmarks)
+        const state = { ...selectedWorkspaceData, rootDirectory: getRootDirectory(baseDir), ...dashboardConfig }
         return state
       }
-      const workspaceData = getWorkspaceData()
+      const workspaceData = await getWorkspaceData()
       event.sender.send(StoreResponses.InitAppSuccess, workspaceData)
     }
   } catch (err) {
@@ -169,32 +176,54 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
     return file
   })
 
-  event.sender.send(SearchResponses.QuerySuccess, mappedResults)
+  event.sender.send(SearchResponses.QuerySuccess, { searchResults: mappedResults })
 }
 
-export const getRecentlyModified = (
-  event: IpcMainEvent,
-  index: Document<Doc, true> & { store?: Record<string, FileEntity> }
-) => {
+export const getDashboardConfig = (
+  index: Document<Doc, true> & { store?: Record<string, Doc> },
+  bookmarks: string[] | undefined
+): { bookmarkedFiles: Doc[]; recentlyModified: Doc[] } => {
   const storeItems = Object.values(index.store)
-  const itemSubset = storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, 10)
+  const getBookmarks = () => {
+    return storeItems
+      .filter((item) => bookmarks?.includes(item.filePath))
+      .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
+      .slice(0, 10)
+  }
 
-  event.sender.send(StoreResponses.GetRecentlyModifiedSuccess, itemSubset)
+  const getRecentlyModified = () => {
+    return storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, 10)
+  }
+
+  return {
+    bookmarkedFiles: getBookmarks(),
+    recentlyModified: getRecentlyModified(),
+  }
 }
 
-export const getBookmarkedFiles = (
-  event: IpcMainEvent,
-  index: Document<Doc, true> & { store?: Record<string, FileEntity> },
-  payload: GetBookmarkedFiles
-) => {
-  const { bookmarks } = payload
-  const storeItems = Object.values(index.store)
-  const itemSubset = storeItems
-    .filter((item) => bookmarks.includes(item.filePath))
-    .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
-    .slice(0, 10)
+export const updateBookmarkedFiles = (event: IpcMainEvent, payload: UpdateBookmarkedFiles): void => {
+  const { bookmarkPath, bookmarkedFiles } = payload
+  const shouldFilter = bookmarkedFiles?.some((file) => file.filePath === bookmarkPath)
 
-  event.sender.send(StoreResponses.GetBookmarkedFilesSuccess, itemSubset)
+  const getBookmarkData = (): Doc => {
+    const content = fs.readFileSync(bookmarkPath, 'utf-8')
+    const fileStats = fs.statSync(bookmarkPath)
+
+    return {
+      ino: fileStats.ino,
+      fileName: getBaseName(bookmarkPath),
+      extension: getExtensionSplit(bookmarkPath),
+      filePath: bookmarkPath,
+      content: content,
+      createdAt: fileStats.birthtime,
+      modifiedAt: fileStats.mtime,
+    }
+  }
+  const updatedBookmarks: Doc[] = shouldFilter
+    ? bookmarkedFiles.filter((file) => file.filePath !== bookmarkPath)
+    : [...bookmarkedFiles, getBookmarkData()]
+
+  event.sender.send(StoreResponses.UpdateBookmarkedFilesSuccess, { bookmarkedFiles: updatedBookmarks })
 }
 
 export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, true>) => {
@@ -206,29 +235,36 @@ export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, 
   })
 }
 
+export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Document<Doc, true>): Promise<string> => {
+  return new Promise(async (resolve, _reject) => {
+    const files = flattenTreeStructure(treeStruct)
+    for (const file of files) {
+      if (file.data.type === 'file') {
+        await addToIndex(file.data.filePath, index)
+      }
+    }
+    resolve('success')
+  })
+}
+
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
   const indexFile = await createIndexFileFromPath(newPath)
-  if (indexFile.isFolder) {
-    return
-  }
-
   const { ino } = indexFile
+
   await index.updateAsync(ino, indexFile)
 }
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
   const indexFile = await createIndexFileFromPath(filePath)
-  if (indexFile.isFolder) {
-    return
-  }
-
   const { ino } = indexFile
+
   await index.addAsync(ino, indexFile)
 }
 
 export const updateIndexesRecursive = (filePaths: string[], index: Document<Doc, true>) => {
   const updateIndexes = (path: string) => {
     if (!fs.lstatSync(path).isDirectory()) {
+      updateIndex(path, index)
       return
     }
 
@@ -267,25 +303,25 @@ export const getEmptyIndex = (): Document<Doc, true> => {
 
 const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (_err, data) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) reject(err)
+
       fs.stat(filePath, (err, stats) => {
-        if (err) {
-          reject()
-        }
+        if (err) reject()
+
         const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
         const extension = getExtensionSplit(filePath)
         const fileName = getBaseName(filePath)
-        const isFolder = stats.isDirectory()
         const doc: Doc = {
           ino,
           filePath,
-          isFolder,
           fileName,
           extension,
           content: data,
           modifiedAt: mtime,
           createdAt: birthtime,
         }
+
         resolve(doc)
       })
     })
@@ -305,7 +341,8 @@ export const flattenTreeStructure = (treeElement: TreeElement[], arr: TreeElemen
 }
 
 export const updateStore = (event: IpcMainEvent, updateData: UpdateStore, configPath: string) => {
-  updateSelectedWorkspaceConfig(updateData, configPath).then(
+  const { state } = updateData
+  updateSelectedWorkspaceConfig(state, configPath).then(
     () => {
       event.sender.send(StoreResponses.UpdateStoreSuccess)
     },

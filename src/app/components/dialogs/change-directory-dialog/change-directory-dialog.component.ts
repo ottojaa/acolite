@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef } from '@angular/material/dialog'
-import { FolderActionResponses } from '../../../../../app/actions'
+import { FolderActionResponses } from '../../../../../app/shared/actions'
 import { ElectronService } from '../../../core/services'
 import { StateService } from '../../../services/state.service'
 

@@ -33,8 +33,7 @@ export class ActionsMenuComponent implements OnInit {
         .pipe(take(1))
         .subscribe((name: string) => {
           if (name && baseDir) {
-            const rootDirectory = this.state.getStatePartValue('rootDirectory')
-            this.electronService.createNewFolderRequest({ directoryName: name, baseDir, rootDirectory })
+            this.electronService.createNewFolderRequest({ directoryName: name, state: this.state.value })
           }
         })
     })

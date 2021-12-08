@@ -7,11 +7,14 @@ import { Document } from 'flexsearch'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
 import { getFileEntityFromPath, getRootDirectory } from '../electron-utils/utils'
 import { getUpdatedMenuItemsRecursive } from '../electron-utils/menu-utils'
-import { CreateNewDirectory, Doc, FolderActionResponses, ReadDirectory } from '../electron-interfaces'
+import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../shared/actions'
+import { Doc } from '../shared/interfaces'
 
 export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
-  const { directoryName, baseDir, rootDirectory, parentPath } = payload
+  const { directoryName, parentPath, state } = payload
+  const { rootDirectory, baseDir } = state
   const directoryPath = path.join(parentPath ? parentPath : baseDir, directoryName)
+
   fs.promises
     .mkdir(directoryPath, { recursive: true })
     .then(() => {
@@ -74,7 +77,8 @@ export const readAndSendMenuItemsFromBaseDirectory = (
   index: Document<Doc, true>
 ) => {
   try {
-    const rootDirectory = getRootDirectory(action.baseDir)
+    const { baseDir } = action.state
+    const rootDirectory = getRootDirectory(baseDir)
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
     addFilesToIndex(rootDirectory?.children, index)
   } catch (err) {

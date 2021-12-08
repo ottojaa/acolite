@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { AbstractComponent } from 'app/abstract/abstract-component'
 import { ElectronService } from 'app/core/services'
-import { Tab } from 'app/interfaces/Menu'
 import { AppDialogService } from 'app/services/dialog.service'
 import { StateService } from 'app/services/state.service'
 import { takeUntil } from 'rxjs/operators'
+import { Tab } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-editor-top-bar',
@@ -44,22 +44,26 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
 
   onChangeTheme(): void {
     const theme = this.isChecked ? 'light' : 'dark'
-    this.state.updateState$.next({ key: 'editorTheme', payload: theme })
+    this.state.updateState$.next([{ key: 'editorTheme', payload: theme }])
   }
 
   toggleBookmark(tab: Tab): void {
     const { path, fileName } = tab
-    const bookmarks = this.state.getStatePartValue('bookmarks')
+    const { bookmarks, bookmarkedFiles } = this.state.getStateParts(['bookmarks', 'bookmarkedFiles'])
     const tabIdx = bookmarks.indexOf(path)
 
     const updateBookmarks = (updated: string[], showToast: boolean) => {
-      this.state.updateState$.next({ key: 'bookmarks', payload: updated })
-      this.electronService.getBookmarked({ bookmarks: updated })
+      this.state.updateState$.next([{ key: 'bookmarks', payload: updated }])
+      this.electronService.getBookmarked({
+        bookmarkPath: path,
+        bookmarkedFiles: bookmarkedFiles,
+      })
 
       if (showToast) {
         this.dialog.openToast(`Bookmarked ${fileName}`, 'success', 2000)
       }
     }
+
     if (tabIdx > -1) {
       const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== path)
       updateBookmarks(updatedBookmarks, false)

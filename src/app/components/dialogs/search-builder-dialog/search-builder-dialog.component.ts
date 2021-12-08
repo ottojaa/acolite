@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
 import { debounceTime, takeUntil, tap } from 'rxjs/operators'
+import { SearchPreference } from '../../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../../abstract/abstract-component'
-import { SearchPreference } from '../../../interfaces/Menu'
 import { StateService } from '../../../services/state.service'
 
 interface SeparatorItem {
@@ -88,7 +88,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
 
   onSave(): void {
     const preferences = this.getSearchPreferencesFromListItems()
-    this.state.updateState$.next({ key: 'searchPreferences', payload: preferences })
+    this.state.updateState$.next([{ key: 'searchPreferences', payload: preferences }])
   }
 
   getListItems(): ListItem[] {

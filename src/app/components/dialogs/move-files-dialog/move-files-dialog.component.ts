@@ -1,11 +1,10 @@
 import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { FilePathContainer, TreeElement } from '../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../core/services'
-import { FilePathContainer } from '../../../interfaces/File'
-import { TreeElement } from '../../../interfaces/Menu'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
-import { getBaseName } from '../../../utils/file-utils'
 import { RenameFileDialogComponent } from '../rename-file-dialog/rename-file-dialog.component'
 
 @Component({
@@ -68,16 +67,13 @@ export class MoveFilesDialogComponent implements OnInit {
 
   onMoveClick(): void {
     const { selectedFiles, target } = this.data
-    const { baseDir, rootDirectory, tabs } = this.state.getStateParts(['baseDir', 'rootDirectory', 'tabs'])
     const paths = Object.values(this.pathsToBeMoved).reduce((acc, curr) => acc.concat(curr), [])
     const filesToBeMoved = selectedFiles.filter((el) => paths.includes(el.data.filePath))
 
     this.electronService.moveFilesRequest({
       target,
-      rootDirectory,
-      baseDir,
       elementsToMove: filesToBeMoved,
-      tabs,
+      state: this.state.value,
     })
     this.dialogRef.close()
   }

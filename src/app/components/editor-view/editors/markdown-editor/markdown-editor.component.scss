@@ -145,7 +145,7 @@ ngx-markdown-editor {
   }
   .CodeMirror-scroll {
     color: $markdown-color-dark;
-    background: var(--background-markdown-bg-dark);
+    background: var(--backgroundTertiary);
   }
   .CodeMirror-cursor {
     border-left: 1px solid $markdown-color-dark;

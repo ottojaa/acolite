@@ -1,148 +1,4 @@
-import { TreeNode } from 'primeng/api'
-
-export interface FileEntity {
-  type: 'folder' | 'file'
-  icon?: string
-  indents?: number
-  ino: number
-  filePath: string
-  parentPath: string
-  size: number
-  createdAt: Date
-  modifiedAt: Date
-  fileExtension?: string
-}
-
-export interface WorkspaceConfig {
-  baseDir?: string
-  tabs?: Tab[]
-  sideMenuWidth?: number
-  selectedTab?: SelectedTab
-  editorTheme?: 'dark' | 'light'
-  searchPreferences?: SearchPreference[]
-  bookmarks?: string[]
-}
-
-export interface AppConfig {
-  selectedWorkspace?: string
-  workspaces: WorkspaceConfig[]
-}
-
-export type TreeElement = TreeNode<FileEntity>
-
-export interface State {
-  baseDir: string
-  initialized: boolean
-  selectedTab: SelectedTab
-  editorTheme: 'dark' | 'light'
-  sideMenuWidth: number
-  searchPreferences: SearchPreference[]
-  bookmarks: string[]
-  searchResults: SearchResult[]
-  tabs: Tab[]
-  rootDirectory: TreeElement
-}
-
-export interface SearchResult {
-  fileName: string
-  extension: string
-  content: string
-  filePath: string
-  iconName: string | undefined
-  createdDate: string
-  modifiedDate: string
-  highlightContentText?: string | undefined
-  highlightTitleText?: string | undefined
-  highlightPathText?: string | undefined
-}
-
-export interface Tab {
-  path: string
-  fileName: string
-  extension: string
-  textContent: string
-  deleted?: boolean
-  createdAt?: Date
-  modifiedAt?: Date
-}
-
-export enum MenuItemTypes {
-  File = 'file',
-  Folder = 'folder',
-}
-
-export interface ActiveIndent {
-  activeParent: string
-  activeNode: string
-  indent: number
-}
-
-export interface SelectedTab {
-  path: string
-  index: number
-  activeIndent?: ActiveIndent
-}
-
-export interface Tab {
-  path: string
-  fileName: string
-  extension: string
-  textContent: string
-  deleted?: boolean
-  modifiedAt?: Date
-  createdAt?: Date
-}
-
-export interface AppConfig {
-  baseDir?: string
-  tabs?: Tab[]
-  sideMenuWidth?: number
-  editorTheme?: 'dark' | 'light'
-}
-
-export interface SearchResult {
-  fileName: string
-  extension: string
-  content: string
-  filePath: string
-  iconName: string | undefined
-  createdAt: Date
-  modifiedAt: Date
-  highlightContentText?: string | undefined
-  highlightTitleText?: string | undefined
-  highlightPathText?: string | undefined
-}
-
-export interface SearchPreference {
-  value: string
-  selected: boolean
-  range?: {
-    start?: Date
-    end?: Date
-  }
-}
-
-export interface Tag {
-  name: string
-  bg: string
-  color: string
-}
-
-export interface FilePathContainer {
-  folders: string[]
-  files: string[]
-}
-
-export interface Doc {
-  ino: number
-  filePath: string
-  fileName: string
-  isFolder: boolean
-  extension: string
-  content: string
-  modifiedAt: Date
-  createdAt: Date
-}
+import { Doc, SearchPreference, SearchResult, State, TreeElement } from './interfaces'
 
 export type UpdateActionPayload =
   | ReadDirectory
@@ -161,7 +17,7 @@ export type UpdateActionPayload =
   | SearchQuery
   | OpenFileLocation
   | GetRecentlyModified
-  | GetBookmarkedFiles
+  | UpdateBookmarkedFiles
 
 export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
 
@@ -169,51 +25,46 @@ export interface CreateFile {
   type: FileActions.Create
   path: string
   openFileAfterCreation: boolean
-  rootDirectory: TreeElement
   content?: string
+  state: State
 }
 export interface ReadDirectory {
   type: FolderActions.ReadDir
-  baseDir: string
+  state: State
 }
 
 export interface CreateNewDirectory {
   type: FolderActions.MkDir
   directoryName: string
-  baseDir: string
-  rootDirectory: TreeElement
   parentPath?: string
+  state: State
 }
 
 export interface RenameFile {
   type: FileActions.Rename
   path: string
-  tabs: Tab[]
   newName: string
-  rootDirectory: TreeElement
+  state: State
 }
 
 export interface DeleteFiles {
   type: FileActions.DeleteFiles
-  baseDir: string
-  rootDirectory: TreeElement
-  tabs: Tab[]
   directoryPaths: string[]
   filePaths: string[]
+  state: State
 }
 
 export interface MoveFiles {
   type: FileActions.MoveFiles
   target: TreeElement
-  rootDirectory: TreeElement
   elementsToMove: TreeElement[]
-  tabs: Tab[]
-  baseDir: string
+  state: State
 }
 
 export interface ReadFile {
   type: FileActions.ReadFile
   filePath: string
+  state: State
 }
 
 export interface OpenFileLocation {
@@ -224,7 +75,7 @@ export interface UpdateFileContent {
   type: FileActions.Update
   content: string
   path: string
-  tabs: Tab[]
+  state: State
 }
 export interface SetDefaultDir {
   type: FolderActions.SetDefaultDir
@@ -234,9 +85,10 @@ export interface GetRecentlyModified {
   type: StoreActions.GetRecentlyModified
 }
 
-export interface GetBookmarkedFiles {
-  type: StoreActions.GetBookmarkedFiles
-  bookmarks: string[]
+export interface UpdateBookmarkedFiles {
+  type: StoreActions.UpdateBookmarkedFiles
+  bookmarkPath: string
+  bookmarkedFiles: Doc[]
 }
 export interface ChooseDir {
   type: FolderActions.ChooseDir
@@ -252,10 +104,7 @@ export interface InitApp {
 
 export interface UpdateStore {
   type: StoreActions.UpdateStore
-  baseDir?: string
-  tabs?: Tab[]
-  fontSize?: string
-  sideMenuWidth?: number
+  state: State
 }
 
 export interface SearchQuery {
@@ -303,7 +152,7 @@ export enum StoreActions {
   GetStore = 'read-store',
   UpdateStore = 'update-store',
   GetRecentlyModified = 'get-recently-modified',
-  GetBookmarkedFiles = 'get-bookmarked-files',
+  UpdateBookmarkedFiles = 'get-bookmarked-files',
 }
 
 export enum SearchActions {
@@ -335,23 +184,15 @@ export enum StoreResponses {
   UpdateStoreFailure = 'update-store-failure',
   InitAppSuccess = 'init-app-success',
   InitAppFailure = 'init-app-failure',
+  GetDashboardConfigSuccess = 'get-dashboard-config-success',
+  GetDashboardConfigFailure = 'get-dashboard-config-failure',
   GetRecentlyModifiedSuccess = 'get-recently-modified-success',
   GetRecentlyModifiedFailure = 'get-recently-modified-failure',
-  GetBookmarkedFilesSuccess = 'get-bookmarked-success',
-  GetBookmarkedFilesFailure = 'get-bookmarked-failure',
+  UpdateBookmarkedFilesSuccess = 'get-bookmarked-success',
+  UpdateBookmarkedFilesFailure = 'get-bookmarked-failure',
 }
 
 export enum SearchResponses {
   QuerySuccess = 'query-success',
   QueryFailure = 'query-failure',
 }
-
-export const allowedConfigKeys: (keyof State)[] = [
-  'baseDir',
-  'tabs',
-  'sideMenuWidth',
-  'editorTheme',
-  'selectedTab',
-  'searchPreferences',
-  'bookmarks',
-]

@@ -4,7 +4,9 @@
       <app-actions-menu class="actions-menu"></app-actions-menu>
 
       <div class="editor-view">
-        <app-top-bar class="topbar"></app-top-bar>
+        <div class="topbar">
+          <app-top-bar></app-top-bar>
+        </div>
         <as-split direction="horizontal" class="as-horizontal" [gutterSize]="1" (dragEnd)="onDragEnd($event)">
           <as-split-area class="side-menu-split" [size]="sideMenuWidth">
             <app-side-menu></app-side-menu>

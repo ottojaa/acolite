@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core'
-import { SearchResult } from 'app/interfaces/Menu'
+import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-file-cards',
@@ -8,7 +8,7 @@ import { SearchResult } from 'app/interfaces/Menu'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileCardsComponent {
-  @Input() files: SearchResult[]
+  @Input() files: Doc[]
   @Input() viewInit: boolean
   @Input() title: string
 }
