@@ -16,7 +16,7 @@
     "target": ["portable"]
   },
   "portable": {
-    "splashImage": "dist/assets/icons/acolite-splash.bmp"
+    "splashImage": "dist/assets/icons/acolite.bmp"
   },
   "mac": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
