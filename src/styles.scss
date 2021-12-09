@@ -130,30 +130,6 @@ body .mat-select-content {
   color: var(--contrast);
 }
 
-.snackbar-success {
-  background-color: #13b38d;
-  color: white;
-  .mat-button-wrapper {
-    color: white;
-  }
-}
-
-.snackbar-failure {
-  background-color: #c11933;
-  color: white;
-  .mat-button-wrapper {
-    color: white;
-  }
-}
-
-.snackbar-info {
-  background-color: #0c88c2;
-  color: white;
-  .mat-button-wrapper {
-    color: white;
-  }
-}
-
 body .topbar {
   background: var(--backgroundPrimary);
 }

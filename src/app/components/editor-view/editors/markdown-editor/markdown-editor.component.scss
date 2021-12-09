@@ -4,7 +4,7 @@ $markdown-bg-dark: #272a2d;
 $markdown-color-dark: white;
 $toolbar-bg-dark: #2e3236;
 
-$markdown-bg-light: white;
+$markdown-bg-light: #ffffffe0;
 $markdown-color-light: black;
 $toolbar-bg-light: white;
 
@@ -60,8 +60,8 @@ $toolbar-bg-light: white;
 }
 
 ngx-markdown-editor {
-  min-height: 80vh;
-  max-height: 80vh;
+  min-height: 84vh;
+  max-height: 84vh;
 }
 
 :host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
@@ -86,6 +86,9 @@ ngx-markdown-editor {
   border-bottom-left-radius: 10px !important;
   border-bottom-right-radius: 10px !important;
   background: var(--editorBg1);
+}
+:host ::ng-deep .CodeMirror-scroll {
+  padding-bottom: 0 !important;
 }
 
 :host ::ng-deep .ngx-markdown-editor-wrapper > :first-child {

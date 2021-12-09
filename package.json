@@ -31,6 +31,7 @@
     "electron:build": "npm run build:prod && electron-builder build --publish=never",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
+    "prepare": "npm run build",
     "e2e": "npm run build:prod && cross-env TS_NODE_PROJECT='e2e/tsconfig.e2e.json' mocha --timeout 300000 --require ts-node/register e2e/**/*.e2e.ts",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "lint": "ng lint"
@@ -57,6 +58,7 @@
     "canvas-txt": "3.0.0",
     "codemirror": "5.63.3",
     "codemirror-github-dark": "0.4.1",
+    "custom-electron-titlebar": "github:ottojaa/custom-electron-titlebar",
     "date-fns": "2.27.0",
     "faker": "5.5.3",
     "flatted": "3.2.2",

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
-import { map, takeUntil, tap } from 'rxjs/operators'
+import { filter, map, takeUntil, tap } from 'rxjs/operators'
 import { getBaseName } from '../../../../app/electron-utils/file-utils'
 import { removeExistingStyleClasses } from '../../../../app/electron-utils/menu-utils'
 import { TreeElement, ActiveIndent } from '../../../../app/shared/interfaces'
@@ -37,6 +37,7 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
     this.activeIndent$ = this.state.getStatePart('selectedTab').pipe(map((tab) => tab.activeIndent))
     this.files$ = this.state.getStatePart('rootDirectory').pipe(
       takeUntil(this.destroy$),
+      filter((dir) => !!dir),
       tap((rootDir) => {
         if (rootDir && rootDir.data) {
           this.workspaceName = getBaseName(rootDir.data.filePath)

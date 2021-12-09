@@ -46,6 +46,7 @@ function createWindow(): BrowserWindow {
     x: 0,
     y: 0,
     show: false,
+    titleBarStyle: 'hidden',
     icon: getJoinedPath([__dirname, 'acolite-logo-ellipse.png']),
     webPreferences: {
       nodeIntegration: true,

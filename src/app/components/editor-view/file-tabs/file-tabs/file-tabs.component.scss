@@ -1,7 +1,7 @@
 @import 'src/variables.scss';
 
 :host ::ng-deep .mat-tab-label {
-  opacity: 1;
+  opacity: 0.8;
   height: 3rem;
   font-size: 1rem;
   .icon {
@@ -48,11 +48,11 @@
 :host ::ng-deep .mat-tab-label {
   background-color: var(--tabBgPrimary);
   border-right: $app-border;
-  border-bottom: $app-border;
 
   &.mat-tab-label-active {
     background-color: var(--buttonColor);
     box-shadow: $box-shadow-elevation;
+    opacity: 1;
   }
 }
 
