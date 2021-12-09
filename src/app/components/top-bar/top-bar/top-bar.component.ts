@@ -21,6 +21,9 @@ export class TopBarComponent implements OnInit {
   }
 
   forceDashboard(): void {
-    this.state.updateState$.next([{ key: 'selectedTab', payload: { index: null, path: null } }])
+    const selectedTab = this.state.getStatePartValue('selectedTab')
+    this.state.updateState$.next([
+      { key: 'selectedTab', payload: { ...selectedTab, forceDashboard: !selectedTab.forceDashboard } },
+    ])
   }
 }

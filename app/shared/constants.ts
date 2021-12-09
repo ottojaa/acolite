@@ -26,6 +26,8 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
+export const defaultSpliceLength = 50
+
 export const allowedConfigKeys: string[] = [
   'baseDir',
   'tabs',

@@ -64,6 +64,7 @@
   </p-tree>
 
   <span
+    #dropzoneTarget
     class="dropzone"
     [ngClass]="{ dragging: isHovering }"
     (dragenter)="onDragEnter($event)"
@@ -82,4 +83,10 @@
   (unselectFile)="onUnselectFile()"
 ></p-contextMenu>
 
-<p-contextMenu #contextMenuDropZone appendTo="body" [model]="dropZoneContextMenuItems"></p-contextMenu>
+<p-contextMenu
+  [target]="dropzoneTarget"
+  #contextMenuDropZone
+  appendTo="body"
+  [model]="dropZoneContextMenuItems"
+  [triggerEvent]="'none'"
+></p-contextMenu>

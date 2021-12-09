@@ -39,6 +39,14 @@ export class ActionsMenuComponent implements OnInit {
     })
   }
 
+  createNewFile(): void {
+    const rootDir = this.state.state$.value.rootDirectory
+
+    this.zone.run(() => {
+      this.dialogService.openNewFileCreationDialog(rootDir).pipe(take(1))
+    })
+  }
+
   expandAll() {
     this.state.value.rootDirectory.children.forEach((node) => {
       this.expandRecursive(node, true)

@@ -30,8 +30,8 @@ export type FadeState = 'visible' | 'hidden'
           opacity: '0',
         })
       ),
-      transition('* => visible', [animate('200ms ease-out')]),
-      transition('visible => hidden', [animate('200ms ease-out')]),
+      transition('* => visible', [animate('500ms ease-out')]),
+      transition('visible => hidden', [animate('500ms ease-out')]),
     ]),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

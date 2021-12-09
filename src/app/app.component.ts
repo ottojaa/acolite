@@ -78,6 +78,7 @@ export class AppComponent implements OnInit {
       StoreResponses.InitAppFailure,
       StoreResponses.UpdateStoreFailure,
       StoreResponses.UpdateBookmarkedFilesSuccess,
+      StoreResponses.GetRecentlyModifiedSuccess,
       SearchResponses.QuerySuccess,
     ]
 
@@ -174,8 +175,12 @@ export class AppComponent implements OnInit {
           break
         }
         case FileActionResponses.UpdateSuccess: {
-          this.state.updateState$.next([{ key: 'tabs', payload: response.tabs }])
-          this.electronService.getRecentlyModified()
+          const { recentlyModified, tabs } = response
+          const payload: StateUpdate<State>[] = [
+            { key: 'recentlyModified', payload: recentlyModified },
+            { key: 'tabs', payload: tabs },
+          ]
+          this.state.updateState$.next(payload)
           break
         }
 
@@ -199,7 +204,6 @@ export class AppComponent implements OnInit {
         }
         case StoreResponses.UpdateBookmarkedFilesSuccess: {
           this.state.updateState$.next([{ key: 'bookmarkedFiles', payload: response.bookmarkedFiles }])
-          console.log('suces')
           break
         }
         default: {
@@ -242,6 +246,7 @@ export class AppComponent implements OnInit {
     mapIsoString()
 
     this.state.state$.next({ ...initialState, ...response, initialized: true })
+    console.log(this.state.state$.value)
 
     if (!this.state.getStatePartValue('baseDir')) {
       this.router.navigate(['base-dir'])

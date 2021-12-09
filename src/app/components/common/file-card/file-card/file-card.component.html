@@ -1,14 +1,18 @@
 <div class="card-header">
-  <h2 class="contrast-text">{{ file.fileName }}</h2>
+  <h3 class="contrast-text">{{ file.fileName }}</h3>
+
+  <ng-container *ngIf="showBookmark">
+    <mat-icon (click)="confirmRemoveBookmark(file.filePath)">bookmark</mat-icon>
+  </ng-container>
 </div>
 
-<p-card [style]="{ width: '300px', height: '175px' }" (click)="openInNewTab(file)">
-  <app-icon [extension]="file.extension" [scale]="4"></app-icon>
+<p-card (click)="openInNewTab(file)">
+  <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
 </p-card>
 
 <div class="chips-container padding">
   <mat-chip-list aria-label="File tags">
-    <!-- <div *ngFor="let tag of file.tags">
+    <!-- <div *ngFor="let tag of [{ bg: 'black', color: 'white', name: 'test' }]">
       <mat-chip [style.background-color]="tag.bg" [style.color]="tag.color">{{ tag.name }}</mat-chip>
     </div> -->
   </mat-chip-list>

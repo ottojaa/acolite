@@ -3,6 +3,7 @@ import { AbstractComponent } from 'app/abstract/abstract-component'
 import { ElectronService } from 'app/core/services'
 import { AppDialogService } from 'app/services/dialog.service'
 import { StateService } from 'app/services/state.service'
+import { TabService } from 'app/services/tab.service'
 import { takeUntil } from 'rxjs/operators'
 import { Tab } from '../../../../../../app/shared/interfaces'
 
@@ -17,7 +18,7 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
   isChecked: boolean
   isBookmarked: boolean
 
-  constructor(private state: StateService, private electronService: ElectronService, private dialog: AppDialogService) {
+  constructor(private state: StateService, private tabService: TabService) {
     super()
   }
 
@@ -48,28 +49,6 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
   }
 
   toggleBookmark(tab: Tab): void {
-    const { path, fileName } = tab
-    const { bookmarks, bookmarkedFiles } = this.state.getStateParts(['bookmarks', 'bookmarkedFiles'])
-    const tabIdx = bookmarks.indexOf(path)
-
-    const updateBookmarks = (updated: string[], showToast: boolean) => {
-      this.state.updateState$.next([{ key: 'bookmarks', payload: updated }])
-      this.electronService.getBookmarked({
-        bookmarkPath: path,
-        bookmarkedFiles: bookmarkedFiles,
-      })
-
-      if (showToast) {
-        this.dialog.openToast(`Bookmarked ${fileName}`, 'success', 2000)
-      }
-    }
-
-    if (tabIdx > -1) {
-      const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== path)
-      updateBookmarks(updatedBookmarks, false)
-    } else {
-      const updatedBookmarks = [...bookmarks, path]
-      updateBookmarks(updatedBookmarks, true)
-    }
+    this.tabService.toggleBookmark(tab)
   }
 }

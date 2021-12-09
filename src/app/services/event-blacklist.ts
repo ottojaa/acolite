@@ -1,6 +1,8 @@
 /// <reference types='zone.js/dist/zone.js' />
 
 /**
+ * Primeng Tree has terrible performance when dragging nodes over other nodes, as the dragover / dragenter events trigger angular digest cycle.
+ * -> run blacklisted events outside of angular zone to circumvent this.
  * Fix from https://stackoverflow.com/questions/43108155/angular-2-how-to-keep-event-from-triggering-digest-loop-detection-cycle
  */
 

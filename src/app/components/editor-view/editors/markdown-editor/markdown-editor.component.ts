@@ -109,6 +109,10 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       const highlighted = hljs.highlightAuto(code)
       return `<pre><code>${highlighted.value}</code></pre>`
     }
+    // webContents.setWindowOpenHandler will not catch the event unless "_blank" is specified
+    this.markdownService.renderer.link = (href: string, _title: string, text: string) => {
+      return `<a href="${href}" target="_blank">${text}</a>`
+    }
   }
 
   updateContent(path: string, content: string): void {

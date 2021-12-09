@@ -69,6 +69,7 @@ export interface ActiveIndent {
 export interface SelectedTab {
   path: string
   index: number
+  forceDashboard: boolean
   activeIndent?: ActiveIndent
 }
 

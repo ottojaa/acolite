@@ -4,6 +4,7 @@ import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-ut
 import { getDirName, getPathSeparator } from './file-utils'
 import { FileEntity, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
+import { ValidatorFn, AbstractControl } from '@angular/forms'
 
 export const getFileEntityFromPath = (filePath: string): FileEntity => {
   const fileInfo = fs.statSync(filePath)
@@ -41,9 +42,9 @@ export const getDeletedFileEntityMock = (filePath: string): FileEntity => {
   }
 }
 
-export const getMenuItemsFromBaseDirectory = (baseDir: string) => {
+export const getMenuItemsFromBaseDirectory = (baseDir: string, rootTreeNode: TreeElement) => {
   const treeStructure = getTreeStructureFromBaseDirectory(baseDir)
-  return folderStructureToMenuItems(baseDir, treeStructure)
+  return folderStructureToMenuItems(baseDir, treeStructure, rootTreeNode)
 }
 
 export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
@@ -99,10 +100,11 @@ export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: 
 }
 
 export const getRootDirectory = (baseDir: string): TreeElement => {
-  const menuItems = getMenuItemsFromBaseDirectory(baseDir)
   const rootEntity = getFileEntityFromPath(baseDir)
+  const rootTreeNode = getTreeNodeFromFileEntity(rootEntity)
+  const menuItems = getMenuItemsFromBaseDirectory(baseDir, rootTreeNode)
 
-  return { ...getTreeNodeFromFileEntity(rootEntity), children: menuItems }
+  return { ...rootTreeNode, children: menuItems }
 }
 
 export const getSelectedTabEntityFromIndex = (state: State, index: number) => {
@@ -150,4 +152,13 @@ export const getActiveIndent = (rootPath: string, path: string) => {
     return { activeParent: parentPath, activeNode: path, indent: pathDepth }
   }
   return null
+}
+
+export const isBannedValue = (bannedValues: string[]): ValidatorFn => {
+  return (c: AbstractControl): { [key: string]: boolean } | null => {
+    if (bannedValues.indexOf(c.value) !== -1) {
+      return { forbiddenValues: true }
+    }
+    return null
+  }
 }

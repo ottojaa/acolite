@@ -12,6 +12,7 @@ import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from 
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
 import { SearchQuery, UpdateBookmarkedFiles, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
+import { defaultSpliceLength } from '../shared/constants'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -25,7 +26,7 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
       const configBuffer = fs.readFileSync(configPath)
       const config: AppConfig = JSON.parse(configBuffer.toString())
 
-      // Invalid JSON, overwrite. nnecessary because JSON.parse would fail -> move the validity check to a separate validation func
+      // Invalid JSON, overwrite. unnecessary because JSON.parse would fail anyway -> move the validity check to a separate validation func?
       if (!isPlainObject(config)) {
         fs.writeFileSync(configPath, getDefaultConfigJSON())
       }
@@ -51,7 +52,7 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
         await addFilesToIndexSynchronous(rootDirectory.children, index)
 
         const dashboardConfig = getDashboardConfig(index, selectedWorkspaceData.bookmarks)
-        const state = { ...selectedWorkspaceData, rootDirectory: getRootDirectory(baseDir), ...dashboardConfig }
+        const state = { ...selectedWorkspaceData, rootDirectory, ...dashboardConfig }
         return state
       }
       const workspaceData = await getWorkspaceData()
@@ -188,17 +189,23 @@ export const getDashboardConfig = (
     return storeItems
       .filter((item) => bookmarks?.includes(item.filePath))
       .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
-      .slice(0, 10)
+      .slice(0, 50)
   }
 
   const getRecentlyModified = () => {
-    return storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, 10)
+    return storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, defaultSpliceLength)
   }
 
   return {
     bookmarkedFiles: getBookmarks(),
     recentlyModified: getRecentlyModified(),
   }
+}
+
+export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemPath: string) => {
+  const item = createIndexFileFromPathSync(updatedItemPath)
+  const filtered = recentlyModified.filter((el) => el.filePath !== updatedItemPath)
+  return [item, ...filtered]
 }
 
 export const updateBookmarkedFiles = (event: IpcMainEvent, payload: UpdateBookmarkedFiles): void => {
@@ -326,6 +333,24 @@ const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
       })
     })
   })
+}
+
+const createIndexFileFromPathSync = (filePath: string): Doc => {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const fileStats = fs.statSync(filePath)
+  const { ino, mtime, birthtime } = fileStats
+  const extension = getExtensionSplit(filePath)
+  const fileName = getBaseName(filePath)
+
+  return {
+    ino,
+    filePath,
+    fileName,
+    extension,
+    content: content,
+    modifiedAt: mtime,
+    createdAt: birthtime,
+  }
 }
 
 // ****************** END Document store index functionality *******************

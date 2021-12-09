@@ -12,8 +12,9 @@ export interface Config {
 
 export const folderStructureToMenuItems = (
   baseDir: string,
-  folderStruct: (TreeElement | FileEntity)[]
-): TreeNode<FileEntity>[] => folderStruct.map((descendant) => createMenuItemsRecursive(baseDir, descendant, null))
+  folderStruct: (TreeElement | FileEntity)[],
+  rootTreeNode: TreeElement
+): TreeNode<FileEntity>[] => folderStruct.map((child) => createMenuItemsRecursive(baseDir, child, rootTreeNode))
 
 const createMenuItemsRecursive = (
   baseDir: string,
@@ -76,6 +77,7 @@ const updateItemByStrategy = (
     case 'create': {
       const isFolder = updatedItem.type === 'folder'
       const treeNode = getTreeNodeFromFileEntity(updatedItem, 'new-file')
+      treeNode.parent = item
 
       // PrimeNG tree sorts folders to the top
       item.children = isFolder ? [treeNode, ...item.children] : [...item.children, treeNode]

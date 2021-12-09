@@ -124,6 +124,9 @@ ngx-markdown-editor {
   .cm-keyword {
     color: #b227c5;
   }
+  .cm-link {
+    color: #007fcc;
+  }
   .mat-button-base,
   .mat-form-field-label,
   .mat-select-arrow,
@@ -145,6 +148,8 @@ ngx-markdown-editor {
   }
   .CodeMirror-scroll {
     color: $markdown-color-dark;
+  }
+  .CodeMirror {
     background: var(--backgroundTertiary);
   }
   .CodeMirror-cursor {
@@ -184,6 +189,9 @@ ngx-markdown-editor {
   }
   .CodeMirror-scroll {
     color: $markdown-color-light;
+    background: $markdown-bg-light;
+  }
+  .Codemirror {
     background: $markdown-bg-light;
   }
   .CodeMirror-cursor {

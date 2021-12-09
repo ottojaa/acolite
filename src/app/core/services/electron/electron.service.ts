@@ -146,7 +146,7 @@ export class ElectronService {
     this.send(StoreActions.GetRecentlyModified, {})
   }
 
-  getBookmarked(payload: OmitActionType<UpdateBookmarkedFiles>): void {
+  updateBookmarkedFiles(payload: OmitActionType<UpdateBookmarkedFiles>): void {
     this.send(StoreActions.UpdateBookmarkedFiles, payload)
   }
 

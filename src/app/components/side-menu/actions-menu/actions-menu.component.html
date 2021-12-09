@@ -21,6 +21,12 @@
       (onClick)="createNewFolder()"
     ></app-rounded-icon-button>
     <app-rounded-icon-button
+      [icon]="'post_add'"
+      [tooltip]="'Create new file'"
+      [scale]="1.1"
+      (onClick)="createNewFile()"
+    ></app-rounded-icon-button>
+    <app-rounded-icon-button
       [icon]="'swap_horiz'"
       [tooltip]="'Change workspace'"
       [scale]="1.1"

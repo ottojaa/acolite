@@ -1,9 +1,12 @@
 import { ElementRef, Injectable, NgZone } from '@angular/core'
+import { AbstractControl, ValidatorFn } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { ConfirmDialogComponent } from 'app/components/dialogs/confirm-dialog/confirm-dialog.component'
 import { TagEditorComponent } from 'app/components/top-bar/tag-editor/tag-editor.component'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { getBaseName } from '../../../app/electron-utils/file-utils'
 import { FilePathContainer, TreeElement } from '../../../app/shared/interfaces'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
 import { ChangeDirectoryDialogComponent } from '../components/dialogs/change-directory-dialog/change-directory-dialog.component'
@@ -13,12 +16,18 @@ import { FolderCreationDialogComponent } from '../components/dialogs/folder-crea
 import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialog/move-files-dialog.component'
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
 import { SearchBuilderDialogComponent } from '../components/dialogs/search-builder-dialog/search-builder-dialog.component'
+import { StateService } from './state.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppDialogService {
-  constructor(public dialog: MatDialog, private _snackBar: MatSnackBar, public zone: NgZone) {}
+  constructor(
+    private dialog: MatDialog,
+    private _snackBar: MatSnackBar,
+    private zone: NgZone,
+    private state: StateService
+  ) {}
 
   openWorkspaceDirectoryDialog(): Observable<string | undefined> {
     const ref = this.dialog.open(BaseDirectoryDialogComponent, { hasBackdrop: true })
@@ -51,9 +60,12 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openNewFileCreationDialog(filePath: string): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
+  openNewFileCreationDialog(node: TreeElement): Observable<{ extension: 'txt' | 'md'; fileName: string }> {
+    const bannedFileNames = this.getBannedFileNames(node, 'create')
+    const filePath = node.data.filePath
+
     const ref = this.dialog.open(FileCreationComponent, {
-      data: filePath,
+      data: { filePath, bannedFileNames },
       minWidth: '400px',
       maxWidth: '600px',
       hasBackdrop: true,
@@ -62,9 +74,12 @@ export class AppDialogService {
     return ref.afterClosed().pipe(take(1))
   }
 
-  openRenameFileDialog(filePath: string): Observable<string> {
+  openRenameFileDialog(node: TreeElement): Observable<string> {
+    const filePath = node.data.filePath
+    const bannedFileNames = this.getBannedFileNames(node, 'rename')
+
     const ref = this.dialog.open(RenameFileDialogComponent, {
-      data: filePath,
+      data: { filePath, bannedFileNames },
       hasBackdrop: true,
       minWidth: '400px',
       maxWidth: '600px',
@@ -106,5 +121,43 @@ export class AppDialogService {
       })
       snackBar.onAction().subscribe(() => snackBar.dismiss())
     })
+  }
+
+  openConfirmDialog(title: string): Observable<boolean> {
+    const ref = this.dialog.open(ConfirmDialogComponent, { data: title })
+    return ref.afterClosed().pipe(take(1))
+  }
+
+  getBannedFileNames(node: TreeElement, action: 'rename' | 'create'): any {
+    const getBannedNodes = (action: 'rename' | 'create') => {
+      switch (action) {
+        case 'rename': {
+          if (!node.parent) {
+            const rootDirectory = this.state.getStatePartValue('rootDirectory')
+
+            const findSiblingsRecursive = (elements: TreeElement[]) => {
+              for (const element of elements) {
+                if (element.data.filePath === node.data.parentPath) {
+                  return element.children
+                }
+                if (element.children) {
+                  findSiblingsRecursive(element.children)
+                }
+              }
+            }
+            return findSiblingsRecursive([rootDirectory]) || []
+          }
+          return node.parent.children
+        }
+        case 'create': {
+          return node.children ? node.children : []
+        }
+        default: {
+          return []
+        }
+      }
+    }
+
+    return getBannedNodes(action).map((el) => getBaseName(el.data.filePath))
   }
 }

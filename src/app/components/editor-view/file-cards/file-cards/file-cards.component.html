@@ -4,7 +4,7 @@
   <div class="file-cards" content>
     <ng-container *ngFor="let file of files">
       <span class="file-card-container">
-        <app-file-card [file]="file"></app-file-card>
+        <app-file-card [file]="file" [showBookmark]="showBookmark"></app-file-card>
       </span>
     </ng-container>
   </div>

@@ -96,12 +96,12 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
     const items: ListItem[] = [
       {
         type: 'label',
-        label: 'Search',
+        label: 'Search using',
       },
       {
         type: 'item',
         value: 'fileName',
-        text: 'Name',
+        text: 'File name',
         selected: true,
       },
       {
@@ -113,7 +113,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
       {
         type: 'item',
         value: 'filePath',
-        text: 'Path',
+        text: 'File path',
         selected: true,
       },
       {
@@ -121,7 +121,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
       },
       {
         type: 'label',
-        label: 'Filter',
+        label: 'Filter results',
       },
       {
         type: 'item',

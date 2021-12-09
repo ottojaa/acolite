@@ -30,6 +30,7 @@ import '@angular/common/locales/global/en-GB'
 import { SearchBuilderDialogModule } from './components/dialogs/search-builder-dialog/search-builder-dialog.module'
 import { MatIconRegistry } from '@angular/material/icon'
 import { FormatDistancePipe } from './components/pipes/format-distance.pipe'
+import { ConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module'
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
@@ -57,6 +58,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     DeleteFilesDialogModule,
     MoveFilesDialogModule,
     SearchBuilderDialogModule,
+    ConfirmDialogModule,
     MatSnackBarModule,
     TranslateModule.forRoot({
       loader: {

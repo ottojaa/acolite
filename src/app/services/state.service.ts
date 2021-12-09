@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { cloneDeep } from 'lodash'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators'
+import { expandNodeRecursive } from '../../../app/electron-utils/utils'
 import { allowedConfigKeys } from '../../../app/shared/constants'
 import { State } from '../../../app/shared/interfaces'
 import { AbstractComponent } from '../abstract/abstract-component'
@@ -10,7 +11,7 @@ import { SettingsService } from './settings.service'
 
 interface UpdatePayload {
   state: State
-  updateStore: boolean
+  triggerKeys: (keyof State)[]
 }
 
 /**
@@ -24,6 +25,11 @@ export type StateUpdate<T> = {
   }
 }[keyof T]
 
+interface TriggerMap {
+  expandNodeParents: string[]
+  updateStore: string[]
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,6 +40,7 @@ export class StateService extends AbstractComponent {
     selectedTab: {
       path: '',
       index: 0,
+      forceDashboard: false,
     },
     editorTheme: 'dark',
     sideMenuWidth: 20,
@@ -64,13 +71,9 @@ export class StateService extends AbstractComponent {
   }
 
   updateStateAndStore(payload: UpdatePayload): void {
-    const { state, updateStore } = payload
+    const { state, triggerKeys } = payload
     this.state$.next(state)
-
-    if (updateStore) {
-      console.log('Triggered store update')
-      this.electronService.updateStore({ state })
-    }
+    this.handleCallbacks(state, triggerKeys)
   }
 
   handleStateUpdate(): Observable<UpdatePayload> {
@@ -108,9 +111,9 @@ export class StateService extends AbstractComponent {
   }
 
   /**
-   * Updates nested properties without mutating the state object
+   * Updates nested properties without mutating the state object (unused for the time being + should probably reimplement without typecast)
    */
-  updateStatePartDeep<P1 extends keyof State>(prop1: P1, update: StateUpdate<State[P1]>): Observable<UpdatePayload> {
+  /* updateStatePartDeep<P1 extends keyof State>(prop1: P1, update: StateUpdate<State[P1]>): Observable<UpdatePayload> {
     return this.state$.pipe(
       take(1),
       map((state) => {
@@ -123,7 +126,7 @@ export class StateService extends AbstractComponent {
         return { state: newState, updateStore: this.shouldTriggerStoreUpdate([key as string]) }
       })
     )
-  }
+  } */
 
   updateState(updateStateParts: StateUpdate<State>[]): Observable<UpdatePayload> {
     return this.state$.pipe(
@@ -140,7 +143,7 @@ export class StateService extends AbstractComponent {
         }, state)
 
         console.log({ oldState: state, newState })
-        return { state: newState, updateStore: this.shouldTriggerStoreUpdate(allKeys) }
+        return { state: newState, triggerKeys: allKeys }
       })
     )
   }
@@ -157,9 +160,26 @@ export class StateService extends AbstractComponent {
     }, <State>{})
   }
 
-  // If state property key is included in allowedConfigKeys, update the persistent config file
-  shouldTriggerStoreUpdate(keys: string[]): boolean {
-    const triggers = allowedConfigKeys
-    return keys.some((key) => triggers.includes(key))
+  /**
+   * In case certain keys in the state were updated, we may want to do certain side effects after the state is updated instead of before,
+   * in case the callback takes time that is clearly visible on the UI (e.g 100ms+).
+   * @param triggerKeys they keys that triggered the state update
+   */
+  handleCallbacks(state: State, triggerKeys: (keyof State)[]): void {
+    const { selectedTab, rootDirectory } = state
+
+    const triggerMap: TriggerMap = {
+      expandNodeParents: ['selectedTab'],
+      updateStore: allowedConfigKeys,
+    }
+
+    const shouldTrigger = (action: keyof TriggerMap) => triggerKeys.some((key) => triggerMap[action].includes(key))
+
+    if (shouldTrigger('updateStore')) {
+      this.electronService.updateStore({ state })
+    }
+    if (shouldTrigger('expandNodeParents')) {
+      expandNodeRecursive(rootDirectory, selectedTab.path)
+    }
   }
 }

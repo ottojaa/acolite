@@ -103,8 +103,8 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   onRightClick(event: { node: TreeElement }): void {
+    this.cmDropZone.hide()
     this.contextMenuItems = [...this.getMenuItems(event.node)]
-    this.cdRef.detectChanges()
   }
 
   onClickOutside(): void {
@@ -118,7 +118,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   onRightClickDropZone(event: MouseEvent): void {
-    console.log(this.dropZoneContextMenuItems)
+    this.cm.hide()
     this.cmDropZone.show(event)
   }
 
@@ -145,7 +145,6 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   createNewFolder(node: TreeElement): void {
-    const baseDir = this.state.state$.value.baseDir
     const { filePath } = node.data
 
     this.dialogService
@@ -210,16 +209,14 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   openNewFileDialog(node: TreeElement): void {
-    const { filePath } = node.data
     this.ngZone.run(() => {
-      this.dialogService.openNewFileCreationDialog(filePath).pipe(take(1)).subscribe()
+      this.dialogService.openNewFileCreationDialog(node).pipe(take(1)).subscribe()
     })
   }
 
   openRenameFileDialog(node: TreeElement): void {
-    const { filePath } = node.data
     this.ngZone.run(() => {
-      this.dialogService.openRenameFileDialog(filePath).pipe(take(1)).subscribe()
+      this.dialogService.openRenameFileDialog(node).pipe(take(1)).subscribe()
     })
   }
 

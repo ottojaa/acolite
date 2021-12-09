@@ -1,4 +1,4 @@
-import { Component, HostListener, Inject, NgZone, ViewChild } from '@angular/core'
+import { Component, Inject, NgZone, ViewChild } from '@angular/core'
 import { FormBuilder, FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { ElectronService } from '../../../core/services'
@@ -7,6 +7,7 @@ import { StateService } from '../../../services/state.service'
 import { MatSelect } from '@angular/material/select'
 import { nameValidationPattern } from '../../../../../app/shared/constants'
 import { getBaseName, getJoinedPath } from '../../../../../app/electron-utils/file-utils'
+import { TreeElement } from '../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-file-creation',
@@ -15,14 +16,6 @@ import { getBaseName, getJoinedPath } from '../../../../../app/electron-utils/fi
 })
 export class FileCreationComponent {
   @ViewChild('typeSelect') typeSelect: MatSelect
-  @HostListener('window:keyup.Enter', ['$event'])
-  onEnter(_event: KeyboardEvent): void {
-    console.log('disabled for the time being, need to rethink this implementation')
-    /* if (this.fileName.invalid || this.extension.invalid || document.activeElement.tagName === 'MAT-SELECT') {
-      return
-    }
-    this.onCreateClick() */
-  }
 
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
   extension = new FormControl('txt', [Validators.required])
@@ -50,7 +43,7 @@ export class FileCreationComponent {
   }
 
   get parent(): string {
-    return getBaseName(this.data)
+    return getBaseName(this.data.filePath)
   }
 
   get formValid(): boolean {
@@ -58,7 +51,7 @@ export class FileCreationComponent {
   }
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: string,
+    @Inject(MAT_DIALOG_DATA) public data: { filePath: string; bannedFileNames: string[] },
     public dialogRef: MatDialogRef<FileCreationComponent>,
     public electronService: ElectronService,
     public dialogService: AppDialogService,
@@ -84,7 +77,13 @@ export class FileCreationComponent {
   }
 
   onCreateClick(): void {
-    const path = getJoinedPath([this.data, this.result])
+    const isBanned = this.data.bannedFileNames.some((name) => name === this.result)
+    if (isBanned) {
+      this.dialogService.openToast(`${this.result} already exists in this location`, 'failure')
+      return
+    }
+
+    const path = getJoinedPath([this.data.filePath, this.result])
 
     this.electronService.createNewFileRequest({
       path,

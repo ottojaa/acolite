@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, V
 import { MenuItem } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Observable } from 'rxjs'
-import { map, takeUntil, tap } from 'rxjs/operators'
+import { delay, map, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { StateService } from '../../../../services/state.service'
 import { TabService } from '../../../../services/tab.service'
@@ -42,7 +42,7 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
       if (selectedTab) {
         selectedTab.scrollIntoView({ behavior: 'smooth' })
       }
-    })
+    }, 50)
   }
 
   onCloseTab(filePath: string) {
@@ -53,7 +53,7 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
     const { selectedTab } = this.state.value
     const newSelectedTab = getSelectedTabEntityFromIndex(this.state.value, event.index)
     if (newSelectedTab.path !== selectedTab.path) {
-      this.state.updateState$.next([{ key: 'selectedTab', payload: newSelectedTab }])
+      this.state.updateState$.next([{ key: 'selectedTab', payload: { ...newSelectedTab, forceDashboard: false } }])
     }
   }
 
@@ -84,6 +84,10 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
       {
         label: 'Close All',
         command: () => this.tabService.closeAllTabs(),
+      },
+      {
+        label: 'Close Deleted',
+        command: () => this.tabService.closeDeleted(),
       },
       {
         label: 'Show in folder',

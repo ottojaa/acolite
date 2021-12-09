@@ -1,10 +1,13 @@
 @import '../../../../../variables.scss';
 
 :host ::ng-deep .p-card {
+  position: relative;
   background-color: var(--backgroundTertiary);
   transition: all 0.25s linear;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+  width: 17rem;
+  height: 11rem;
   .p-card-body {
     padding: 0;
     width: 100%;
@@ -29,12 +32,28 @@
 }
 
 .contrast-text {
+  margin: 0.7rem 0;
   color: var(--contrast);
-  opacity: 0.9;
+  max-width: 15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
 }
 
-:host ::ng-deep .mat-chip-list-wrapper {
-  flex-wrap: nowrap;
+:host ::ng-deep {
+  .mat-chip-list-wrapper {
+    flex-wrap: nowrap;
+  }
+  .mat-standard-chip {
+    margin: 0 !important;
+  }
+}
+
+.bookmark-container {
+  position: absolute;
+  top: 2%;
+  right: 2%;
 }
 
 .padding {
@@ -65,7 +84,19 @@ pre {
 
 .card-header {
   padding: 0.5rem 1rem 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   & p {
     margin: 0;
+  }
+  mat-icon {
+    color: var(--buttonColorLowOpacity);
+    transform: scale(0.9);
+    cursor: pointer;
+    transition: 300ms all;
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 }

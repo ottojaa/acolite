@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
@@ -56,6 +56,12 @@ function createWindow(): BrowserWindow {
   win.maximize()
   win.show()
 
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    console.log(url)
+    return { action: 'deny' }
+  })
+
   if (serve) {
     win.webContents.openDevTools()
     require('electron-reload')(__dirname, {
@@ -102,7 +108,6 @@ const IPCChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
-  StoreActions.GetRecentlyModified,
   StoreActions.UpdateBookmarkedFiles,
   SearchActions.Query,
 ]
@@ -171,10 +176,6 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         searchFiles(event, payload, index)
         break
       }
-      /* case StoreActions.GetRecentlyModified: {
-        getRecentlyModified(event, index)
-        break
-      } */
       case StoreActions.UpdateBookmarkedFiles: {
         updateBookmarkedFiles(event, payload)
         break

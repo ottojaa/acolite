@@ -11,4 +11,5 @@ export class FileCardsComponent {
   @Input() files: Doc[]
   @Input() viewInit: boolean
   @Input() title: string
+  @Input() showBookmark = false
 }

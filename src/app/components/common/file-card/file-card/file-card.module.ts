@@ -10,7 +10,7 @@ import { FormatDistanceModule } from 'app/components/pipes/format-distance.modul
 @NgModule({
   declarations: [FileCardComponent],
   exports: [FileCardComponent],
-  imports: [CommonModule, CardModule, MatChipsModule, IconModule, FormatDistanceModule],
+  imports: [CommonModule, CardModule, MatChipsModule, MatIconModule, IconModule, FormatDistanceModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FileCardModule {}

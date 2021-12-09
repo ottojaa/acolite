@@ -25,7 +25,7 @@ export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirect
 
       const rootDir = first(updatedRootDirectory)
 
-      event.sender.send(FolderActionResponses.MakeDirectorySuccess, rootDir)
+      event.sender.send(FolderActionResponses.MakeDirectorySuccess, { rootDirectory: rootDir })
     })
     .catch((err) => {
       event.sender.send(FolderActionResponses.MakeDirectoryFailure, err)

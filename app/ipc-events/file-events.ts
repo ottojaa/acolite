@@ -3,7 +3,13 @@ import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
 import { Document } from 'flexsearch'
-import { addToIndex, removeIndexes, updateIndex, updateIndexesRecursive } from './store-events'
+import {
+  addToIndex,
+  getUpdatedRecentlyModified,
+  removeIndexes,
+  updateIndex,
+  updateIndexesRecursive,
+} from './store-events'
 import { getBaseName, getDirName, getExtension, getExtensionSplit, getJoinedPath } from '../electron-utils/file-utils'
 import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
 import { getDeletedFileEntityMock, getFileEntityFromPath, getSelectedTabEntityFromIndex } from '../electron-utils/utils'
@@ -52,7 +58,7 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
 
 export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
   const { path, content, state } = action
-  const { tabs } = state
+  const { tabs, recentlyModified } = state
 
   fs.writeFile(path, content, (err) => {
     if (err) {
@@ -62,8 +68,9 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
 
     updateTabData(tabs, path, content)
     updateIndex(path, index)
+    const updatedRecentlyModified = getUpdatedRecentlyModified(recentlyModified, path) || recentlyModified
 
-    event.sender.send(FileActionResponses.UpdateSuccess, { tabs })
+    event.sender.send(FileActionResponses.UpdateSuccess, { tabs, recentlyModified: updatedRecentlyModified })
   })
 }
 
@@ -143,7 +150,7 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
     updateTabData(tabs, path, null, newPath)
     updateIndexesRecursive([newPath], index)
 
-    event.sender.send(FileActionResponses.RenameSuccess, { rootDirectory })
+    event.sender.send(FileActionResponses.RenameSuccess, { rootDirectory: rootDir, tabs })
   })
 }
 

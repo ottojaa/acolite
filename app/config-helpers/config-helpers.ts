@@ -205,8 +205,8 @@ const validateEditorTheme = (config: WorkspaceConfig) => {
 
 const validateSelectedTab = (config: WorkspaceConfig) => {
   const { tabs, selectedTab } = config
-  const isValid = tabs.findIndex((tab) => tab.path === selectedTab.path) > -1
-  return isValid ? selectedTab : 0
+  const isValid = tabs?.findIndex((tab) => tab.path === selectedTab.path) > -1
+  return isValid ? selectedTab : { path: null, index: 0, forceDashboard: false }
 }
 
 const validateSearchPreferences = (config: WorkspaceConfig) => {
