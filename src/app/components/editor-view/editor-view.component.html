@@ -1,4 +1,4 @@
-<ng-container *ngIf="viewInit; else loader">
+<ng-container *ngIf="viewInit$ | async; else loader">
   <div class="editor-view">
     <ng-template #mainView let-hideTabs="forceDashboard">
       <div *ngIf="tabs$ | async as tabs" class="tabs-container">

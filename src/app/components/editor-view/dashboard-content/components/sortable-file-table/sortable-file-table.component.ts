@@ -22,9 +22,8 @@ import { Tab } from '../../../../../../../app/shared/interfaces'
         animate(
           '.3s ease-in',
           keyframes([
-            style({ opacity: 0, transform: 'translateX(-2%)', offset: 0 }),
-            style({ opacity: 0.5, transform: 'translateX(-1%)', offset: 0.3 }),
-            style({ opacity: 1, transform: 'translateX(0)', offset: 1 }),
+            style({ opacity: 0, transform: 'translateX(-10px)' }),
+            style({ opacity: 1, transform: 'translateX(0)' }),
           ])
         ),
       ]),
@@ -37,7 +36,7 @@ export class SortableFileListComponent implements AfterViewInit {
   }
   @Input() basePath: string
 
-  displayedColumns: string[] = ['fileName', 'extension', 'createdAt', 'modifiedAt', 'filePath']
+  displayedColumns: string[] = ['fileName', 'createdAt', 'modifiedAt', 'filePath']
   dataSource: MatTableDataSource<Tab>
   expandedElement: Tab | null
 

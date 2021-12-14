@@ -79,7 +79,7 @@ export const readAndSendMenuItemsFromBaseDirectory = (
   try {
     const { baseDir } = action.state
     const rootDirectory = getRootDirectory(baseDir)
-    event.sender.send(FolderActionResponses.ReadDirectorySuccess, rootDirectory)
+    event.sender.send(FolderActionResponses.ReadDirectorySuccess, { rootDirectory })
     addFilesToIndex(rootDirectory?.children, index)
   } catch (err) {
     console.log(err)

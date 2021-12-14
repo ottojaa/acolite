@@ -10,7 +10,7 @@
   <p-card (click)="openInNewTab(file)">
     <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
   </p-card>
-
+  <p class="last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>
   <div class="chips-container padding">
     <mat-chip-list aria-label="File tags">
       <!-- <div *ngFor="let tag of [{ bg: 'black', color: 'white', name: 'test' }]">
@@ -18,5 +18,4 @@
     </div> -->
     </mat-chip-list>
   </div>
-  <p class="last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>
 </div>

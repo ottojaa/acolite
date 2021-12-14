@@ -24,7 +24,6 @@ export class AppComponent implements OnInit {
     private electronService: ElectronService,
     private translate: TranslateService,
     private themeService: ThemeService,
-    private tabService: TabService,
     public state: StateService,
     public router: Router,
     public dialogService: AppDialogService,
