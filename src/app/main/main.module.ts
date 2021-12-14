@@ -10,6 +10,7 @@ import { PanelModule } from 'primeng/panel'
 import { BrowserModule } from '@angular/platform-browser'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { ActionsMenuModule } from 'app/components/side-menu/actions-menu/actions-menu.module'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 @NgModule({
   declarations: [MainComponent],
@@ -23,6 +24,7 @@ import { ActionsMenuModule } from 'app/components/side-menu/actions-menu/actions
     PanelModule,
     BrowserModule,
     ProgressSpinnerModule,
+    BrowserAnimationsModule,
     ActionsMenuModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

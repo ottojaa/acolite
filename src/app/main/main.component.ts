@@ -13,7 +13,7 @@ import { ThemeService } from '../services/theme.service'
   styleUrls: ['./main.component.scss'],
   animations: [
     trigger('componentLoaded', [
-      transition(':enter', [style({ opacity: 0 }), animate('100ms', style({ opacity: 1 }))]),
+      transition(':enter', [style({ opacity: 0 }), animate('300ms', style({ opacity: 1 }))]),
     ]),
   ],
 })

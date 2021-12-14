@@ -56,6 +56,27 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   })
 }
 
+export const getFileData = (action: ReadFile) => {
+  const { filePath } = action
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, content) => {
+      if (err) {
+        reject(`Failure reading ${filePath}`)
+      }
+      const fileStats = fs.statSync(filePath)
+
+      resolve({
+        fileName: getBaseName(filePath),
+        extension: getExtensionSplit(filePath),
+        path: filePath,
+        textContent: content,
+        modifiedAt: fileStats.mtime,
+        createdAt: fileStats.birthtime,
+      })
+    })
+  })
+}
+
 export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
   const { path, content, state } = action
   const { tabs, recentlyModified } = state

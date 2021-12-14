@@ -37,11 +37,16 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   }
 
   ngOnInit(): void {
+    this.initTabData()
     this.initSelectedTabListener()
     this.initAutoSave()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
     this.editorOptions = this.getDefaultOptions()
+  }
+
+  async initTabData(): Promise<void> {
+    const data = await this.electronService.getFileData({ filePath: this.tab.path })
   }
 
   onEditorContentChange(): void {

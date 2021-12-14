@@ -1,35 +1,32 @@
-<div class="editor-view">
-  <ng-template #mainView let-hideTabs="forceDashboard">
-    <div *ngIf="tabs$ | async as tabs" class="tabs-container">
-      <ng-container *ngIf="!hideTabs && tabs?.length; else showDefault">
-        <app-file-tabs [tabs]="tabs"></app-file-tabs>
-      </ng-container>
-
-      <ng-template #showDefault>
-        <ng-container *ngIf="hideTabs">
-          <div class="banner">
-            <h3>
-              {{ tabs.length }} tabs hidden, click <span (click)="onClickBanner()" class="emphasis">here</span> to
-              reveal
-            </h3>
-          </div>
+<ng-container *ngIf="viewInit; else loader">
+  <div class="editor-view">
+    <ng-template #mainView let-hideTabs="forceDashboard">
+      <div *ngIf="tabs$ | async as tabs" class="tabs-container">
+        <ng-container *ngIf="!hideTabs && tabs?.length; else showDefault">
+          <app-file-tabs [tabs]="tabs"></app-file-tabs>
         </ng-container>
 
-        <app-file-cards
-          [title]="'Recently updated'"
-          [files]="recentlyModified$ | async"
-          [viewInit]="viewInit"
-        ></app-file-cards>
+        <ng-template #showDefault>
+          <ng-container *ngIf="hideTabs">
+            <div class="banner">
+              <h3>
+                {{ tabs.length }} tabs hidden, click <span (click)="onClickBanner()" class="emphasis">here</span> to
+                reveal
+              </h3>
+            </div>
+          </ng-container>
 
-        <app-file-cards
-          [title]="'Bookmarked'"
-          [files]="bookmarked$ | async"
-          [viewInit]="viewInit"
-          [showBookmark]="true"
-        ></app-file-cards>
-      </ng-template>
-    </div>
-  </ng-template>
+          <app-dashboard-content
+            [recentlyModified]="recentlyModified$ | async"
+            [bookmarks]="bookmarked$ | async"
+            [basePath]="basePath$ | async"
+          ></app-dashboard-content>
+        </ng-template>
+      </div>
+    </ng-template>
 
-  <ng-container *ngTemplateOutlet="mainView; context: { forceDashboard: forceDashboard$ | async }"></ng-container>
-</div>
+    <ng-container *ngTemplateOutlet="mainView; context: { forceDashboard: forceDashboard$ | async }"></ng-container>
+  </div>
+</ng-container>
+
+<ng-template #loader> <mat-progress-bar mode="indeterminate"></mat-progress-bar> </ng-template>

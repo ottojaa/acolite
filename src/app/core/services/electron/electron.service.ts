@@ -26,8 +26,9 @@ import {
   SearchActions,
   StoreActions,
   UpdateStore,
+  HandlerAction,
 } from '../../../../../app/shared/actions'
-import { AppConfig, WorkspaceConfig } from '../../../../../app/shared/interfaces'
+import { AppConfig, Tab, WorkspaceConfig } from '../../../../../app/shared/interfaces'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 
 type OmitActionType<T> = Omit<T, 'type'>
@@ -72,11 +73,11 @@ export class ElectronService {
     this.ipcRenderer.send(channel, action)
   }
 
-  public once(channel: string, listener: any): void {
+  public async handle<T>(channel: HandlerAction, payload?: T): Promise<any> {
     if (!this.ipcRenderer) {
       return
     }
-    this.ipcRenderer.once(channel, listener)
+    return this.ipcRenderer.invoke(channel, payload)
   }
 
   // Folder actions
@@ -155,5 +156,9 @@ export class ElectronService {
     payload: T
   ): T & { type: ActionType } {
     return { ...payload, type: channel }
+  }
+
+  async getFileData(payload: { filePath: string }): Promise<Tab> {
+    return this.handle(HandlerAction.GetTabData, payload)
   }
 }

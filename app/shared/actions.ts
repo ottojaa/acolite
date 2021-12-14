@@ -112,6 +112,10 @@ export interface SearchQuery {
   searchOpts?: SearchOptions
 }
 
+export interface Handler {
+  type: HandlerAction
+}
+
 interface SearchOptions {
   content?: string
   baseDir?: string
@@ -157,6 +161,10 @@ export enum StoreActions {
 
 export enum SearchActions {
   Query = 'query-index',
+}
+
+export enum HandlerAction {
+  GetTabData = 'get-tab-data',
 }
 
 export enum FileActionResponses {

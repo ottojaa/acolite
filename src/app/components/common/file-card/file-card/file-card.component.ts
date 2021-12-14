@@ -1,7 +1,7 @@
-import { Component, Input, NgZone, OnInit } from '@angular/core'
+import { trigger, transition, style, animate } from '@angular/animations'
+import { Component, Input, NgZone } from '@angular/core'
 import { AppDialogService } from 'app/services/dialog.service'
 import { TabService } from 'app/services/tab.service'
-import { fileExtensionIcons } from '../../../../../../app/shared/constants'
 import { SearchResult } from '../../../../../../app/shared/interfaces'
 
 @Component({

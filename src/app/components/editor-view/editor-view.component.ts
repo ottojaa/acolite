@@ -16,16 +16,15 @@ export class EditorViewComponent implements OnInit {
   forceDashboard$: Observable<boolean>
   recentlyModified$: Observable<Doc[]>
   bookmarked$: Observable<Doc[]>
-  viewInit$: Observable<boolean>
+  basePath$: Observable<string>
   bannerOpen = true
-
   viewInit = false
-  contrastColor: string
 
   constructor(private state: StateService, public tabService: TabService, public electronService: ElectronService) {}
 
   ngOnInit(): void {
-    this.tabs$ = this.state.getStatePart('tabs').pipe(tap((data) => console.log(data)))
+    this.basePath$ = this.state.getStatePart('baseDir')
+    this.tabs$ = this.state.getStatePart('tabs')
     this.bookmarked$ = this.state.getStatePart('bookmarkedFiles')
     this.recentlyModified$ = this.state.getStatePart('recentlyModified')
     this.forceDashboard$ = this.state.getStatePart('selectedTab').pipe(
@@ -34,7 +33,7 @@ export class EditorViewComponent implements OnInit {
     )
 
     combineLatest([this.recentlyModified$, this.bookmarked$])
-      .pipe(take(1), delay(500))
+      .pipe(take(1), delay(400))
       .subscribe(() => (this.viewInit = true))
   }
 

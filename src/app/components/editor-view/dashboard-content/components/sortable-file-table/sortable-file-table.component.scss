@@ -1,0 +1,94 @@
+.container {
+  padding: 2rem;
+}
+
+table {
+  width: 100%;
+  background: var(--backgroundPrimary);
+  color: var(--contrast);
+}
+
+.mat-paginator {
+  background: var(--backgroundPrimary);
+  color: var(--contrast);
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+.item-row td {
+  border-bottom-width: 0;
+}
+
+.element-detail-row {
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  border-bottom: 0;
+
+  .extension-icon {
+    width: 7rem;
+    padding: 2rem 1rem;
+    mat-icon {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .text-content blockquote {
+    margin: 0;
+    padding: 0 1em;
+    --color-fg-default: #c9d1d9;
+    --color-fg-muted: #8b949e;
+    color: #8b949e;
+    border-left: 0.25em solid #30363d;
+  }
+}
+
+td,
+th {
+  cursor: pointer;
+  color: var(--contrast);
+  border-bottom-color: var(--contrastLowerOpacity);
+  &.mat-header-cell {
+    color: var(--buttonColor);
+  }
+}
+.mat-column-fileName {
+  width: 20rem;
+}
+.mat-column-extension,
+.mat-column-createdAt,
+.mat-column-modifiedAt {
+  width: 15rem;
+}
+.mat-column-filePath {
+  width: 35rem;
+}
+.mat-sort-header-container {
+  font-weight: bold;
+}
+
+:host ::ng-deep {
+  .mat-select-value,
+  .mat-select-arrow,
+  input.mat-input-element {
+    color: var(--contrast) !important;
+  }
+  .mat-option.mat-focus-indicator {
+    &:hover {
+      background: var(--buttonColor) !important;
+    }
+  }
+  .mat-option {
+    padding: 5rem !important;
+  }
+  .mat-form-field-underline {
+    // background-color: var(--buttonColorLowerOpacity);
+  }
+}

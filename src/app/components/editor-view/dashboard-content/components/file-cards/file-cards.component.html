@@ -1,0 +1,5 @@
+<div class="file-cards" [@cardAnimation]="files.length">
+  <div *ngFor="let file of files">
+    <app-file-card [file]="file" [showBookmark]="showBookmark"></app-file-card>
+  </div>
+</div>

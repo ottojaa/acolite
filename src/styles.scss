@@ -29,14 +29,14 @@ app-main {
 }
 
 body ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 5px;
   scrollbar-width: 5px;
 }
 
 body ::-webkit-scrollbar-thumb {
-  background: #a7a6a6a8;
+  background: #a7a6a63b;
   border-radius: 5px;
   visibility: hidden;
 }
@@ -105,10 +105,17 @@ body .p-contextmenu {
 body .mat-option {
   background: var(--backgroundPrimary);
   color: var(--contrast);
+  &:hover {
+    background: var(--buttonColorLowOpacity) !important;
+  }
+}
+
+body .mat-simple-snackbar {
+  color: white;
 }
 body .mat-option.mat-active {
   color: var(--contrast);
-  background: var(--buttonColorLowOpacity) !important;
+  background: var(--buttonColor) !important;
 }
 
 body .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {

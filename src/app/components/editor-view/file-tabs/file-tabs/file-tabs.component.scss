@@ -1,7 +1,7 @@
 @import 'src/variables.scss';
 
 :host ::ng-deep .mat-tab-label {
-  opacity: 0.8;
+  opacity: 1;
   height: 3rem;
   font-size: 1rem;
   .icon {
@@ -46,12 +46,13 @@
 } */
 
 :host ::ng-deep .mat-tab-label {
-  background-color: var(--tabBgPrimary);
+  opacity: 0.8;
+  background-color: var(--backgroundPrimary);
   border-right: $app-border;
 
   &.mat-tab-label-active {
-    background-color: var(--buttonColor);
-    box-shadow: $box-shadow-elevation;
+    background-color: var(--backgroundTertiary);
+    font-weight: bold;
     opacity: 1;
   }
 }
@@ -59,7 +60,8 @@
 ::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
 .mat-tab-nav-bar.mat-primary .mat-ink-bar {
   background-color: var(--buttonColor);
-  display: none;
+  padding-top: 3px;
+  transform: translateY(-1px);
 }
 
 :host ::ng-deep .mat-tab-body-wrapper,

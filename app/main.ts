@@ -18,10 +18,19 @@ import {
   updateFileContent,
   readAndSendTabData,
   openFileLocation,
+  getFileData,
 } from './ipc-events/file-events'
 import { getEmptyIndex, initAppState, searchFiles, updateBookmarkedFiles, updateStore } from './ipc-events/store-events'
 import { getJoinedPath } from './electron-utils/file-utils'
-import { FileActions, FolderActions, SearchActions, StoreActions, UpdateActionPayload } from './shared/actions'
+import {
+  FileActions,
+  FolderActions,
+  HandlerAction,
+  ReadFile,
+  SearchActions,
+  StoreActions,
+  UpdateActionPayload,
+} from './shared/actions'
 import { Doc } from './shared/interfaces'
 
 type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
@@ -46,7 +55,6 @@ function createWindow(): BrowserWindow {
     x: 0,
     y: 0,
     show: false,
-    titleBarStyle: 'hidden',
     icon: getJoinedPath([__dirname, 'acolite-logo-ellipse.png']),
     webPreferences: {
       nodeIntegration: true,
@@ -59,7 +67,6 @@ function createWindow(): BrowserWindow {
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
-    console.log(url)
     return { action: 'deny' }
   })
 
@@ -94,11 +101,14 @@ function createWindow(): BrowserWindow {
   return win
 }
 
-const IPCChannels = [
+const FolderActionChannels = [
   FolderActions.ChooseDir,
   FolderActions.ReadDir,
   FolderActions.MkDir,
   FolderActions.SetDefaultDir,
+]
+
+const FileActionChannels = [
   FileActions.Create,
   FileActions.Rename,
   FileActions.DeleteFiles,
@@ -106,18 +116,56 @@ const IPCChannels = [
   FileActions.ReadFile,
   FileActions.Update,
   FileActions.OpenFileLocation,
+]
+
+const StoreActionChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
   StoreActions.UpdateBookmarkedFiles,
-  SearchActions.Query,
 ]
 
+const SearchActionChannels = [SearchActions.Query]
+
 const startIPCChannelListeners = () => {
-  IPCChannels.forEach((channel) => IPCChannelReducer(channel))
+  FolderActionChannels.forEach((channel) => FolderActionReducer(channel))
+  FileActionChannels.forEach((channel) => FileActionReducer(channel))
+  StoreActionChannels.forEach((channel) => StoreActionReducer(channel))
+  SearchActionChannels.forEach((channel) => SearchActionReducer(channel))
+  IPCHandlerReducer()
 }
 
-const IPCChannelReducer = (action: IPCChannelAction) => {
+const SearchActionReducer = (action: SearchActions) => {
+  ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
+    switch (payload.type) {
+      case SearchActions.Query: {
+        searchFiles(event, payload, index)
+        break
+      }
+    }
+  })
+}
+
+const StoreActionReducer = (action: StoreActions) => {
+  ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
+    switch (payload.type) {
+      case StoreActions.InitApp: {
+        initAppState(event, configPath, index)
+        break
+      }
+      case StoreActions.UpdateStore: {
+        updateStore(event, payload, configPath)
+        break
+      }
+      case StoreActions.UpdateBookmarkedFiles: {
+        updateBookmarkedFiles(event, payload)
+        break
+      }
+    }
+  })
+}
+
+const FolderActionReducer = (action: FolderActions) => {
   ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
     switch (payload.type) {
       case FolderActions.MkDir: {
@@ -137,6 +185,13 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         readAndSendMenuItemsFromBaseDirectory(event, payload, index)
         break
       }
+    }
+  })
+}
+
+const FileActionReducer = (action: FileActions) => {
+  ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
+    switch (payload.type) {
       case FileActions.Create: {
         createFile(event, payload, index)
         break
@@ -165,23 +220,14 @@ const IPCChannelReducer = (action: IPCChannelAction) => {
         openFileLocation(event, payload)
         break
       }
-      case StoreActions.InitApp: {
-        initAppState(event, configPath, index)
-        break
-      }
-      case StoreActions.UpdateStore: {
-        updateStore(event, payload, configPath)
-        break
-      }
-      case SearchActions.Query: {
-        searchFiles(event, payload, index)
-        break
-      }
-      case StoreActions.UpdateBookmarkedFiles: {
-        updateBookmarkedFiles(event, payload)
-        break
-      }
     }
+  })
+}
+
+const IPCHandlerReducer = () => {
+  ipcMain.handle(HandlerAction.GetTabData, async (_event, action: ReadFile) => {
+    const result = await getFileData(action)
+    return result
   })
 }
 

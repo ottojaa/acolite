@@ -1,0 +1,36 @@
+.container {
+  padding: 2rem;
+  .layout-selector-container {
+    display: flex;
+    justify-content: space-between;
+    > h2 {
+      color: var(--buttonColor);
+    }
+    .layout-selector {
+      color: var(--contrast);
+      opacity: 0.9;
+      mat-icon {
+        cursor: pointer;
+        transition: 150ms;
+        &:hover {
+          transform: scale(1.1);
+        }
+        &.selected {
+          color: var(--iconColor);
+        }
+      }
+    }
+  }
+}
+
+.separator-el {
+  padding: 2rem 0;
+  &:after {
+    content: '';
+    display: block;
+    width: 100%;
+    margin: 0.7rem auto 0;
+    // border-bottom: 1px solid var(--backgroundTertiary);
+    opacity: 0.3;
+  }
+}

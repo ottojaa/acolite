@@ -1,20 +1,22 @@
-<div class="card-header">
-  <h3 class="contrast-text">{{ file.fileName }}</h3>
+<div class="card-container">
+  <div class="card-header">
+    <h3 class="contrast-text">{{ file.fileName }}</h3>
 
-  <ng-container *ngIf="showBookmark">
-    <mat-icon (click)="confirmRemoveBookmark(file.filePath)">bookmark</mat-icon>
-  </ng-container>
-</div>
+    <ng-container *ngIf="showBookmark">
+      <mat-icon (click)="confirmRemoveBookmark(file.filePath)">bookmark</mat-icon>
+    </ng-container>
+  </div>
 
-<p-card (click)="openInNewTab(file)">
-  <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
-</p-card>
+  <p-card (click)="openInNewTab(file)">
+    <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
+  </p-card>
 
-<div class="chips-container padding">
-  <mat-chip-list aria-label="File tags">
-    <!-- <div *ngFor="let tag of [{ bg: 'black', color: 'white', name: 'test' }]">
+  <div class="chips-container padding">
+    <mat-chip-list aria-label="File tags">
+      <!-- <div *ngFor="let tag of [{ bg: 'black', color: 'white', name: 'test' }]">
       <mat-chip [style.background-color]="tag.bg" [style.color]="tag.color">{{ tag.name }}</mat-chip>
     </div> -->
-  </mat-chip-list>
+    </mat-chip-list>
+  </div>
+  <p class="last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>
 </div>
-<p class="padding-horizontal last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>

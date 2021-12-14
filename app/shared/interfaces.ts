@@ -73,16 +73,6 @@ export interface SelectedTab {
   activeIndent?: ActiveIndent
 }
 
-export interface Tab {
-  path: string
-  fileName: string
-  extension: string
-  textContent: string
-  deleted?: boolean
-  modifiedAt?: Date
-  createdAt?: Date
-}
-
 export interface SearchResult {
   fileName: string
   extension: string
