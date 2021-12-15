@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { combineLatest, Observable } from 'rxjs'
-import { delay, map, take, tap } from 'rxjs/operators'
-import { Tab, Doc } from '../../../../app/shared/interfaces'
+import { map, take, tap } from 'rxjs/operators'
+import { Doc } from '../../../../app/shared/interfaces'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
 
@@ -12,7 +12,7 @@ import { TabService } from '../../services/tab.service'
   styleUrls: ['./editor-view.component.scss'],
 })
 export class EditorViewComponent implements OnInit {
-  tabs$: Observable<Tab[]>
+  tabs$: Observable<Doc[]>
   forceDashboard$: Observable<boolean>
   recentlyModified$: Observable<Doc[]>
   bookmarked$: Observable<Doc[]>

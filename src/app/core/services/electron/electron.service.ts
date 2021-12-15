@@ -28,8 +28,8 @@ import {
   UpdateStore,
   HandlerAction,
 } from '../../../../../app/shared/actions'
-import { AppConfig, Tab, WorkspaceConfig } from '../../../../../app/shared/interfaces'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
+import { Doc } from '../../../../../app/shared/interfaces'
 
 type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({
@@ -158,7 +158,7 @@ export class ElectronService {
     return { ...payload, type: channel }
   }
 
-  async getFileData(payload: { filePath: string }): Promise<Tab> {
+  async getFileData(payload: { filePath: string }): Promise<Doc> {
     return this.handle(HandlerAction.GetTabData, payload)
   }
 }

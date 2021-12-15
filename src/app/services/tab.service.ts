@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { getSelectedTabEntityFromIndex } from '../../../app/electron-utils/utils'
-import { Tab, SelectedTab, State } from '../../../app/shared/interfaces'
+import { Doc, SelectedTab, State } from '../../../app/shared/interfaces'
 import { ElectronService } from '../core/services'
 import { AppDialogService } from './dialog.service'
 import { StateService, StateUpdate } from './state.service'
@@ -17,7 +17,7 @@ export class TabService {
 
   openNewTab(filePath: string): void {
     const { tabs } = this.state.getStateParts(['tabs', 'selectedTab'])
-    const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
+    const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
     const state = this.state.value
 
     if (tabIdx > -1) {
@@ -38,22 +38,22 @@ export class TabService {
 
   closeOtherTabs(filePath: string): void {
     const { tabs } = this.state.getStateParts(['selectedTab', 'tabs'])
-    const tabToKeepOpen = tabs.find((tab) => tab.path === filePath)
+    const tabToKeepOpen = tabs.find((tab) => tab.filePath === filePath)
     if (tabToKeepOpen) {
-      this.update({ path: tabToKeepOpen.path, forceDashboard: false, index: 0 }, [tabToKeepOpen])
+      this.update({ filePath: tabToKeepOpen.filePath, forceDashboard: false, index: 0 }, [tabToKeepOpen])
     }
   }
 
-  revertDelete(tab: Tab): void {
-    const { textContent, path } = tab
+  revertDelete(tab: Doc): void {
+    const { textContent, filePath } = tab
     const { tabs, selectedTab } = this.state.value
-    const tabIdx = tabs.findIndex((tab) => tab.path === path)
+    const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
     if (tabIdx > -1) {
       tabs[tabIdx].deleted = false
       this.update(selectedTab, tabs)
 
       const payload = {
-        path,
+        filePath,
         content: textContent,
         openFileAfterCreation: false,
         state: this.state.value,
@@ -63,7 +63,7 @@ export class TabService {
   }
 
   closeAllTabs(): void {
-    this.update({ path: '', index: 0, forceDashboard: false }, [])
+    this.update({ filePath: '', index: 0, forceDashboard: false }, [])
   }
 
   closeDeleted(): void {
@@ -81,7 +81,7 @@ export class TabService {
     this.electronService.openFileLocationRequest({ filePath })
   }
 
-  update(selectedTab: SelectedTab, tabs: Tab[], expand?: boolean): void {
+  update(selectedTab: SelectedTab, tabs: Doc[]): void {
     const payload: StateUpdate<State>[] = [
       { key: 'selectedTab', payload: selectedTab },
       { key: 'tabs', payload: tabs },
@@ -89,24 +89,24 @@ export class TabService {
     this.state.updateState$.next(payload)
   }
 
-  filterClosedTab(tabs: Tab[], tabToClose: string): Tab[] {
-    return tabs.filter((tab) => tab.path !== tabToClose)
+  filterClosedTab(tabs: Doc[], tabToClose: string): Doc[] {
+    return tabs.filter((tab) => tab.filePath !== tabToClose)
   }
 
-  private getNewSelectedTab(selectedTab: SelectedTab, tabs: Tab[]): any {
+  private getNewSelectedTab(selectedTab: SelectedTab, tabs: Doc[]): any {
     const newIndex = selectedTab.index - 1 >= 0 ? selectedTab.index - 1 : 0
-    return tabs[newIndex] ? { path: tabs[newIndex].path, index: newIndex } : { path: '', index: 0 }
+    return tabs[newIndex] ? { path: tabs[newIndex].filePath, index: newIndex } : { path: '', index: 0 }
   }
 
-  toggleBookmark(tab: Tab): void {
-    const { path, fileName } = tab
+  toggleBookmark(tab: Doc): void {
+    const { filePath, fileName } = tab
     const { bookmarks, bookmarkedFiles } = this.state.getStateParts(['bookmarks', 'bookmarkedFiles'])
-    const tabIdx = bookmarks.indexOf(path)
+    const tabIdx = bookmarks.indexOf(filePath)
 
     const updateBookmarks = (updated: string[], showToast: boolean) => {
       this.state.updateState$.next([{ key: 'bookmarks', payload: updated }])
       this.electronService.updateBookmarkedFiles({
-        bookmarkPath: path,
+        bookmarkPath: filePath,
         bookmarkedFiles: bookmarkedFiles,
       })
 
@@ -116,10 +116,10 @@ export class TabService {
     }
 
     if (tabIdx > -1) {
-      const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== path)
+      const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== filePath)
       updateBookmarks(updatedBookmarks, false)
     } else {
-      const updatedBookmarks = [...bookmarks, path]
+      const updatedBookmarks = [...bookmarks, filePath]
       updateBookmarks(updatedBookmarks, true)
     }
   }

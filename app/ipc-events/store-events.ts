@@ -8,7 +8,14 @@ import {
   updateSelectedWorkspaceConfig,
 } from '../config-helpers/config-helpers'
 import { formatDate } from '../date-and-time-helpers'
-import { getBaseName, getExtensionSplit, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
+import {
+  getBaseName,
+  getExtensionSplit,
+  getFileData,
+  getFileDataSync,
+  getJoinedPath,
+  getPathSeparator,
+} from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
 import { SearchQuery, UpdateBookmarkedFiles, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
@@ -203,7 +210,7 @@ export const getDashboardConfig = (
 }
 
 export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemPath: string) => {
-  const item = createIndexFileFromPathSync(updatedItemPath)
+  const item = getFileDataSync(updatedItemPath)
   const filtered = recentlyModified.filter((el) => el.filePath !== updatedItemPath)
   return [item, ...filtered]
 }
@@ -212,23 +219,9 @@ export const updateBookmarkedFiles = (event: IpcMainEvent, payload: UpdateBookma
   const { bookmarkPath, bookmarkedFiles } = payload
   const shouldFilter = bookmarkedFiles?.some((file) => file.filePath === bookmarkPath)
 
-  const getBookmarkData = (): Doc => {
-    const content = fs.readFileSync(bookmarkPath, 'utf-8')
-    const fileStats = fs.statSync(bookmarkPath)
-
-    return {
-      ino: fileStats.ino,
-      fileName: getBaseName(bookmarkPath),
-      extension: getExtensionSplit(bookmarkPath),
-      filePath: bookmarkPath,
-      content: content,
-      createdAt: fileStats.birthtime,
-      modifiedAt: fileStats.mtime,
-    }
-  }
   const updatedBookmarks: Doc[] = shouldFilter
     ? bookmarkedFiles.filter((file) => file.filePath !== bookmarkPath)
-    : [...bookmarkedFiles, getBookmarkData()]
+    : [...bookmarkedFiles, getFileDataSync(bookmarkPath)]
 
   event.sender.send(StoreResponses.UpdateBookmarkedFilesSuccess, { bookmarkedFiles: updatedBookmarks })
 }
@@ -255,14 +248,14 @@ export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Doc
 }
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
-  const indexFile = await createIndexFileFromPath(newPath)
+  const indexFile = await getFileData(newPath)
   const { ino } = indexFile
 
   await index.updateAsync(ino, indexFile)
 }
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
-  const indexFile = await createIndexFileFromPath(filePath)
+  const indexFile = await getFileData(filePath)
   const { ino } = indexFile
 
   await index.addAsync(ino, indexFile)
@@ -306,51 +299,6 @@ export const getEmptyIndex = (): Document<Doc, true> => {
       store: true,
     },
   })
-}
-
-const createIndexFileFromPath = (filePath: string): Promise<Doc> => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) reject(err)
-
-      fs.stat(filePath, (err, stats) => {
-        if (err) reject()
-
-        const { ino, mtime, birthtime } = stats // Ino refers to the unique lnode - identifier of the file, which we can use as a unique id
-        const extension = getExtensionSplit(filePath)
-        const fileName = getBaseName(filePath)
-        const doc: Doc = {
-          ino,
-          filePath,
-          fileName,
-          extension,
-          content: data,
-          modifiedAt: mtime,
-          createdAt: birthtime,
-        }
-
-        resolve(doc)
-      })
-    })
-  })
-}
-
-const createIndexFileFromPathSync = (filePath: string): Doc => {
-  const content = fs.readFileSync(filePath, 'utf-8')
-  const fileStats = fs.statSync(filePath)
-  const { ino, mtime, birthtime } = fileStats
-  const extension = getExtensionSplit(filePath)
-  const fileName = getBaseName(filePath)
-
-  return {
-    ino,
-    filePath,
-    fileName,
-    extension,
-    content: content,
-    modifiedAt: mtime,
-    createdAt: birthtime,
-  }
 }
 
 // ****************** END Document store index functionality *******************

@@ -23,7 +23,7 @@ export type ActionType = FileActions | FolderActions | StoreActions | SearchActi
 
 export interface CreateFile {
   type: FileActions.Create
-  path: string
+  filePath: string
   openFileAfterCreation: boolean
   content?: string
   state: State
@@ -42,7 +42,7 @@ export interface CreateNewDirectory {
 
 export interface RenameFile {
   type: FileActions.Rename
-  path: string
+  filePath: string
   newName: string
   state: State
 }
@@ -74,7 +74,7 @@ export interface OpenFileLocation {
 export interface UpdateFileContent {
   type: FileActions.Update
   content: string
-  path: string
+  filePath: string
   state: State
 }
 export interface SetDefaultDir {

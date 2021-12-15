@@ -1,7 +1,7 @@
 import { Component, Inject, NgZone } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { getBaseName, getExtension } from '../../../../../app/electron-utils/file-utils'
 import { isBannedValue } from '../../../../../app/electron-utils/utils'
 import { nameValidationPattern } from '../../../../../app/shared/constants'
 import { TreeElement } from '../../../../../app/shared/interfaces'
@@ -45,7 +45,8 @@ export class RenameFileDialogComponent {
   }
 
   initFileNameAndExtension(filePath: string): void {
-    const [fileName, extension] = getBaseName(filePath).split('.')
+    const [fileName] = getBaseName(filePath).split('.')
+    const extension = getExtension(filePath).replace('.', '')
     this.fileName.setValue(fileName)
     this.extension = extension
   }
@@ -63,7 +64,7 @@ export class RenameFileDialogComponent {
     }
 
     this.electronService.renameFileRequest({
-      path: this.data.filePath,
+      filePath: this.data.filePath,
       newName: this.fileName.value,
       state: this.state.value,
     })

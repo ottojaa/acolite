@@ -6,7 +6,11 @@ interface FileExtensionIcon {
   color?: string
 }
 
-export const nameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$'
+export const nameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöüÄÖÜß. ]+$'
+export const extensionValidationPattern = '^[a-z]+$'
+
+export const allowedTextEditorExtensions = ['txt', 'text', 'html', 'yml', 'doc', 'docx']
+export const allowedMarkdownEditorExtensions = ['markdown', 'md']
 
 export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'file-image-outline', acceptedExtensions: ['jpg', 'jpeg', 'png', 'img'], color: '#65ff87' },
@@ -19,6 +23,14 @@ export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'language-javascript', acceptedExtensions: ['js'], color: 'yellow' },
   { name: 'folder', acceptedExtensions: ['folder'] },
   { name: 'file-document', acceptedExtensions: ['default'], color: 'white' },
+]
+
+export const editorTypes = [
+  {
+    editor: 'txt',
+    acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx'],
+  },
+  { editor: 'md', acceptedTypes: ['markdown', 'md'] },
 ]
 
 export enum EntityTypes {

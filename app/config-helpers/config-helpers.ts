@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 import { first, uniq } from 'lodash'
-import { getBaseName, getExtensionSplit } from '../electron-utils/file-utils'
+import { getFileDataSync } from '../electron-utils/file-utils'
 import { allowedConfigKeys } from '../shared/constants'
-import { WorkspaceConfig, AppConfig, Tab } from '../shared/interfaces'
+import { WorkspaceConfig, AppConfig } from '../shared/interfaces'
 
 export const getDefaultConfigJSON = (workspacePath?: string): string => {
   if (!workspacePath) {
@@ -161,22 +161,7 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
 }
 
 const validateTabs = (config: WorkspaceConfig) => {
-  const getTabData = (path: string) => {
-    if (!fs.existsSync(path)) {
-      return null
-    }
-    const content = fs.readFileSync(path, 'utf-8')
-    const fileStats = fs.statSync(path)
-    return <Tab>{
-      fileName: getBaseName(path),
-      extension: getExtensionSplit(path),
-      path,
-      textContent: content,
-      createdAt: fileStats.birthtime,
-      modifiedAt: fileStats.mtime,
-    }
-  }
-  return config.tabs.map((tab) => getTabData(tab.path)).filter((tab) => !!tab)
+  return config.tabs.map((tab) => getFileDataSync(tab.filePath)).filter((tab) => !!tab)
 }
 
 const validateBaseDir = (config: WorkspaceConfig) => {
@@ -205,7 +190,7 @@ const validateEditorTheme = (config: WorkspaceConfig) => {
 
 const validateSelectedTab = (config: WorkspaceConfig) => {
   const { tabs, selectedTab } = config
-  const isValid = tabs?.findIndex((tab) => tab.path === selectedTab.path) > -1
+  const isValid = tabs?.findIndex((tab) => tab.filePath === selectedTab.filePath) > -1
   return isValid ? selectedTab : { path: null, index: 0, forceDashboard: false }
 }
 

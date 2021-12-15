@@ -38,7 +38,7 @@ export class StateService extends AbstractComponent {
     initialized: false,
     baseDir: '',
     selectedTab: {
-      path: '',
+      filePath: '',
       index: 0,
       forceDashboard: false,
     },
@@ -179,7 +179,7 @@ export class StateService extends AbstractComponent {
       this.electronService.updateStore({ state })
     }
     if (shouldTrigger('expandNodeParents')) {
-      expandNodeRecursive(rootDirectory, selectedTab.path)
+      expandNodeRecursive(rootDirectory, selectedTab.filePath)
     }
   }
 }

@@ -7,7 +7,7 @@ import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
 import hljs from 'highlight.js/lib/common'
-import { Tab } from '../../../../../../app/shared/interfaces'
+import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-markdown-editor',
@@ -15,7 +15,7 @@ import { Tab } from '../../../../../../app/shared/interfaces'
   styleUrls: ['./markdown-editor.component.scss'],
 })
 export class MarkdownEditorViewComponent extends AbstractComponent implements OnInit {
-  @Input() tab: Tab
+  @Input() tab: Doc
 
   // Perhaps something to do with animations, but ngxMde is not immediately available on NgOnInit, and
   // there's a small delay between the ngxMde instance being available and the underlying
@@ -46,7 +46,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   }
 
   async initTabData(): Promise<void> {
-    const data = await this.electronService.getFileData({ filePath: this.tab.path })
+    const data = await this.electronService.getFileData({ filePath: this.tab.filePath })
   }
 
   onEditorContentChange(): void {
@@ -70,9 +70,10 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
    */
   initTextContentIfNgxMdeInView(): void {
     setTimeout(() => {
-      const queryString = `ngx-markdown-editor-${this.tab.path}`
+      const queryString = `ngx-markdown-editor-${this.tab.filePath}`
       const editor = document.getElementById(queryString)
       if (editor && this.ngxMde) {
+        console.log(this.tab)
         this.ngxMde.mde.setContent(this.tab.textContent)
         this.initialized$.next(true)
         this.initialized$.unsubscribe()
@@ -95,7 +96,7 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
         debounceTime(1000)
       )
       .subscribe(() => {
-        this.updateContent(this.tab.path, this.textContent)
+        this.updateContent(this.tab.filePath, this.textContent)
       })
   }
 
@@ -120,8 +121,8 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     }
   }
 
-  updateContent(path: string, content: string): void {
-    const payload = { path, content, state: this.state.value }
+  updateContent(filePath: string, content: string): void {
+    const payload = { filePath, content, state: this.state.value }
     this.electronService.updateFileContent(payload)
   }
 

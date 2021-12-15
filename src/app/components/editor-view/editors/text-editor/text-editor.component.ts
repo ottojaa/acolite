@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core'
 import { MenuItem } from 'primeng/api'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
-import { Tab } from '../../../../../../app/shared/interfaces'
+import { Doc } from '../../../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
@@ -13,7 +13,7 @@ import { StateService } from '../../../../services/state.service'
   styleUrls: ['./text-editor.component.scss'],
 })
 export class TextEditorComponent extends AbstractComponent implements OnInit {
-  @Input() tab: Tab
+  @Input() tab: Doc
 
   isChecked: boolean
   textContent: string
@@ -35,7 +35,7 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
 
   initAutoSave(): void {
     this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(1000), distinctUntilChanged()).subscribe(() => {
-      this.updateContent(this.tab.path, this.textContent)
+      this.updateContent(this.tab.filePath, this.textContent)
     })
   }
 
@@ -46,8 +46,8 @@ export class TextEditorComponent extends AbstractComponent implements OnInit {
       .subscribe((data) => (this.isChecked = data === 'light'))
   }
 
-  updateContent(path: string, content: string): void {
-    const payload = { path, content, state: this.state.value }
+  updateContent(filePath: string, content: string): void {
+    const payload = { filePath, content, state: this.state.value }
     this.electronService.updateFileContent(payload)
   }
 

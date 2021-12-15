@@ -15,7 +15,7 @@ export interface FileEntity {
 
 export interface WorkspaceConfig {
   baseDir?: string
-  tabs?: Tab[]
+  tabs?: Doc[]
   sideMenuWidth?: number
   selectedTab?: SelectedTab
   editorTheme?: 'dark' | 'light'
@@ -38,21 +38,11 @@ export interface State {
   sideMenuWidth: number
   searchPreferences: SearchPreference[]
   searchResults: SearchResult[]
-  tabs: Tab[]
+  tabs: Doc[]
   rootDirectory: TreeElement
   bookmarks: string[]
   bookmarkedFiles: Doc[]
   recentlyModified: Doc[]
-}
-
-export interface Tab {
-  path: string
-  fileName: string
-  extension: string
-  textContent: string
-  deleted?: boolean
-  createdAt?: Date
-  modifiedAt?: Date
 }
 
 export enum MenuItemTypes {
@@ -67,7 +57,7 @@ export interface ActiveIndent {
 }
 
 export interface SelectedTab {
-  path: string
+  filePath: string
   index: number
   forceDashboard: boolean
   activeIndent?: ActiveIndent
@@ -110,9 +100,11 @@ export interface Doc {
   filePath: string
   fileName: string
   extension: string
-  content: string
+  editorType: string
   modifiedAt: Date
   createdAt: Date
+  textContent?: string
+  deleted?: boolean
 }
 
 export interface ThemeOption {

@@ -3,7 +3,7 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
-import { Tab } from '../../../../../../../app/shared/interfaces'
+import { Doc } from '../../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-sortable-file-list',
@@ -31,14 +31,14 @@ import { Tab } from '../../../../../../../app/shared/interfaces'
   ],
 })
 export class SortableFileListComponent implements AfterViewInit {
-  @Input() set files(files: Tab[]) {
+  @Input() set files(files: Doc[]) {
     this.dataSource.data = files
   }
   @Input() basePath: string
 
   displayedColumns: string[] = ['fileName', 'createdAt', 'modifiedAt', 'filePath']
-  dataSource: MatTableDataSource<Tab>
-  expandedElement: Tab | null
+  dataSource: MatTableDataSource<Doc>
+  expandedElement: Doc | null
 
   @ViewChild(MatPaginator) paginator: MatPaginator
   @ViewChild(MatSort) sort: MatSort

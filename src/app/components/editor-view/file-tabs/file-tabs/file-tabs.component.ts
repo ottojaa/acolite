@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, V
 import { MenuItem } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Observable } from 'rxjs'
-import { delay, map, takeUntil, tap } from 'rxjs/operators'
+import { map, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { StateService } from '../../../../services/state.service'
 import { TabService } from '../../../../services/tab.service'
 import { MatTabChangeEvent } from '@angular/material/tabs'
-import { Tab, SelectedTab } from '../../../../../../app/shared/interfaces'
+import { Doc, SelectedTab } from '../../../../../../app/shared/interfaces'
 import { getSelectedTabEntityFromIndex } from '../../../../../../app/electron-utils/utils'
+import { allowedMarkdownEditorExtensions, allowedTextEditorExtensions } from '../../../../../../app/shared/constants'
 
 @Component({
   selector: 'app-file-tabs',
@@ -17,17 +18,20 @@ import { getSelectedTabEntityFromIndex } from '../../../../../../app/electron-ut
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileTabsComponent extends AbstractComponent implements OnInit {
-  @Input() tabs: Tab[]
+  @Input() tabs: Doc[]
   @ViewChild('cm') cm: ContextMenu
 
   contextMenuItems: MenuItem[]
   selectedTab$: Observable<number>
+  textEditorExtensions = allowedTextEditorExtensions
+  markdownEditorExtensions = allowedMarkdownEditorExtensions
 
   constructor(public state: StateService, public cdRef: ChangeDetectorRef, public tabService: TabService) {
     super()
   }
 
   ngOnInit(): void {
+    console.log(this.tabs)
     this.selectedTab$ = this.state.getStatePart('selectedTab').pipe(
       takeUntil(this.destroy$),
       tap((selectedTab) => this.scrollSelectedTabIntoView(selectedTab)),
@@ -52,22 +56,22 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
   onSelectTab(event: MatTabChangeEvent): void {
     const { selectedTab } = this.state.value
     const newSelectedTab = getSelectedTabEntityFromIndex(this.state.value, event.index)
-    if (newSelectedTab.path !== selectedTab.path) {
+    if (newSelectedTab.filePath !== selectedTab.filePath) {
       this.state.updateState$.next([{ key: 'selectedTab', payload: { ...newSelectedTab, forceDashboard: false } }])
     }
   }
 
-  trackByPath(_index: number, tab: Tab): string {
-    return tab.path
+  trackByPath(_index: number, tab: Doc): string {
+    return tab.filePath
   }
 
-  onRightClick(event: MouseEvent, tab: Tab): void {
-    const { path } = tab
-    this.contextMenuItems = this.getContextMenuItems(path)
+  onRightClick(event: MouseEvent, tab: Doc): void {
+    const { filePath } = tab
+    this.contextMenuItems = this.getContextMenuItems(filePath)
     this.cm.show(event)
   }
 
-  revertDelete(tab: Tab): void {
+  revertDelete(tab: Doc): void {
     this.tabService.revertDelete(tab)
   }
 

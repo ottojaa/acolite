@@ -5,7 +5,7 @@ import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { MatSelect } from '@angular/material/select'
-import { nameValidationPattern } from '../../../../../app/shared/constants'
+import { extensionValidationPattern, nameValidationPattern } from '../../../../../app/shared/constants'
 import { getBaseName, getJoinedPath } from '../../../../../app/electron-utils/file-utils'
 import { TreeElement } from '../../../../../app/shared/interfaces'
 
@@ -18,18 +18,29 @@ export class FileCreationComponent {
   @ViewChild('typeSelect') typeSelect: MatSelect
 
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
-  extension = new FormControl('txt', [Validators.required])
+  extension = new FormControl('txt', [Validators.required, Validators.pattern(extensionValidationPattern)])
   openFileAfterCreation = true
+  showExtensionInput = false
   options = [
     {
       icon: 'text',
       value: 'txt',
-      label: 'Text',
+      label: 'Text (txt)',
     },
     {
       icon: 'md',
       value: 'md',
-      label: 'Markdown',
+      label: 'Markdown (md)',
+    },
+    {
+      icon: 'json',
+      value: 'json',
+      label: 'JSON (json)',
+    },
+    {
+      icon: 'other',
+      value: 'other',
+      label: 'Other (manual input)',
     },
   ]
 
@@ -64,6 +75,10 @@ export class FileCreationComponent {
     this.dialogRef.close()
   }
 
+  onClickOtherOption(): void {
+    this.showExtensionInput
+  }
+
   getErrorMessage(): string | undefined {
     if (this.fileName.hasError('required')) {
       return 'You must enter a file name'
@@ -74,6 +89,9 @@ export class FileCreationComponent {
     if (this.extension.hasError('required')) {
       return 'You must choose an extension'
     }
+    if (this.extension.hasError('pattern')) {
+      return 'Extension can only consist of lower-case letters'
+    }
   }
 
   onCreateClick(): void {
@@ -83,10 +101,10 @@ export class FileCreationComponent {
       return
     }
 
-    const path = getJoinedPath([this.data.filePath, this.result])
+    const filePath = getJoinedPath([this.data.filePath, this.result])
 
     this.electronService.createNewFileRequest({
-      path,
+      filePath,
       openFileAfterCreation: this.openFileAfterCreation,
       state: this.state.value,
     })

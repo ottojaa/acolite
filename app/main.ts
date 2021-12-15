@@ -18,10 +18,9 @@ import {
   updateFileContent,
   readAndSendTabData,
   openFileLocation,
-  getFileData,
 } from './ipc-events/file-events'
 import { getEmptyIndex, initAppState, searchFiles, updateBookmarkedFiles, updateStore } from './ipc-events/store-events'
-import { getJoinedPath } from './electron-utils/file-utils'
+import { getFileData, getJoinedPath } from './electron-utils/file-utils'
 import {
   FileActions,
   FolderActions,
@@ -33,7 +32,6 @@ import {
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 
-type IPCChannelAction = FileActions | FolderActions | StoreActions | SearchActions
 // Initialize remote module
 require('@electron/remote/main').initialize()
 
@@ -226,7 +224,7 @@ const FileActionReducer = (action: FileActions) => {
 
 const IPCHandlerReducer = () => {
   ipcMain.handle(HandlerAction.GetTabData, async (_event, action: ReadFile) => {
-    const result = await getFileData(action)
+    const result = await getFileData(action.filePath)
     return result
   })
 }

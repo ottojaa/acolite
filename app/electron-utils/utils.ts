@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-utils'
 import { getDirName, getPathSeparator } from './file-utils'
-import { FileEntity, State, TreeElement } from '../shared/interfaces'
+import { FileEntity, SelectedTab, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
 import { ValidatorFn, AbstractControl } from '@angular/forms'
 
@@ -107,11 +107,14 @@ export const getRootDirectory = (baseDir: string): TreeElement => {
   return { ...rootTreeNode, children: menuItems }
 }
 
-export const getSelectedTabEntityFromIndex = (state: State, index: number) => {
+export const getSelectedTabEntityFromIndex = (state: State, index: number): SelectedTab => {
   const { tabs, baseDir } = state
   const selectedTab = tabs[index]
   if (selectedTab) {
-    return { path: tabs[index].path, index, activeIndent: getActiveIndent(baseDir, selectedTab.path) }
+    const filePath = tabs[index].filePath
+    const activeIndent = getActiveIndent(baseDir, selectedTab.filePath)
+
+    return { filePath, index, activeIndent, forceDashboard: false }
   } else {
     console.error(`No tab at index ${index}`)
     return null

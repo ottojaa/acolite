@@ -5,7 +5,7 @@
     <div class="editor-border">
       <ngx-markdown-editor
         class="markdown-body"
-        id="ngx-markdown-editor-{{ tab.path }}"
+        id="ngx-markdown-editor-{{ tab.filePath }}"
         [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
         [options]="editorOptions"
         (contentChange)="onEditorContentChange()"

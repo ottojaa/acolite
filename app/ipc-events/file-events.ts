@@ -10,7 +10,15 @@ import {
   updateIndex,
   updateIndexesRecursive,
 } from './store-events'
-import { getBaseName, getDirName, getExtension, getExtensionSplit, getJoinedPath } from '../electron-utils/file-utils'
+import {
+  getBaseName,
+  getDirName,
+  getEditorType,
+  getExtension,
+  getExtensionSplit,
+  getFileData,
+  getJoinedPath,
+} from '../electron-utils/file-utils'
 import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
 import { getDeletedFileEntityMock, getFileEntityFromPath, getSelectedTabEntityFromIndex } from '../electron-utils/utils'
 import {
@@ -24,79 +32,51 @@ import {
   FileActionResponses,
   FileActions,
 } from '../shared/actions'
-import { Doc, Tab, TreeElement } from '../shared/interfaces'
+import { Doc, TreeElement } from '../shared/interfaces'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action
   const { tabs } = state
-  fs.readFile(filePath, 'utf-8', (err, content) => {
-    if (err) {
-      event.sender.send(FileActionResponses.ReadFailure)
-      return
-    }
-    const fileStats = fs.statSync(filePath)
-    const tabData: Tab = {
-      fileName: getBaseName(filePath),
-      extension: getExtensionSplit(filePath),
-      path: filePath,
-      textContent: content,
-      modifiedAt: fileStats.mtime,
-      createdAt: fileStats.birthtime,
-    }
 
-    const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
-    if (tabIdx === -1) {
-      tabs.push(tabData)
-    }
-
-    const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
-    const selectedTab = getSelectedTabEntityFromIndex(state, selectedTabIndex)
-
-    event.sender.send(FileActionResponses.ReadSuccess, { tabs, selectedTab })
-  })
-}
-
-export const getFileData = (action: ReadFile) => {
-  const { filePath } = action
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, content) => {
-      if (err) {
-        reject(`Failure reading ${filePath}`)
+  getFileData(filePath).then(
+    (tabData) => {
+      const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
+      if (tabIdx === -1) {
+        tabs.push(tabData)
       }
-      const fileStats = fs.statSync(filePath)
 
-      resolve({
-        fileName: getBaseName(filePath),
-        extension: getExtensionSplit(filePath),
-        path: filePath,
-        textContent: content,
-        modifiedAt: fileStats.mtime,
-        createdAt: fileStats.birthtime,
-      })
-    })
-  })
+      const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
+      const selectedTab = getSelectedTabEntityFromIndex(state, selectedTabIndex)
+
+      event.sender.send(FileActionResponses.ReadSuccess, { tabs, selectedTab })
+    },
+    (err) => {
+      console.error(err)
+      event.sender.send(FileActionResponses.ReadFailure)
+    }
+  )
 }
 
 export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
-  const { path, content, state } = action
+  const { filePath, content, state } = action
   const { tabs, recentlyModified } = state
 
-  fs.writeFile(path, content, (err) => {
+  fs.writeFile(filePath, content, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.UpdateFailure)
       return
     }
 
-    updateTabData(tabs, path, content)
-    updateIndex(path, index)
-    const updatedRecentlyModified = getUpdatedRecentlyModified(recentlyModified, path) || recentlyModified
+    updateTabData(tabs, filePath, content)
+    updateIndex(filePath, index)
+    const updatedRecentlyModified = getUpdatedRecentlyModified(recentlyModified, filePath) || recentlyModified
 
     event.sender.send(FileActionResponses.UpdateSuccess, { tabs, recentlyModified: updatedRecentlyModified })
   })
 }
 
-const updateTabData = (tabs: Tab[], oldTabPath: string, newContent?: string, newPath?: string): void => {
-  const tabIdx = tabs.findIndex((tab) => tab.path === oldTabPath)
+const updateTabData = (tabs: Doc[], oldTabPath: string, newContent?: string, newPath?: string): void => {
+  const tabIdx = tabs.findIndex((tab) => tab.filePath === oldTabPath)
   if (tabIdx > -1) {
     const pathToBeUsed = newPath ? newPath : oldTabPath
     const fileStats = fs.statSync(pathToBeUsed)
@@ -112,46 +92,46 @@ const updateTabData = (tabs: Tab[], oldTabPath: string, newContent?: string, new
       tabs[tabIdx].textContent = newContent
     }
     if (newPath) {
-      tabs[tabIdx].path = newPath
+      tabs[tabIdx].filePath = newPath
     }
   }
 }
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
-  const { path, openFileAfterCreation, content, state } = action
+  const { filePath, openFileAfterCreation, content, state } = action
   const { rootDirectory } = state
   const textContent = content || ''
 
-  fs.writeFile(path, textContent, (err) => {
+  fs.writeFile(filePath, textContent, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
     }
-    const file = getFileEntityFromPath(path)
+    const file = getFileEntityFromPath(filePath)
     const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
       baseDir: rootDirectory.data.filePath,
     })
 
     const rootDir = first(updatedRootDirectory)
-    addToIndex(path, index)
+    addToIndex(filePath, index)
 
     event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
 
     if (openFileAfterCreation) {
-      readAndSendTabData(event, { state, filePath: path, type: FileActions.ReadFile })
+      readAndSendTabData(event, { state, filePath, type: FileActions.ReadFile })
     }
   })
 }
 
 export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Document<Doc, true>) => {
-  const { path, newName, state } = action
+  const { filePath, newName, state } = action
   const { rootDirectory, tabs } = state
-  const parentDirectory = getDirName(path)
-  const extension = getExtension(path)
+  const parentDirectory = getDirName(filePath)
+  const extension = getExtension(filePath)
   const newPath = getJoinedPath([parentDirectory, newName]) + extension
-  const oldPath = path
+  const oldPath = filePath
 
-  fs.rename(path, newPath, (err) => {
+  fs.rename(filePath, newPath, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.RenameFailure)
       return
@@ -168,7 +148,7 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
     })
     const rootDir = first(updatedRootDirectory)
 
-    updateTabData(tabs, path, null, newPath)
+    updateTabData(tabs, filePath, null, newPath)
     updateIndexesRecursive([newPath], index)
 
     event.sender.send(FileActionResponses.RenameSuccess, { rootDirectory: rootDir, tabs })
@@ -187,9 +167,9 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
   }
 
   const updateTabPath = (currentPath: string, newPath: string) => {
-    const tabIdx = tabs.findIndex((tab) => tab.path === currentPath)
+    const tabIdx = tabs.findIndex((tab) => tab.filePath === currentPath)
     if (tabIdx > -1) {
-      tabs[tabIdx].path = newPath
+      tabs[tabIdx].filePath = newPath
     }
   }
 
@@ -251,7 +231,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
   }
 
   const markTabAsDeleted = (filePath: string) => {
-    const tabIdx = tabs.findIndex((tab) => tab.path === filePath)
+    const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
     if (tabIdx > -1) {
       tabs[tabIdx].deleted = true
     }
