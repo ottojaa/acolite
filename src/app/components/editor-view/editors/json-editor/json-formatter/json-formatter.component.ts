@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { getObjectName, getPreview, getType, getValuePreview } from './formatter-utils'
 
 const JSONFormatterConfig = {
@@ -13,11 +13,16 @@ const JSONFormatterConfig = {
   styleUrls: ['./json-formatter.component.scss'],
 })
 export class JsonFormatterComponent implements OnInit {
-  @Input() json: any
+  @Input() set json(value: any) {
+    this._json = value
+    this.initParams()
+  }
   @Input() key: string
+  @Input() forceOpen: boolean
   @Input() open: number
   @Input() isValid: boolean
-
+  @ViewChildren('formatter') formatters: QueryList<JsonFormatterComponent>
+  _json: any
   isArray: boolean
   isObject: boolean
   isUrl: boolean
@@ -29,7 +34,15 @@ export class JsonFormatterComponent implements OnInit {
   isOpen: boolean
   constructorName: string
 
+  get json() {
+    return this._json
+  }
+
   ngOnInit() {
+    this.initParams()
+  }
+
+  initParams(): void {
     this.isArray = Array.isArray(this.json)
     this.isObject = this.json != null && typeof this.json === 'object'
     this.type = getType(this.json)
@@ -78,7 +91,6 @@ export class JsonFormatterComponent implements OnInit {
 
   getThumbnail() {
     if (this.isArray) {
-      // if array length is greater then 100 it shows "Array[101]"
       if (this.json.length > JSONFormatterConfig.hoverPreviewArrayCount) {
         return 'Array[' + this.json.length + ']'
       } else {

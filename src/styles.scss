@@ -5,6 +5,9 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import '../src/variables.scss';
 @import './github-markdown.css';
+@import '~codemirror/lib/codemirror';
+@import '~codemirror/theme/moxer';
+@import '../src/assets/themes/codemirror-lint.css';
 
 body,
 body .p-component {

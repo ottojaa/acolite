@@ -2,10 +2,74 @@
 
 :host {
   white-space: pre;
+  ::ng-deep {
+    .CodeMirror {
+      height: 100%;
+      background-color: var(--backgroundPrimary);
+      border-radius: 10px;
+    }
+    .CodeMirror-gutters {
+      background-color: var(--backgroundPrimary);
+    }
+    .as-split-gutter {
+      z-index: 999;
+    }
+  }
+  .side-menu-split {
+    position: relative;
+    &:hover .show-button {
+      opacity: 1;
+      &:hover {
+        color: var(--buttonColor);
+      }
+    }
+  }
 }
 
-.side-menu-split {
+.editor {
+  height: 100%;
+}
+
+.format-view {
+  height: 100%;
   position: relative;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background: white;
+  overflow-y: auto;
+  &:hover .hide-button {
+    opacity: 1;
+    &:hover {
+      color: var(--buttonColor);
+    }
+  }
+
+  .button-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.hide-button {
+  color: black;
+  position: absolute;
+  top: 50%;
+  opacity: 0;
+  cursor: pointer;
+  transition: 300ms all;
+}
+
+.show-button {
+  color: white;
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  right: 0%;
+  opacity: 0;
+  cursor: pointer;
+  transition: 300ms all;
 }
 
 .contenteditable-div {
@@ -15,7 +79,6 @@
 .format-result {
   width: 100%;
   white-space: pre;
-  background: white;
 }
 
 .layout-section {
@@ -27,30 +90,15 @@
   opacity: 0.3;
 }
 
-textarea,
-pre {
-  tab-size: 4;
-}
-
-.raw-json {
-  tab-size: 4;
-}
-
 .lint-button {
   position: absolute;
   top: 0;
   right: 0;
   transition: all 150ms;
+  z-index: 9;
   &:hover {
     background-color: var(--buttonColor);
   }
-}
-
-.button-container {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .invalid-json {

@@ -32,4 +32,9 @@ export class AbstractEditor extends AbstractComponent {
   themeListener(): Observable<string> {
     return this.state.getStatePart('editorTheme').pipe(takeUntil(this.destroy$))
   }
+
+  showContextMenu(event: MouseEvent): void {
+    event.preventDefault()
+    this.electronService.showContextMenu()
+  }
 }

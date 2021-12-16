@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain, screen, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import { IpcMainEvent } from 'electron/main'
+import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
   createNewDirectory,
@@ -22,6 +22,7 @@ import {
 import { getEmptyIndex, initAppState, searchFiles, updateBookmarkedFiles, updateStore } from './ipc-events/store-events'
 import { getFileData, getJoinedPath } from './electron-utils/file-utils'
 import {
+  ContextMenuActions,
   FileActions,
   FolderActions,
   HandlerAction,
@@ -31,6 +32,7 @@ import {
   UpdateActionPayload,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
+import { getEditorMenuItems } from './menu'
 
 // Initialize remote module
 require('@electron/remote/main').initialize()
@@ -123,6 +125,8 @@ const StoreActionChannels = [
   StoreActions.UpdateBookmarkedFiles,
 ]
 
+const ContextMenuChannels = [ContextMenuActions.ShowEditorContextMenu]
+
 const SearchActionChannels = [SearchActions.Query]
 
 const startIPCChannelListeners = () => {
@@ -130,6 +134,8 @@ const startIPCChannelListeners = () => {
   FileActionChannels.forEach((channel) => FileActionReducer(channel))
   StoreActionChannels.forEach((channel) => StoreActionReducer(channel))
   SearchActionChannels.forEach((channel) => SearchActionReducer(channel))
+  ContextMenuChannels.forEach((channel) => ContextMenuReducer(channel))
+
   IPCHandlerReducer()
 }
 
@@ -217,6 +223,17 @@ const FileActionReducer = (action: FileActions) => {
       case FileActions.OpenFileLocation: {
         openFileLocation(event, payload)
         break
+      }
+    }
+  })
+}
+
+const ContextMenuReducer = (action: ContextMenuActions) => {
+  ipcMain.on(action, (event: IpcMainEvent) => {
+    switch (action) {
+      case ContextMenuActions.ShowEditorContextMenu: {
+        const menu = Menu.buildFromTemplate(getEditorMenuItems())
+        menu.popup(<PopupOptions>BrowserWindow.fromWebContents(event.sender))
       }
     }
   })

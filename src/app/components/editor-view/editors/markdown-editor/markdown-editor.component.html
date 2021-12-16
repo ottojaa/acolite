@@ -9,6 +9,7 @@
         [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
         [options]="editorOptions"
         (contentChange)="onEditorContentChange()"
+        (contextmenu)="showContextMenu($event)"
       ></ngx-markdown-editor>
     </div>
   </div>

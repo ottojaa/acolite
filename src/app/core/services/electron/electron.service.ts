@@ -27,6 +27,7 @@ import {
   StoreActions,
   UpdateStore,
   HandlerAction,
+  ContextMenuActions,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc } from '../../../../../app/shared/interfaces'
@@ -149,6 +150,10 @@ export class ElectronService {
 
   updateBookmarkedFiles(payload: OmitActionType<UpdateBookmarkedFiles>): void {
     this.send(StoreActions.UpdateBookmarkedFiles, payload)
+  }
+
+  showContextMenu(): void {
+    this.ipcRenderer.send(ContextMenuActions.ShowEditorContextMenu)
   }
 
   addActionType<T extends OmitActionType<UpdateActionPayload>>(

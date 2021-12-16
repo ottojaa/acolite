@@ -159,6 +159,10 @@ export enum StoreActions {
   UpdateBookmarkedFiles = 'get-bookmarked-files',
 }
 
+export enum ContextMenuActions {
+  ShowEditorContextMenu = 'show-editor-context-menu',
+}
+
 export enum SearchActions {
   Query = 'query-index',
 }

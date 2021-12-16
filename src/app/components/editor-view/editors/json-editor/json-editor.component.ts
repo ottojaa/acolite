@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, ViewChild } from '@angular/core'
+import { IOutputAreaSizes } from 'angular-split'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import hljs from 'highlight.js/lib/common'
-import { MenuItem } from 'primeng/api'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
+import { JsonFormatterComponent } from './json-formatter/json-formatter.component'
 
 @Component({
   selector: 'app-json-editor',
@@ -13,16 +14,18 @@ import { StateService } from '../../../../services/state.service'
 })
 export class JsonEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
+  @ViewChild('jsonFormatter') jsonFormatter: JsonFormatterComponent
 
   isChecked: boolean
   textContent: string
-  rand = new Date()
-  currentSelection: any
-  menuItems: MenuItem[]
-  formattedResult: string
+  formattedResult: Object
   highlightedContent: any
   isValidJson: boolean
   previewMode: 'json' | 'raw' = 'json'
+  openCount = 1
+  viewInit = false
+  previewWidth = 40
+  editorWidth = 60
 
   get filePath(): string {
     return this.tab.filePath
@@ -34,9 +37,28 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
 
   ngOnInit(): void {
     this.textContent = this.tab.textContent
-    this.menuItems = this.getMenuItems()
     this.initThemeListener()
     this.updateJSONPreview(this.textContent)
+  }
+
+  ngAfterViewInit(): void {
+    this.viewInit = true
+  }
+
+  hidePreview(): void {
+    this.previewWidth = 0
+    this.editorWidth = 100
+  }
+
+  showPreview(): void {
+    this.previewWidth = 40
+    this.editorWidth = 100
+  }
+
+  onDragEnd(event: { sizes: IOutputAreaSizes }): void {
+    const [editorWidth, previewWidth] = event.sizes
+    this.editorWidth = editorWidth as number
+    this.previewWidth = previewWidth as number
   }
 
   updateJSONPreview(content: string): void {
@@ -44,7 +66,7 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.isValidJson = !!formatted
 
     if (this.isValidJson) {
-      this.formattedResult = formatted
+      this.formattedResult = { ...formatted }
       const highlighted = hljs.highlightAuto(content)
       this.highlightedContent = `<pre><code class="raw-json">${highlighted.value}</code></pre>`
     }
@@ -55,7 +77,7 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.updateJSONPreview(this.textContent)
   }
 
-  formatJSON(textContent: string): string {
+  formatJSON(textContent: string): Object {
     try {
       return JSON.parse(textContent)
     } catch {
@@ -74,91 +96,15 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     } catch {}
   }
 
-  handleKeydown(event: any) {
-    if (event.key == 'Tab') {
-      event.preventDefault()
-      let start = event.target.selectionStart
-      let end = event.target.selectionEnd
-      if (event.shiftKey) {
-        if (event.target.value.substring(start - 1, start) !== '\t') {
-          return
-        }
-        event.target.value = event.target.value.substring(0, start - 1) + event.target.value.substring(end)
-        event.target.selectionStart = event.target.selectionEnd = start - 1
-      } else {
-        event.target.value = event.target.value.substring(0, start) + '\t' + event.target.value.substring(end)
-        event.target.selectionStart = event.target.selectionEnd = start + 1
-      }
-    }
-  }
-
-  getMenuItems(): any {
-    return [
-      {
-        label: 'Copy',
-        icon: 'pi pi-copy',
-        command: () => this.eventHandler('copy'),
-      },
-      {
-        label: 'Paste',
-        icon: 'pi pi-file-o',
-        command: () => this.eventHandler('paste'),
-      },
-      {
-        label: 'Cut',
-        icon: 'pi pi-pencil',
-        command: () => this.eventHandler('cut'),
-      },
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: () => this.eventHandler('delete'),
-      },
-    ]
-  }
-
-  onRightClickTextArea(): void {
-    this.currentSelection = document.activeElement
-  }
-
-  async eventHandler(type: 'copy' | 'paste' | 'cut' | 'delete'): Promise<void> {
-    const actElem: any = this.currentSelection
-    const actTagName = actElem.tagName
-    if (actTagName != 'TEXTAREA') {
-      return
-    }
-
-    navigator.clipboard.readText().then((paste) => {
-      switch (type) {
-        case 'copy':
-          const selection = actElem.value
-          navigator.clipboard.writeText(selection).then(() => {})
-          break
-        case 'paste': {
-          const actText = actElem.value
-          actElem.value = actText.slice(0, actElem.selectionStart) + paste + actText.slice(actElem.selectionEnd)
-          break
-        }
-
-        case 'cut': {
-          const actText = actElem.value
-          const cutText = actText.slice(actElem.selectionStart, actElem.selectionEnd)
-          navigator.clipboard.writeText(cutText).then(() => {
-            actElem.value = actText.slice(0, actElem.selectionStart) + actText.slice(actElem.selectionEnd)
-          })
-          break
-        }
-
-        case 'delete': {
-          const actText = actElem.value
-          actElem.value = actText.slice(0, actElem.selectionStart) + actText.slice(actElem.selectionEnd)
-          break
-        }
-      }
-    })
-  }
-
   private initThemeListener(): void {
     this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))
+  }
+
+  private initSelectedTabListener(): void {
+    this.selectedTabListener().subscribe(() => this.initContentIfInView())
+  }
+
+  initContentIfInView(): void {
+    this.textContent = this.tab.textContent
   }
 }

@@ -1,14 +1,12 @@
 <div class="editor-container">
   <app-editor-top-bar [tab]="tab"></app-editor-top-bar>
-  <p-contextMenu [target]="editor" appendTo="body" [model]="menuItems"></p-contextMenu>
 
   <div class="area-container dark-theme" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'">
     <textarea
       #editor
-      (keydown)="handleKeydown($event)"
-      (contextmenu)="onRightClickTextArea()"
       [(ngModel)]="textContent"
       (ngModelChange)="onInputChange()"
+      (contextmenu)="showContextMenu($event)"
       contentEditable
       spellcheck="false"
     ></textarea>

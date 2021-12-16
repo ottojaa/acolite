@@ -24,6 +24,7 @@
 
   <div class="children" *ngIf="keys?.length && isOpen">
     <app-json-formatter
+      #formatter
       *ngFor="let key of keys; trackBy: trackByFn"
       [json]="json[key]"
       [key]="key"
