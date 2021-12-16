@@ -43,7 +43,13 @@
     </ng-template>
 
     <ng-template let-node pTemplate="folder">
-      <span class="row-container" (click)="expand($event, node)" [ngClass]="{ dragging: isDragging }">
+      <span
+        dragEvents
+        (fileDroppedFromOutside)="filesDroppedFromOutside($event, node)"
+        class="row-container"
+        (click)="expand($event, node)"
+        [ngClass]="{ dragging: isDragging }"
+      >
         <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
           <div
             class="indent"

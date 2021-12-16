@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core'
+import { CodemirrorComponent } from '@ctrl/ngx-codemirror'
 import { IOutputAreaSizes } from 'angular-split'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import hljs from 'highlight.js/lib/common'
@@ -15,6 +16,7 @@ import { JsonFormatterComponent } from './json-formatter/json-formatter.componen
 export class JsonEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
   @ViewChild('jsonFormatter') jsonFormatter: JsonFormatterComponent
+  @ViewChild('codeMirror') codeMirror: CodemirrorComponent
 
   isChecked: boolean
   textContent: string
@@ -31,13 +33,14 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     return this.tab.filePath
   }
 
-  constructor(public electronService: ElectronService, public state: StateService) {
+  constructor(public electronService: ElectronService, public state: StateService, public cdRef: ChangeDetectorRef) {
     super(electronService, state)
   }
 
   ngOnInit(): void {
     this.textContent = this.tab.textContent
     this.initThemeListener()
+    this.initSelectedTabListener()
     this.updateJSONPreview(this.textContent)
   }
 
@@ -105,6 +108,14 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
   }
 
   initContentIfInView(): void {
-    this.textContent = this.tab.textContent
+    setTimeout(() => {
+      const queryString = `ngx-codemirror-${this.tab.filePath}`
+      const editor = document.getElementById(queryString)
+      if (editor && this.codeMirror) {
+        this.codeMirror.codeMirror.setValue(this.textContent)
+        this.initialized$.next(true)
+        this.initialized$.unsubscribe()
+      }
+    })
   }
 }

@@ -8,6 +8,8 @@
         <button [disabled]="!isValidJson" class="lint-button" mat-button (click)="lint()">Lint</button>
         <div class="editor">
           <ngx-codemirror
+            #codeMirror
+            id="ngx-codemirror-{{ tab.filePath }}"
             [(ngModel)]="textContent"
             (ngModelChange)="onInputChange()"
             (contextmenu)="showContextMenu($event)"

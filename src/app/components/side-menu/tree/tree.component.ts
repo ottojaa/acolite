@@ -144,6 +144,10 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     })
   }
 
+  filesDroppedFromOutside(filePaths: string[], node: TreeElement): void {
+    console.log(filePaths)
+  }
+
   createNewFolder(node: TreeElement): void {
     const { filePath } = node.data
 

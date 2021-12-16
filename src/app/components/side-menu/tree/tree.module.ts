@@ -10,9 +10,10 @@ import { FileCreationModule } from '../../dialogs/file-creation/file-creation.mo
 import { MatIconModule } from '@angular/material/icon'
 import { ShiftSelect } from './shift-select-directive'
 import { IconModule } from 'app/components/common/icon/icon.module'
+import { DragEvents } from './drag-events-directive'
 
 @NgModule({
-  declarations: [TreeComponent, ShiftSelect],
+  declarations: [TreeComponent, ShiftSelect, DragEvents],
   exports: [TreeComponent],
   providers: [TreeDragDropService],
   imports: [
