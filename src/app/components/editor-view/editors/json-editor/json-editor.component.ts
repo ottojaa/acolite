@@ -1,19 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
+import hljs from 'highlight.js/lib/common'
 import { MenuItem } from 'primeng/api'
-import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
-import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
 
 @Component({
-  selector: 'app-text-editor',
-  templateUrl: './text-editor.component.html',
-  styleUrls: ['./text-editor.component.scss'],
+  selector: 'app-json-editor',
+  templateUrl: './json-editor.component.html',
+  styleUrls: ['./json-editor.component.scss'],
 })
-export class TextEditorComponent extends AbstractEditor implements OnInit {
+export class JsonEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
 
   isChecked: boolean
@@ -21,6 +19,10 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   rand = new Date()
   currentSelection: any
   menuItems: MenuItem[]
+  formattedResult: string
+  highlightedContent: any
+  isValidJson: boolean
+  previewMode: 'json' | 'raw' = 'json'
 
   get filePath(): string {
     return this.tab.filePath
@@ -34,10 +36,42 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
     this.textContent = this.tab.textContent
     this.menuItems = this.getMenuItems()
     this.initThemeListener()
+    this.updateJSONPreview(this.textContent)
+  }
+
+  updateJSONPreview(content: string): void {
+    const formatted = this.formatJSON(content)
+    this.isValidJson = !!formatted
+
+    if (this.isValidJson) {
+      this.formattedResult = formatted
+      const highlighted = hljs.highlightAuto(content)
+      this.highlightedContent = `<pre><code class="raw-json">${highlighted.value}</code></pre>`
+    }
   }
 
   onInputChange(): void {
     this.autoSave$.next({ filePath: this.filePath, content: this.textContent })
+    this.updateJSONPreview(this.textContent)
+  }
+
+  formatJSON(textContent: string): string {
+    try {
+      return JSON.parse(textContent)
+    } catch {
+      return null
+    }
+  }
+
+  lint(): void {
+    try {
+      const textJson = JSON.parse(this.textContent)
+      if (textJson) {
+        this.autoSave$.next({ filePath: this.filePath, content: this.textContent })
+        this.textContent = JSON.stringify(textJson, null, 4)
+        this.updateJSONPreview(this.textContent)
+      }
+    } catch {}
   }
 
   handleKeydown(event: any) {

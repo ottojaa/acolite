@@ -1,0 +1,35 @@
+<div class="json-formatter-row">
+  <a (click)="toggleOpen()">
+    <span class="toggler" [class.open]="isOpen" *ngIf="isObject"></span>
+    <span class="key" *ngIf="hasKey"
+      ><span class="key-text">{{ key }}</span
+      ><span class="colon">:</span></span
+    >
+    <span class="value">
+      <span *ngIf="isObject">
+        <span class="constructor-name">{{ constructorName }}</span>
+        <span *ngIf="isArray"
+          ><span class="bracket">[</span><span class="number">{{ json.length }}</span
+          ><span class="bracket">]</span></span
+        >
+      </span>
+      <span *ngIf="!isObject" (click)="openLink(isUrl)" class="{{ type }}" [ngClass]="{ date: isDate, url: isUrl }">{{
+        parseValue(json)
+      }}</span>
+    </span>
+    <span *ngIf="showThumbnail()" class="thumbnail-text">
+      {{ getThumbnail() }}
+    </span>
+  </a>
+
+  <div class="children" *ngIf="keys?.length && isOpen">
+    <app-json-formatter
+      *ngFor="let key of keys; trackBy: trackByFn"
+      [json]="json[key]"
+      [key]="key"
+      [open]="childrenOpen()"
+    ></app-json-formatter>
+  </div>
+  <div class="children empty object" *ngIf="isEmptyObject()"></div>
+  <div class="children empty array" *ngIf="!keys?.length && isOpen && isArray"></div>
+</div>

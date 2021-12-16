@@ -8,6 +8,7 @@ import { TextEditorModule } from '../../editors/text-editor/text-editor.module'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/markdown-editor.module'
 import { IconModule } from 'app/components/common/icon/icon.module'
+import { JsonEditorModule } from '../../editors/json-editor/json-editor.module'
 
 @NgModule({
   declarations: [FileTabsComponent],
@@ -18,6 +19,7 @@ import { IconModule } from 'app/components/common/icon/icon.module'
     MatIconModule,
     MatRippleModule,
     TextEditorModule,
+    JsonEditorModule,
     ContextMenuModule,
     MarkdownEditorContainerModule,
     IconModule,

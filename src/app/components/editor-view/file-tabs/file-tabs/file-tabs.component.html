@@ -41,6 +41,10 @@
                 <app-markdown-editor [tab]="tab"></app-markdown-editor>
               </div>
 
+              <div *ngSwitchCase="'json'" class="editor">
+                <app-json-editor [tab]="tab"></app-json-editor>
+              </div>
+
               <div *ngSwitchDefault>No editor for this type of file</div>
             </ng-container>
           </ng-template>

@@ -8,13 +8,14 @@ import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
 import hljs from 'highlight.js/lib/common'
 import { Doc } from '../../../../../../app/shared/interfaces'
+import { AbstractEditor } from 'app/abstract/abstract-editor'
 
 @Component({
   selector: 'app-markdown-editor',
   templateUrl: './markdown-editor.component.html',
   styleUrls: ['./markdown-editor.component.scss'],
 })
-export class MarkdownEditorViewComponent extends AbstractComponent implements OnInit {
+export class MarkdownEditorViewComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
 
   // Perhaps something to do with animations, but ngxMde is not immediately available on NgOnInit, and
@@ -22,24 +23,22 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
   // CodeMirror being available. SetTimeOut used as a bandaid fix for this
   @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
-  public autoSave$ = new Subject()
   textContent: string
   isChecked: boolean
-  initialized$ = new Subject<boolean>()
   editorOptions: Options
+  viewInit = false
 
   constructor(
     public state: StateService,
     public electronService: ElectronService,
     private markdownService: MarkdownService
   ) {
-    super()
+    super(electronService, state)
   }
 
   ngOnInit(): void {
     this.initTabData()
     this.initSelectedTabListener()
-    this.initAutoSave()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
     this.editorOptions = this.getDefaultOptions()
@@ -53,8 +52,11 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     if (!this.ngxMde) {
       return
     }
+    if (this.viewInit) {
+      this.autoSave$.next({ filePath: this.tab.filePath, content: this.tab.textContent })
+    }
     this.textContent = this.ngxMde.mde.cm.getValue()
-    this.autoSave$.next()
+    this.viewInit = true
   }
 
   getDefaultOptions(): Options {
@@ -73,31 +75,11 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
       const queryString = `ngx-markdown-editor-${this.tab.filePath}`
       const editor = document.getElementById(queryString)
       if (editor && this.ngxMde) {
-        console.log(this.tab)
         this.ngxMde.mde.setContent(this.tab.textContent)
         this.initialized$.next(true)
         this.initialized$.unsubscribe()
       }
     })
-  }
-
-  initSelectedTabListener(): void {
-    this.state
-      .getStatePart('selectedTab')
-      .pipe(takeUntil(this.initialized$))
-      .subscribe(() => this.initTextContentIfNgxMdeInView())
-  }
-
-  initAutoSave(): void {
-    this.autoSave$
-      .pipe(
-        takeUntil(this.destroy$),
-        skip(1), // Skip the initial update caused by the initialization of the editor
-        debounceTime(1000)
-      )
-      .subscribe(() => {
-        this.updateContent(this.tab.filePath, this.textContent)
-      })
   }
 
   initMarkdownDefaultBehaviorOverride(): void {
@@ -121,15 +103,11 @@ export class MarkdownEditorViewComponent extends AbstractComponent implements On
     }
   }
 
-  updateContent(filePath: string, content: string): void {
-    const payload = { filePath, content, state: this.state.value }
-    this.electronService.updateFileContent(payload)
+  private initSelectedTabListener(): void {
+    this.selectedTabListener().subscribe(() => this.initTextContentIfNgxMdeInView())
   }
 
-  initThemeListener(): void {
-    this.state
-      .getStatePart('editorTheme')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => (this.isChecked = data === 'light'))
+  private initThemeListener(): void {
+    this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))
   }
 }

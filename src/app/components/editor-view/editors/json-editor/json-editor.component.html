@@ -1,0 +1,48 @@
+<div class="editor-container">
+  <app-editor-top-bar [tab]="tab"></app-editor-top-bar>
+  <p-contextMenu [target]="editor" appendTo="body" [model]="menuItems"></p-contextMenu>
+
+  <div class="area-container dark-theme" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'">
+    <as-split direction="horizontal" class="as-horizontal" [gutterSize]="1">
+      <as-split-area class="side-menu-split">
+        <button [disabled]="!isValidJson" class="lint-button" mat-button (click)="lint()">Lint</button>
+        <textarea
+          #editor
+          (keydown)="handleKeydown($event)"
+          (contextmenu)="onRightClickTextArea()"
+          [(ngModel)]="textContent"
+          (ngModelChange)="onInputChange()"
+          contentEditable
+          spellcheck="false"
+        ></textarea>
+      </as-split-area>
+
+      <as-split-area class="format-result">
+        <span class="button-container">
+          <div>
+            <h3 class="invalid-json" *ngIf="!isValidJson">Invalid json</h3>
+          </div>
+          <mat-button-toggle-group
+            appearance="legacy"
+            name="toggle json | raw"
+            aria-label="toggle json | raw"
+            [(ngModel)]="previewMode"
+          >
+            <mat-button-toggle value="json">JSON</mat-button-toggle>
+            <mat-button-toggle value="raw">Pretty</mat-button-toggle>
+          </mat-button-toggle-group>
+        </span>
+
+        <section class="layout-section">
+          <ng-container *ngIf="previewMode === 'json' && formattedResult; else raw">
+            <app-json-formatter [json]="formattedResult" [open]="true"></app-json-formatter>
+          </ng-container>
+
+          <ng-template #raw>
+            <div class="raw-json" [innerHTML]="highlightedContent"></div>
+          </ng-template>
+        </section>
+      </as-split-area>
+    </as-split>
+  </div>
+</div>
