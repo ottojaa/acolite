@@ -1,4 +1,4 @@
-<div class="editor-container">
+<div class="editor-container" keyboardEvents (save)="onSaveHotkeyPress()">
   <app-editor-top-bar [tab]="tab"></app-editor-top-bar>
 
   <div class="area-container dark-theme" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'">
@@ -11,7 +11,7 @@
             #codeMirror
             id="ngx-codemirror-{{ tab.filePath }}"
             [(ngModel)]="textContent"
-            (ngModelChange)="onInputChange()"
+            (ngModelChange)="onInputChange($event)"
             (contextmenu)="showContextMenu($event)"
             [options]="{
               mode: 'javascript',
@@ -42,7 +42,7 @@
                 [(ngModel)]="previewMode"
               >
                 <mat-button-toggle value="json">JSON</mat-button-toggle>
-                <mat-button-toggle value="raw">Pretty</mat-button-toggle>
+                <mat-button-toggle value="raw">Raw</mat-button-toggle>
               </mat-button-toggle-group>
             </div>
           </span>

@@ -50,8 +50,8 @@
                 </div>
                 <div class="bottom-row">
                   <blockquote
-                    [ngClass]="file.highlightContentText || file.content ? 'show' : 'hide'"
-                    [innerHtml]="file.highlightContentText ? file.highlightContentText : file.content"
+                    [ngClass]="file.highlightContentText || file.textContent ? 'show' : 'hide'"
+                    [innerHtml]="file.highlightContentText ? file.highlightContentText : file.textContent"
                   ></blockquote>
                 </div>
               </div>

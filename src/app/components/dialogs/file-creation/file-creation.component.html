@@ -19,7 +19,7 @@
       <mat-select #typeSelect [formControl]="extension" required>
         <mat-option *ngFor="let option of options" [value]="option.value">
           <ng-container *ngIf="option.value === 'other'; else showLabel">
-            <button style="padding: 0" mat-button (click)="showExtensionInput = true">{{ option.label }}</button>
+            <button style="padding: 0" mat-button (click)="onClickShowExtensionInput()">{{ option.label }}</button>
           </ng-container>
           <ng-template #showLabel>
             {{ option.label }}

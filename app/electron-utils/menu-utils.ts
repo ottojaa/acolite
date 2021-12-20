@@ -2,7 +2,7 @@ import { TreeNode } from 'primeng/api'
 import { TreeElement, FileEntity, MenuItemTypes } from '../shared/interfaces'
 import { getBaseName, getPathSeparator } from './file-utils'
 
-export type UpdateStrategy = 'create' | 'rename' | 'delete'
+export type UpdateStrategy = 'create' | 'rename' | 'delete' | 'copy'
 export interface Config {
   oldPath?: string
   newPath?: string
@@ -67,6 +67,26 @@ export const getUpdatedMenuItemsRecursive = (
   return menuItems
 }
 
+export const replaceTreeNodeRecursive = (treeElements: TreeElement[], nodeToReplace: TreeElement, baseDir: string) => {
+  const { filePath, parentPath } = nodeToReplace.data
+  const replace = (elements: TreeElement[]) => {
+    for (let item of elements) {
+      if (item.data.filePath === parentPath) {
+        const nodeIndex = item?.children.findIndex((el) => el.data.filePath === filePath)
+        if (nodeIndex > -1) {
+          item.children[nodeIndex] = { ...nodeToReplace }
+          addIndents(item.children, baseDir)
+        }
+      } else if (item.children?.length) {
+        replace(item.children)
+      }
+    }
+  }
+  replace(treeElements)
+
+  return treeElements
+}
+
 const updateItemByStrategy = (
   item: TreeElement,
   updatedItem: FileEntity,
@@ -92,6 +112,9 @@ const updateItemByStrategy = (
     }
     case 'delete': {
       item.children = item.children.filter((el) => !el.data.filePath.includes(updatedItem.filePath))
+      break
+    }
+    default: {
       break
     }
   }
@@ -189,7 +212,11 @@ export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
   }, 500)
 }
 
-export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string): TreeNode<FileEntity> => {
+export const getTreeNodeFromFileEntity = (
+  data: FileEntity,
+  styleClass?: string,
+  children?: TreeElement[]
+): TreeNode<FileEntity> => {
   if (data.type === 'folder') {
     return {
       data,
@@ -197,7 +224,7 @@ export const getTreeNodeFromFileEntity = (data: FileEntity, styleClass?: string)
       leaf: false,
       key: data.filePath,
       type: MenuItemTypes.Folder,
-      children: [],
+      children: children?.length ? children : [],
       ...(styleClass && { styleClass }),
     }
   } else {

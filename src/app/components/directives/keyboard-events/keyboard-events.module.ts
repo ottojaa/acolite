@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { KeyboardNavigationListDirective } from './keyboard-navigation-list.directive'
-import { KeyboardNavigationItemDirective } from './keyboard-navigation-item.directive'
+import { KeyboardEventsDirective } from './keyboard-events.directive'
 
 @NgModule({
-  declarations: [
-    KeyboardNavigationListDirective,
-    KeyboardNavigationItemDirective,
-  ],
-  exports: [KeyboardNavigationListDirective, KeyboardNavigationItemDirective],
+  declarations: [KeyboardEventsDirective],
+  exports: [KeyboardEventsDirective],
   imports: [CommonModule],
 })
 export class KeyboardEventsModule {}

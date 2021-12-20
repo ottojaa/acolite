@@ -6,15 +6,14 @@ import { ClickOutsideModule } from 'ng-click-outside'
 import { ButtonModule } from 'primeng/button'
 import { RippleModule } from 'primeng/ripple'
 import { SharedModule } from 'primeng/api'
-import { KeyboardEventsModule } from '../../directives/keyboard-events/keyboard-events.module'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatIconModule } from '@angular/material/icon'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatMenuModule } from '@angular/material/menu'
 import { SearchBuilderDialogModule } from '../../dialogs/search-builder-dialog/search-builder-dialog.module'
 import { IconModule } from 'app/components/common/icon/icon.module'
-import { FormatDistancePipe } from 'app/components/pipes/format-distance.pipe'
 import { FormatDistanceModule } from 'app/components/pipes/format-distance.module'
+import { KeyboardNavigationModule } from 'app/components/directives/keyboard-events/keyboard-navigation.module'
 
 @NgModule({
   declarations: [AutocompleteComponent],
@@ -28,7 +27,7 @@ import { FormatDistanceModule } from 'app/components/pipes/format-distance.modul
     RippleModule,
     SearchBuilderDialogModule,
     MatDialogModule,
-    KeyboardEventsModule,
+    KeyboardNavigationModule,
     BrowserAnimationsModule,
     MatIconModule,
     MatMenuModule,

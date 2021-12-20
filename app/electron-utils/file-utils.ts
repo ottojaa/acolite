@@ -32,6 +32,7 @@ export const getFileData = (filePath: string): Promise<Doc> => {
         textContent,
         extension,
         editorType,
+        size: fileStats.size,
         ino: fileStats.ino,
         modifiedAt: fileStats.mtime,
         createdAt: fileStats.birthtime,
@@ -54,11 +55,16 @@ export const getFileDataSync = (filePath: string): Doc => {
       extension,
       editorType,
       ino: fileStats.ino,
+      size: fileStats.size,
       modifiedAt: fileStats.mtime,
       createdAt: fileStats.birthtime,
     }
   } catch (err) {
-    console.error(`error reading ${filePath}`, err)
+    console.error(`error reading ${filePath}, removing`, err)
     return null
   }
+}
+
+export const getNewPath = (currentPath: string, newParentPath: string) => {
+  return getJoinedPath([currentPath.replace(currentPath, newParentPath), getBaseName(currentPath)])
 }

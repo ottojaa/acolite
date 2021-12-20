@@ -37,31 +37,31 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
   }
 
   ngOnInit(): void {
-    this.initTabData()
     this.initSelectedTabListener()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
     this.editorOptions = this.getDefaultOptions()
   }
 
-  async initTabData(): Promise<void> {
+  /*  async initTabData(): Promise<void> {
     const data = await this.electronService.getFileData({ filePath: this.tab.filePath })
-  }
+  } */
 
   onEditorContentChange(): void {
     if (!this.ngxMde) {
       return
     }
-    if (this.viewInit) {
-      this.autoSave$.next({ filePath: this.tab.filePath, content: this.tab.textContent })
-    }
     this.textContent = this.ngxMde.mde.cm.getValue()
+    if (this.viewInit) {
+      this.autoSave$.next({ filePath: this.tab.filePath, content: this.textContent })
+    }
     this.viewInit = true
   }
 
   getDefaultOptions(): Options {
     return {
       highlightTokens: true,
+      shortcutsEnabled: 'all',
     }
   }
 

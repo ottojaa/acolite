@@ -28,6 +28,8 @@ export type StateUpdate<T> = {
 interface TriggerMap {
   expandNodeParents: string[]
   updateStore: string[]
+  bookmarks: string[]
+  recentlyModified: string[]
 }
 
 @Injectable({
@@ -166,20 +168,28 @@ export class StateService extends AbstractComponent {
    * @param triggerKeys they keys that triggered the state update
    */
   handleCallbacks(state: State, triggerKeys: (keyof State)[]): void {
-    const { selectedTab, rootDirectory } = state
+    const { selectedTab, rootDirectory, bookmarks } = state
 
     const triggerMap: TriggerMap = {
       expandNodeParents: ['selectedTab'],
+      bookmarks: ['bookmarks'],
+      recentlyModified: ['rootDirectory'],
       updateStore: allowedConfigKeys,
     }
 
     const shouldTrigger = (action: keyof TriggerMap) => triggerKeys.some((key) => triggerMap[action].includes(key))
 
+    if (shouldTrigger('expandNodeParents')) {
+      expandNodeRecursive(rootDirectory, selectedTab.filePath)
+    }
     if (shouldTrigger('updateStore')) {
       this.electronService.updateStore({ state })
     }
-    if (shouldTrigger('expandNodeParents')) {
-      expandNodeRecursive(rootDirectory, selectedTab.filePath)
+    if (shouldTrigger('recentlyModified')) {
+      this.electronService.getRecentlyModified()
+    }
+    if (shouldTrigger('bookmarks')) {
+      this.electronService.getBookmarkedFiles({ bookmarks })
     }
   }
 }

@@ -100,15 +100,11 @@ export class TabService {
 
   toggleBookmark(tab: Doc): void {
     const { filePath, fileName } = tab
-    const { bookmarks, bookmarkedFiles } = this.state.getStateParts(['bookmarks', 'bookmarkedFiles'])
+    const { bookmarks } = this.state.getStateParts(['bookmarks'])
     const tabIdx = bookmarks.indexOf(filePath)
 
     const updateBookmarks = (updated: string[], showToast: boolean) => {
       this.state.updateState$.next([{ key: 'bookmarks', payload: updated }])
-      this.electronService.updateBookmarkedFiles({
-        bookmarkPath: filePath,
-        bookmarkedFiles: bookmarkedFiles,
-      })
 
       if (showToast) {
         this.dialog.openToast(`Bookmarked ${fileName}`, 'success', 2000)
@@ -125,14 +121,10 @@ export class TabService {
   }
 
   removeBookmark(bookmarkPath: string): void {
-    const { bookmarks, bookmarkedFiles } = this.state.getStateParts(['bookmarks', 'bookmarkedFiles'])
+    const { bookmarks } = this.state.getStateParts(['bookmarks'])
     const updatedBookmarks = bookmarks.filter((bookmark) => bookmark !== bookmarkPath)
 
     this.state.updateState$.next([{ key: 'bookmarks', payload: updatedBookmarks }])
-    this.electronService.updateBookmarkedFiles({
-      bookmarkPath,
-      bookmarkedFiles: bookmarkedFiles,
-    })
   }
 
   toggleForceDashboard(): void {

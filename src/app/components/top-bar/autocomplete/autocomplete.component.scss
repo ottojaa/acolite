@@ -229,7 +229,7 @@
 }
 
 :host ::ng-deep.highlightText {
-  background: var(--buttonColor);
+  color: var(--buttonColor);
   border-radius: 2px;
 }
 

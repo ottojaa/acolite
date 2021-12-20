@@ -14,8 +14,8 @@
     </span>
     <span *ngFor="let file of displayTexts.files">
       <div class="file-container">
-        <app-icon [extension]="'txt'"></app-icon>
-        <p class="display-text">{{ file }}</p>
+        <app-icon [extension]="file.extension"></app-icon>
+        <p class="display-text">{{ file.name }}</p>
       </div>
     </span>
   </div>

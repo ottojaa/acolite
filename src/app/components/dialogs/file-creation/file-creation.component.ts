@@ -40,7 +40,7 @@ export class FileCreationComponent {
     {
       icon: 'other',
       value: 'other',
-      label: 'Other (manual input)',
+      label: 'Other (specify)',
     },
   ]
 
@@ -75,8 +75,9 @@ export class FileCreationComponent {
     this.dialogRef.close()
   }
 
-  onClickOtherOption(): void {
-    this.showExtensionInput
+  onClickShowExtensionInput(): void {
+    this.showExtensionInput = true
+    this.extension.setValue('')
   }
 
   getErrorMessage(): string | undefined {

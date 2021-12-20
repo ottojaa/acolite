@@ -8,6 +8,7 @@
         id="ngx-markdown-editor-{{ tab.filePath }}"
         [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
         [options]="editorOptions"
+        [toolbar]="[]"
         (contentChange)="onEditorContentChange()"
         (contextmenu)="showContextMenu($event)"
       ></ngx-markdown-editor>

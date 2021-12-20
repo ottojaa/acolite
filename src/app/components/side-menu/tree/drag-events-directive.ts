@@ -14,23 +14,38 @@ export class DragEvents {
     this.elRef = el
   }
 
+  setHoverClass(method: 'add' | 'remove') {
+    try {
+      this.elRef.nativeElement.parentNode.parentNode.parentNode.parentNode.classList[method]('hovering')
+    } catch {}
+  }
+
+  /**
+   * If files were dropped from outside the window, dataTransfer.files object will contain the filePaths of the dragged element.
+   * If dataTransfer.files is empty, files were dragged from inside the tree
+   */
   @HostListener('drop', ['$event'])
   onDrop(event: DragEvent) {
-    this.elRef.nativeElement.classList.remove('hovering')
-    event.preventDefault()
-    event.stopPropagation()
+    this.setHoverClass('remove')
     const filePaths = Array.from(event.dataTransfer.files).map((file) => file.path)
+
+    if (!filePaths.length) {
+      return
+    }
 
     this.filesDroppedFromOutside.emit(filePaths)
   }
+
   @HostListener('dragover', ['$event'])
   onDragover(event: DragEvent) {
-    this.elRef.nativeElement.classList.add('hovering')
     event.preventDefault()
     event.stopPropagation()
+
+    this.setHoverClass('add')
   }
+
   @HostListener('dragleave', ['$event'])
   onDragleave(_event: DragEvent) {
-    this.elRef.nativeElement.classList.remove('hovering')
+    this.setHoverClass('remove')
   }
 }

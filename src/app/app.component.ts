@@ -6,7 +6,6 @@ import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { StateService, StateUpdate } from './services/state.service'
 import { Router } from '@angular/router'
-import { TabService } from './services/tab.service'
 import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/shared/actions'
 import { State } from '../../app/shared/interfaces'
 
@@ -71,12 +70,14 @@ export class AppComponent implements OnInit {
       FileActionResponses.ReadFailure,
       FileActionResponses.UpdateSuccess,
       FileActionResponses.UpdateFailure,
+      FileActionResponses.CopySuccess,
+      FileActionResponses.CopyFailure,
       StoreResponses.ReadStoreSuccess,
       StoreResponses.ReadStoreFailure,
       StoreResponses.InitAppSuccess,
       StoreResponses.InitAppFailure,
       StoreResponses.UpdateStoreFailure,
-      StoreResponses.UpdateBookmarkedFilesSuccess,
+      StoreResponses.GetBookmarkedFilesSuccess,
       StoreResponses.GetRecentlyModifiedSuccess,
       SearchResponses.QuerySuccess,
     ]
@@ -105,9 +106,10 @@ export class AppComponent implements OnInit {
         }
         // Folder actions
 
+        case FolderActionResponses.ReadDirectorySuccess:
+        case FileActionResponses.CopySuccess:
         case FileActionResponses.CreateSuccess:
-        case FolderActionResponses.MakeDirectorySuccess:
-        case FolderActionResponses.ReadDirectorySuccess: {
+        case FolderActionResponses.MakeDirectorySuccess: {
           this.state.updateState$.next([{ key: 'rootDirectory', payload: response.rootDirectory }])
           break
         }
@@ -201,8 +203,12 @@ export class AppComponent implements OnInit {
           this.state.updateState$.next([{ key: 'searchResults', payload: response.searchResults }])
           break
         }
-        case StoreResponses.UpdateBookmarkedFilesSuccess: {
+        case StoreResponses.GetBookmarkedFilesSuccess: {
           this.state.updateState$.next([{ key: 'bookmarkedFiles', payload: response.bookmarkedFiles }])
+          break
+        }
+        case StoreResponses.GetRecentlyModifiedSuccess: {
+          this.state.updateState$.next([{ key: 'recentlyModified', payload: response.recentlyModified }])
           break
         }
         default: {
@@ -245,7 +251,6 @@ export class AppComponent implements OnInit {
     mapIsoString()
 
     this.state.state$.next({ ...initialState, ...response, initialized: true })
-    console.log(this.state.state$.value)
 
     if (!this.state.getStatePartValue('baseDir')) {
       this.router.navigate(['base-dir'])

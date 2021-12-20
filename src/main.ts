@@ -9,6 +9,8 @@ import { JSHINT } from 'jshint'
 import 'codemirror/mode/javascript/javascript'
 import 'codemirror/addon/lint/javascript-lint'
 import 'codemirror/addon/lint/lint'
+import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror/addon/selection/active-line'
 ;(window as any).JSHINT = JSHINT
 if (APP_CONFIG.production) {
   enableProdMode()

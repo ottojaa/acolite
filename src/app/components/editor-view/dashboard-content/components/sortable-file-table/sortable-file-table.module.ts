@@ -10,6 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms'
 import { IconModule } from 'app/components/common/icon/icon.module'
 import { FormatPathPipeModule } from 'app/components/pipes/format-path.module'
 import { FormatFileNamePipeModule } from 'app/components/pipes/format-file-name.module'
+import { FormatFileSizePipeModule } from 'app/components/pipes/format-file-size.module'
 
 @NgModule({
   declarations: [SortableFileListComponent],
@@ -23,7 +24,7 @@ import { FormatFileNamePipeModule } from 'app/components/pipes/format-file-name.
     MatInputModule,
     ReactiveFormsModule,
     IconModule,
-    FormatPathPipeModule,
+    FormatFileSizePipeModule,
     FormatFileNamePipeModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

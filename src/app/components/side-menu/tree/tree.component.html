@@ -45,7 +45,7 @@
     <ng-template let-node pTemplate="folder">
       <span
         dragEvents
-        (fileDroppedFromOutside)="filesDroppedFromOutside($event, node)"
+        (filesDroppedFromOutside)="filesDroppedFromOutside($event, node)"
         class="row-container"
         (click)="expand($event, node)"
         [ngClass]="{ dragging: isDragging }"
@@ -70,6 +70,8 @@
   </p-tree>
 
   <span
+    dragEvents
+    (filesDroppedFromOutside)="filesDroppedFromOutside($event)"
     #dropzoneTarget
     class="dropzone"
     [ngClass]="{ dragging: isHovering }"

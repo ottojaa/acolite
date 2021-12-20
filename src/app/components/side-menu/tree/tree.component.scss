@@ -3,6 +3,12 @@
   .p-component {
     font-size: 1.1rem;
   }
+  .p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-dragover {
+    background: none;
+  }
+  .p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-selectable:not(.p-highlight):hover {
+    background: none;
+  }
   &:hover::-webkit-scrollbar-thumb {
     visibility: visible !important;
   }
@@ -31,6 +37,7 @@
   .p-treenode-content .p-tree-toggler {
     width: 0 !important;
     height: 0 !important;
+    margin: 0 !important;
     padding: 0;
   }
   .p-tree-wrapper {
@@ -68,6 +75,9 @@
     &:hover {
       outline: none;
     }
+  }
+  .hovering {
+    background-color: var(--buttonColorLowerOpacity) !important;
   }
 }
 
@@ -117,10 +127,6 @@
       transition: background-color 300ms;
     }
   }
-}
-
-.hovering {
-  background-color: var(--buttonColorLowerOpacity);
 }
 
 .indent {

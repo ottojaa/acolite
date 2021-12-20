@@ -19,7 +19,6 @@ import {
   OpenFileLocation,
   UpdateFileContent,
   SearchQuery,
-  UpdateBookmarkedFiles,
   UpdateActionPayload,
   FileActions,
   FolderActions,
@@ -28,6 +27,8 @@ import {
   UpdateStore,
   HandlerAction,
   ContextMenuActions,
+  CopyFiles,
+  GetBookmarkedFiles,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc } from '../../../../../app/shared/interfaces'
@@ -113,6 +114,10 @@ export class ElectronService {
     this.send(FileActions.DeleteFiles, payload)
   }
 
+  copyFilesRequest(payload: OmitActionType<CopyFiles>): void {
+    this.send(FileActions.CopyFiles, payload)
+  }
+
   moveFilesRequest(payload: OmitActionType<MoveFiles>): void {
     this.send(FileActions.MoveFiles, payload)
   }
@@ -148,8 +153,8 @@ export class ElectronService {
     this.send(StoreActions.GetRecentlyModified, {})
   }
 
-  updateBookmarkedFiles(payload: OmitActionType<UpdateBookmarkedFiles>): void {
-    this.send(StoreActions.UpdateBookmarkedFiles, payload)
+  getBookmarkedFiles(payload: OmitActionType<GetBookmarkedFiles>) {
+    this.send(StoreActions.GetBookmarkedFiles, payload)
   }
 
   showContextMenu(): void {

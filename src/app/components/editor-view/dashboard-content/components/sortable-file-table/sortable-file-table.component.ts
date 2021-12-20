@@ -3,6 +3,7 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
+import { TabService } from 'app/services/tab.service'
 import { Doc } from '../../../../../../../app/shared/interfaces'
 
 @Component({
@@ -36,14 +37,14 @@ export class SortableFileListComponent implements AfterViewInit {
   }
   @Input() basePath: string
 
-  displayedColumns: string[] = ['fileName', 'createdAt', 'modifiedAt', 'filePath']
+  displayedColumns: string[] = ['fileName', 'createdAt', 'modifiedAt', 'size']
   dataSource: MatTableDataSource<Doc>
   expandedElement: Doc | null
 
   @ViewChild(MatPaginator) paginator: MatPaginator
   @ViewChild(MatSort) sort: MatSort
 
-  constructor() {
+  constructor(private tabService: TabService) {
     this.dataSource = new MatTableDataSource([])
   }
 
@@ -66,5 +67,9 @@ export class SortableFileListComponent implements AfterViewInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage()
     }
+  }
+
+  openInNewTab(file: Doc): void {
+    this.tabService.openNewTab(file.filePath)
   }
 }

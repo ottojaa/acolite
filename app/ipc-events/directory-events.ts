@@ -77,7 +77,7 @@ export const readAndSendMenuItemsFromBaseDirectory = (
   index: Document<Doc, true>
 ) => {
   try {
-    const { baseDir } = action.state
+    const { baseDir, bookmarks } = action.state
     const rootDirectory = getRootDirectory(baseDir)
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, { rootDirectory })
     addFilesToIndex(rootDirectory?.children, index)

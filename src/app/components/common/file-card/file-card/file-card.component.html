@@ -2,9 +2,7 @@
   <div class="card-header">
     <h3 class="contrast-text">{{ file.fileName }}</h3>
 
-    <ng-container *ngIf="showBookmark">
-      <mat-icon (click)="confirmRemoveBookmark(file.filePath)">bookmark</mat-icon>
-    </ng-container>
+    <mat-icon>more_vert</mat-icon>
   </div>
 
   <p-card (click)="openInNewTab(file)">

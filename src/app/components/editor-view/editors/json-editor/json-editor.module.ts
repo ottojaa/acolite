@@ -13,6 +13,7 @@ import { AngularSplitModule } from 'angular-split'
 import { MatButtonModule } from '@angular/material/button'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { CodemirrorModule } from '@ctrl/ngx-codemirror'
+import { KeyboardEventsModule } from 'app/components/directives/keyboard-events/keyboard-events.module'
 
 @NgModule({
   declarations: [JsonEditorComponent],
@@ -32,6 +33,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror'
     AngularSplitModule,
     MatButtonToggleModule,
     CodemirrorModule,
+    KeyboardEventsModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

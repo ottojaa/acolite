@@ -58,6 +58,10 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.editorWidth = 100
   }
 
+  onSaveHotkeyPress(): void {
+    this.lint()
+  }
+
   onDragEnd(event: { sizes: IOutputAreaSizes }): void {
     const [editorWidth, previewWidth] = event.sizes
     this.editorWidth = editorWidth as number
@@ -75,9 +79,9 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     }
   }
 
-  onInputChange(): void {
-    this.autoSave$.next({ filePath: this.filePath, content: this.textContent })
-    this.updateJSONPreview(this.textContent)
+  onInputChange(event: any): void {
+    this.autoSave$.next({ filePath: this.filePath, content: event })
+    this.updateJSONPreview(event)
   }
 
   formatJSON(textContent: string): Object {
@@ -90,11 +94,12 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
 
   lint(): void {
     try {
-      const textJson = JSON.parse(this.textContent)
+      const replaced = this.textContent.replace(/\'/g, '"')
+      const textJson = JSON.parse(replaced)
       if (textJson) {
-        this.autoSave$.next({ filePath: this.filePath, content: this.textContent })
         this.textContent = JSON.stringify(textJson, null, 4)
-        this.updateJSONPreview(this.textContent)
+        this.saveContent({ filePath: this.filePath, content: this.textContent })
+        this.updateJSONPreview(replaced)
       }
     } catch {}
   }

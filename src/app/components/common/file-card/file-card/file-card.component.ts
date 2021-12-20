@@ -21,7 +21,7 @@ export class FileCardComponent {
 
   confirmRemoveBookmark(path: string): void {
     this.zone.run(() => {
-      this.dialogService.openConfirmDialog('Remove bookmark?').subscribe((data) => {
+      this.dialogService.openConfirmDialog({ title: 'Remove bookmark?' }).subscribe((data) => {
         if (data) {
           this.tabService.removeBookmark(path)
         }

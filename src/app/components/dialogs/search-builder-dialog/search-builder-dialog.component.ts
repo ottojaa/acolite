@@ -48,7 +48,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
   debouncedSave$ = new Subject()
 
   get atLeastOneSearchOptionSelected(): boolean {
-    const searchOptions = ['filePath', 'fileName', 'content']
+    const searchOptions = ['filePath', 'fileName', 'textContent']
 
     return this.listItems
       .filter(this.isOptionItem)
@@ -88,7 +88,10 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
 
   onSave(): void {
     const preferences = this.getSearchPreferencesFromListItems()
-    this.state.updateState$.next([{ key: 'searchPreferences', payload: preferences }])
+    this.state.updateState$.next([
+      { key: 'searchPreferences', payload: preferences },
+      { key: 'searchResults', payload: [] },
+    ])
   }
 
   getListItems(): ListItem[] {
@@ -106,7 +109,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
       },
       {
         type: 'item',
-        value: 'content',
+        value: 'textContent',
         text: 'Content',
         selected: true,
       },

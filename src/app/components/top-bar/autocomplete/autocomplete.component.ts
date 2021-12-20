@@ -68,6 +68,6 @@ export class AutocompleteComponent extends AbstractComponent {
     }
 
     const { baseDir, searchPreferences } = this.state.getStateParts(['baseDir', 'searchPreferences'])
-    this.electronService.searchFiles({ searchOpts: { content: value, baseDir, searchPreferences } })
+    this.electronService.searchFiles({ searchOpts: { textContent: value, baseDir, searchPreferences } })
   }
 }

@@ -13,6 +13,16 @@ export interface FileEntity {
   fileExtension?: string
 }
 
+export interface ConfirmDialogConfig {
+  title?: string
+  content?: string
+  fileList?: TreeElement[]
+  buttonLabels?: {
+    confirm?: string
+    cancel?: string
+  }
+}
+
 export interface WorkspaceConfig {
   baseDir?: string
   tabs?: Doc[]
@@ -66,7 +76,7 @@ export interface SelectedTab {
 export interface SearchResult {
   fileName: string
   extension: string
-  content: string
+  textContent: string
   filePath: string
   createdAt: Date
   modifiedAt: Date
@@ -103,6 +113,7 @@ export interface Doc {
   editorType: string
   modifiedAt: Date
   createdAt: Date
+  size: number
   textContent?: string
   deleted?: boolean
 }

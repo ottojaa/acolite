@@ -1,61 +1,58 @@
 <div @componentLoaded>
   <mat-form-field appearance="standard">
-    <mat-label>Filter</mat-label>
+    <mat-label class="filter">Filter</mat-label>
     <input matInput (keyup)="applyFilter($event)" #input />
   </mat-form-field>
 
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
-      <ng-container matColumnDef="fileName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-        <td mat-cell *matCellDef="let row">{{ row.fileName }}</td>
-      </ng-container>
+  <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+    <ng-container matColumnDef="fileName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="filename-column">
+          <app-icon [extension]="row.extension"></app-icon>
+          <p class="filename">{{ row.fileName }}</p>
+        </div>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
-        <td mat-cell *matCellDef="let row">{{ row.createdAt | date: 'medium' }}</td>
-      </ng-container>
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+      <td mat-cell *matCellDef="let row">{{ row.createdAt | date: 'mediumDate' }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="modifiedAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Last updated</th>
-        <td mat-cell *matCellDef="let row">{{ row.modifiedAt | date: 'medium' }}</td>
-      </ng-container>
+    <ng-container matColumnDef="modifiedAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Last updated</th>
+      <td mat-cell *matCellDef="let row">{{ row.modifiedAt | date: 'mediumDate' }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="filePath">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
-        <td mat-cell *matCellDef="let row">{{ row.filePath | formatPath: basePath }}</td>
-      </ng-container>
+    <ng-container matColumnDef="size">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
+      <td mat-cell *matCellDef="let row">{{ row.size | formatSize }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-          <div class="element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
-            <div class="element-detail-row">
-              <div class="extension-icon"><app-icon [extension]="element.extension" [scale]="2"></app-icon></div>
-              <div class="text-content">
-                <blockquote>{{ element.content }}</blockquote>
-              </div>
-              <div class="example-element-name">{{ element.fileName }}</div>
-              <div class="example-element-weight">{{ element.weight }}</div>
+    <!-- <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+        <div class="element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+          <div class="element-detail-row">
+            <div class="extension-icon"><app-icon [extension]="element.extension" [scale]="2"></app-icon></div>
+            <div class="text-content">
+              <blockquote>{{ element.content }}</blockquote>
             </div>
+            <div class="example-element-name">{{ element.fileName }}</div>
+            <div class="example-element-weight">{{ element.weight }}</div>
           </div>
-        </td>
-      </ng-container>
+        </div>
+      </td>
+    </ng-container> -->
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: displayedColumns"
-        class="item-row"
-        (click)="expandedElement = expandedElement === row ? null : row"
-      ></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns" class="item-row" (click)="openInNewTab(row)"></tr>
 
-      <!-- Row shown when there is no matching data. -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="4">No files matching the filter "{{ input.value }}"</td>
-      </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
-    </table>
+    <!-- Row shown when there is no matching data. -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="4">No files matching the filter "{{ input.value }}"</td>
+    </tr>
+  </table>
 
-    <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of users"></mat-paginator>
-  </div>
+  <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of users"></mat-paginator>
 </div>

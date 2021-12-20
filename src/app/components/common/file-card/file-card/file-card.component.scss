@@ -9,6 +9,8 @@
   cursor: pointer;
   width: 15rem;
   height: 8rem;
+  border-radius: 8px;
+
   .p-card-body {
     padding: 0;
     width: 100%;
@@ -89,7 +91,6 @@ pre {
 }
 
 .card-header {
-  padding: 0.5rem 1rem 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -97,12 +98,13 @@ pre {
     margin: 0;
   }
   mat-icon {
-    color: var(--buttonColorLowOpacity);
-    transform: scale(0.9);
+    transform: scale(0.8) translateX(5px);
+    color: var(--contrast);
+    opacity: 0.7;
     cursor: pointer;
     transition: 300ms all;
     &:hover {
-      transform: scale(1.1);
+      color: var(--buttonColor);
     }
   }
 }

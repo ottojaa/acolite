@@ -96,6 +96,7 @@
   right: 0;
   transition: all 150ms;
   z-index: 9;
+  color: var(--contrast);
   &:hover {
     background-color: var(--buttonColor);
   }

@@ -13,14 +13,25 @@ import {
 import {
   getBaseName,
   getDirName,
-  getEditorType,
   getExtension,
-  getExtensionSplit,
   getFileData,
   getJoinedPath,
+  getNewPath,
 } from '../electron-utils/file-utils'
-import { getUpdatedMenuItemsRecursive, getUpdatedFilePathsRecursive, moveRecursive } from '../electron-utils/menu-utils'
-import { getDeletedFileEntityMock, getFileEntityFromPath, getSelectedTabEntityFromIndex } from '../electron-utils/utils'
+import {
+  getUpdatedMenuItemsRecursive,
+  getUpdatedFilePathsRecursive,
+  moveRecursive,
+  folderStructureToMenuItems,
+  replaceTreeNodeRecursive,
+} from '../electron-utils/menu-utils'
+import {
+  getDeletedFileEntityMock,
+  getFileEntityFromPath,
+  getSelectedTabEntityFromIndex,
+  getTreeElementsFromFilePath,
+  getTreeStructureFromBaseDirectory,
+} from '../electron-utils/utils'
 import {
   ReadFile,
   UpdateFileContent,
@@ -31,8 +42,10 @@ import {
   OpenFileLocation,
   FileActionResponses,
   FileActions,
+  CopyFiles,
 } from '../shared/actions'
-import { Doc, TreeElement } from '../shared/interfaces'
+import { Doc, FileEntity, State, TreeElement } from '../shared/interfaces'
+import { resolve } from 'path/posix'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action
@@ -157,14 +170,10 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
 
 export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Document<Doc, true>) => {
   const { target, elementsToMove, state } = action
-  const { rootDirectory, tabs } = state
+  const { rootDirectory, tabs, bookmarks } = state
   const newParentPath = target.data.filePath
   const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'file' ? 1 : -1))
   const failedToMove = []
-
-  const getNewPath = (currentPath: string, newParentPath: string) => {
-    return getJoinedPath([currentPath.replace(currentPath, newParentPath), getBaseName(currentPath)])
-  }
 
   const updateTabPath = (currentPath: string, newPath: string) => {
     const tabIdx = tabs.findIndex((tab) => tab.filePath === currentPath)
@@ -190,7 +199,7 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
       })
   )
   Promise.all(promises)
-    .then(() => {
+    .then(async () => {
       const elementsToDelete = cloneDeep(sortedElements)
       const elementsToAdd = cloneDeep(sortedElements)
         .filter((el) => !failedToMove.includes(el.data.filePath))
@@ -199,7 +208,7 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
           return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
         })
 
-      updateIndexesRecursive(
+      await updateIndexesRecursive(
         elementsToAdd.map((el) => el.data.filePath),
         index
       )
@@ -214,17 +223,21 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
 
 export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Document<Doc, true>) => {
   const { directoryPaths, filePaths, state } = action
-  const { baseDir, rootDirectory, tabs } = state
+  const { baseDir, rootDirectory, tabs, bookmarks } = state
   const paths = [...directoryPaths, ...filePaths]
 
-  // Gather all inode-values prior to deleting, so we can remove the files' indexes if the deletions were succesfull
-  const getInodesRecursive = (el: TreeElement, inodes: number[] = []) => {
-    if (paths.includes(el.data.filePath)) {
+  // Gather all inode-values prior to deleting, so we can remove the files' indexes if the deletions were succesful.
+  // If forceDelete = true, it means that the containing parent folder was deleted and hence children should also.
+  const getInodesRecursive = (el: TreeElement, inodes: number[] = [], forceDelete: boolean = false) => {
+    if (paths.includes(el.data.filePath) || forceDelete) {
       inodes.push(el.data.ino)
     }
+
     if (el.children?.length) {
+      const shouldDeleteChildren = forceDelete || paths.includes(el.data.filePath)
+
       for (let child of el.children) {
-        getInodesRecursive(child, inodes)
+        getInodesRecursive(child, inodes, shouldDeleteChildren)
       }
     }
     return inodes
@@ -256,14 +269,14 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
       })
   )
   Promise.all(promises).then(
-    () => {
-      removeIndexes(inodes, index)
+    async () => {
+      await removeIndexes(inodes, index)
 
-      const files = paths
+      const filesToDelete = paths
         .filter((el) => !failedToDelete.includes(el))
         .map((filePath) => getDeletedFileEntityMock(filePath))
 
-      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], files, 'delete', { baseDir })
+      const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], filesToDelete, 'delete', { baseDir })
       const rootDir = first(updatedRootDirectory)
       event.sender.send(FileActionResponses.DeleteSuccess, { rootDirectory: rootDir, tabs })
     },
@@ -274,6 +287,83 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
   )
 }
 
+export const copyFiles = (event: IpcMainEvent, payload: CopyFiles, index: Document<Doc, true>) => {
+  const { filePathsToCopy, state, target } = payload
+  const { rootDirectory, baseDir } = state
+
+  const failedToCopy = []
+
+  const promises: Promise<void>[] = filePathsToCopy.map(
+    (filePath) =>
+      new Promise((resolve, reject) => {
+        const currentPath = filePath
+        const newPath = getNewPath(currentPath, target.data.filePath)
+        const isDirectory = fs.lstatSync(currentPath).isDirectory()
+
+        if (isDirectory) {
+          copyDirectory(currentPath, newPath, index).then(
+            () => {
+              resolve()
+            },
+            (err: Error) => {
+              reject(err)
+            }
+          )
+        } else {
+          fs.copyFile(currentPath, newPath, (err) => {
+            if (err) {
+              failedToCopy.push(currentPath)
+              reject(err)
+            }
+            addToIndex(newPath, index)
+            resolve()
+          })
+        }
+      })
+  )
+
+  Promise.all(promises).then(
+    () => {
+      const updatedTargetNodeChildren = getTreeElementsFromFilePath(target.data.filePath)
+      const node = { ...target, children: updatedTargetNodeChildren }
+      const updatedRootDir = first(replaceTreeNodeRecursive([rootDirectory], node, baseDir))
+
+      event.sender.send(FileActionResponses.CopySuccess, { rootDirectory: updatedRootDir })
+    },
+    (err) => {
+      event.sender.send(FileActionResponses.CopyFailure, err)
+    }
+  )
+}
+
+export const copyDirectory = async (src: string, dest: string, index: Document<Doc, true>) => {
+  const [entries] = await Promise.all([
+    fs.promises.readdir(src, { withFileTypes: true }),
+    fs.promises.mkdir(dest, { recursive: true }),
+  ])
+
+  await Promise.all(
+    entries.map(async (entry) => {
+      const srcPath = getJoinedPath([src, entry.name])
+      const destPath = getJoinedPath([dest, entry.name])
+
+      const copyFileFunc = async () => {
+        await fs.promises.copyFile(srcPath, destPath)
+        addToIndex(destPath, index)
+      }
+
+      entry.isDirectory() ? await copyDirectory(srcPath, destPath, index) : await copyFileFunc()
+    })
+  )
+}
+
 export const openFileLocation = (_event: IpcMainEvent, action: OpenFileLocation) => {
   shell.showItemInFolder(action.filePath)
+}
+
+const stateUpdate = (state: State, type: 'copy') => {
+  switch (type) {
+    case 'copy': {
+    }
+  }
 }

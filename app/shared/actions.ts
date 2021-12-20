@@ -8,6 +8,7 @@ export type UpdateActionPayload =
   | CreateFile
   | RenameFile
   | DeleteFiles
+  | CopyFiles
   | MoveFiles
   | ReadFile
   | UpdateFileContent
@@ -17,7 +18,7 @@ export type UpdateActionPayload =
   | SearchQuery
   | OpenFileLocation
   | GetRecentlyModified
-  | UpdateBookmarkedFiles
+  | GetBookmarkedFiles
 
 export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
 
@@ -61,6 +62,13 @@ export interface MoveFiles {
   state: State
 }
 
+export interface CopyFiles {
+  type: FileActions.CopyFiles
+  target: TreeElement
+  filePathsToCopy: string[]
+  state: State
+}
+
 export interface ReadFile {
   type: FileActions.ReadFile
   filePath: string
@@ -85,10 +93,9 @@ export interface GetRecentlyModified {
   type: StoreActions.GetRecentlyModified
 }
 
-export interface UpdateBookmarkedFiles {
-  type: StoreActions.UpdateBookmarkedFiles
-  bookmarkPath: string
-  bookmarkedFiles: Doc[]
+export interface GetBookmarkedFiles {
+  type: StoreActions.GetBookmarkedFiles
+  bookmarks: string[]
 }
 export interface ChooseDir {
   type: FolderActions.ChooseDir
@@ -117,7 +124,7 @@ export interface Handler {
 }
 
 interface SearchOptions {
-  content?: string
+  textContent?: string
   baseDir?: string
   searchPreferences: SearchPreference[]
 }
@@ -145,6 +152,7 @@ export enum FileActions {
   Create = 'create-file',
   Rename = 'rename-file',
   Update = 'update-file',
+  CopyFiles = 'copy-files',
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
   ReadFile = 'read-file',
@@ -156,7 +164,7 @@ export enum StoreActions {
   GetStore = 'read-store',
   UpdateStore = 'update-store',
   GetRecentlyModified = 'get-recently-modified',
-  UpdateBookmarkedFiles = 'get-bookmarked-files',
+  GetBookmarkedFiles = 'get-bookmarked-files',
 }
 
 export enum ContextMenuActions {
@@ -181,6 +189,8 @@ export enum FileActionResponses {
   DeleteFailure = 'delete-files-failure',
   MoveSuccess = 'move-files-success',
   MoveFailure = 'move-files-failure',
+  CopySuccess = 'copy-files-success',
+  CopyFailure = 'copy-files-failure',
   ReadSuccess = 'read-file-success',
   ReadFailure = 'read-file-failure',
   UpdateSuccess = 'update-success',
@@ -200,8 +210,8 @@ export enum StoreResponses {
   GetDashboardConfigFailure = 'get-dashboard-config-failure',
   GetRecentlyModifiedSuccess = 'get-recently-modified-success',
   GetRecentlyModifiedFailure = 'get-recently-modified-failure',
-  UpdateBookmarkedFilesSuccess = 'get-bookmarked-success',
-  UpdateBookmarkedFilesFailure = 'get-bookmarked-failure',
+  GetBookmarkedFilesSuccess = 'get-bookmarked-files-success',
+  GetBookmarkedFilesFailure = 'get-bookmarked-files-failure',
 }
 
 export enum SearchResponses {

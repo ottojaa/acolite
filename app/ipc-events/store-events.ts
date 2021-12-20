@@ -8,17 +8,10 @@ import {
   updateSelectedWorkspaceConfig,
 } from '../config-helpers/config-helpers'
 import { formatDate } from '../date-and-time-helpers'
-import {
-  getBaseName,
-  getExtensionSplit,
-  getFileData,
-  getFileDataSync,
-  getJoinedPath,
-  getPathSeparator,
-} from '../electron-utils/file-utils'
+import { getFileData, getFileDataSync, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
-import { SearchQuery, UpdateBookmarkedFiles, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
+import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
 import { defaultSpliceLength } from '../shared/constants'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
@@ -75,14 +68,14 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
 
 export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index: Document<Doc, true>) => {
   const { searchOpts } = query
-  const { content, baseDir, searchPreferences } = searchOpts
+  const { textContent, baseDir, searchPreferences } = searchOpts
 
   const replacePath = (pathToReplace: string) => {
     return pathToReplace.replace(getJoinedPath([baseDir, getPathSeparator()]), '')
   }
 
   const getSearchPayload = (searchPreferences: SearchPreference[]) => {
-    const indexedFields = ['content', 'filePath', 'fileName', 'extension']
+    const indexedFields = ['textContent', 'filePath', 'fileName', 'extension']
     const selectedOptions = searchPreferences.filter((preference) => preference.selected)
 
     if (!selectedOptions.length) {
@@ -155,7 +148,7 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   }
 
   const searchPayload = getSearchPayload(searchPreferences)
-  const searchResult = await index.searchAsync(content, searchPayload)
+  const searchResult = await index.searchAsync(textContent, searchPayload)
   const mappedResult = searchResult.map((res) => res.result)
   const uniqueElements = uniqBy(
     mappedResult.reduce((acc: SearchResult[], curr: any) => acc.concat([...curr.map((el) => el.doc)]), []),
@@ -166,7 +159,7 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   const defaultHighlights = {
     fileName: true,
     filePath: true,
-    content: true,
+    textContent: true,
   }
 
   const shouldHighlight = searchPreferences.length
@@ -177,9 +170,13 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
     : defaultHighlights
 
   const mappedResults = filteredResults.map((file) => {
-    file.highlightContentText = shouldHighlight['content'] ? getHighlightContentText(file.content, content) : ''
-    file.highlightTitleText = shouldHighlight['fileName'] ? getHighlightText(file.fileName, content) : ''
-    file.highlightPathText = shouldHighlight['filePath'] ? getHighlightText(replacePath(file.filePath), content) : ''
+    file.highlightContentText = shouldHighlight['textContent']
+      ? getHighlightContentText(file.textContent, textContent)
+      : ''
+    file.highlightTitleText = shouldHighlight['fileName'] ? getHighlightText(file.fileName, textContent) : ''
+    file.highlightPathText = shouldHighlight['filePath']
+      ? getHighlightText(replacePath(file.filePath), textContent)
+      : ''
 
     return file
   })
@@ -191,39 +188,33 @@ export const getDashboardConfig = (
   index: Document<Doc, true> & { store?: Record<string, Doc> },
   bookmarks: string[] | undefined
 ): { bookmarkedFiles: Doc[]; recentlyModified: Doc[] } => {
-  const storeItems = Object.values(index.store)
-  const getBookmarks = () => {
-    return storeItems
-      .filter((item) => bookmarks?.includes(item.filePath))
-      .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
-      .slice(0, 50)
-  }
-
-  const getRecentlyModified = () => {
-    return storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, defaultSpliceLength)
-  }
-
   return {
-    bookmarkedFiles: getBookmarks(),
-    recentlyModified: getRecentlyModified(),
+    bookmarkedFiles: getBookmarkedFiles(index, bookmarks),
+    recentlyModified: getRecentlyModifiedFiles(index),
   }
+}
+
+export const getBookmarkedFiles = (
+  index: Document<Doc, true> & { store?: Record<string, Doc> },
+  bookmarks: string[]
+) => {
+  const storeItems = Object.values(index.store)
+
+  return storeItems
+    .filter((item) => bookmarks?.includes(item.filePath))
+    .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
+    .slice(0, 50)
+}
+
+export const getRecentlyModifiedFiles = (index: Document<Doc, true> & { store?: Record<string, Doc> }) => {
+  const storeItems = Object.values(index.store)
+  return storeItems.sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1)).slice(0, defaultSpliceLength)
 }
 
 export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemPath: string) => {
   const item = getFileDataSync(updatedItemPath)
   const filtered = recentlyModified.filter((el) => el.filePath !== updatedItemPath)
   return [item, ...filtered]
-}
-
-export const updateBookmarkedFiles = (event: IpcMainEvent, payload: UpdateBookmarkedFiles): void => {
-  const { bookmarkPath, bookmarkedFiles } = payload
-  const shouldFilter = bookmarkedFiles?.some((file) => file.filePath === bookmarkPath)
-
-  const updatedBookmarks: Doc[] = shouldFilter
-    ? bookmarkedFiles.filter((file) => file.filePath !== bookmarkPath)
-    : [...bookmarkedFiles, getFileDataSync(bookmarkPath)]
-
-  event.sender.send(StoreResponses.UpdateBookmarkedFilesSuccess, { bookmarkedFiles: updatedBookmarks })
 }
 
 export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, true>) => {
@@ -261,25 +252,25 @@ export const addToIndex = async (filePath: string, index: Document<Doc, true>) =
   await index.addAsync(ino, indexFile)
 }
 
-export const updateIndexesRecursive = (filePaths: string[], index: Document<Doc, true>) => {
-  const updateIndexes = (path: string) => {
+export const updateIndexesRecursive = async (filePaths: string[], index: Document<Doc, true>) => {
+  const updateIndexes = async (path: string) => {
     if (!fs.lstatSync(path).isDirectory()) {
-      updateIndex(path, index)
+      await updateIndex(path, index)
       return
     }
 
     fs.readdirSync(path)
       .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item))
-      .forEach((file) => {
+      .forEach(async (file) => {
         const subpath = getJoinedPath([path, file])
         if (fs.lstatSync(subpath).isDirectory()) {
           updateIndexes(subpath)
         } else {
-          updateIndex(subpath, index)
+          await updateIndex(subpath, index)
         }
       })
   }
-  filePaths.forEach((path) => updateIndexes(path))
+  await Promise.all(filePaths.map(async (path) => await updateIndexes(path)))
 }
 
 export const removeIndexes = async (inodes: number[], index: Document<Doc, true>) => {
@@ -295,7 +286,7 @@ export const getEmptyIndex = (): Document<Doc, true> => {
     optimize: true,
     document: {
       id: 'id',
-      index: ['filePath', 'fileName', 'content', 'createdAt', 'modifiedAt', 'extension'],
+      index: ['filePath', 'fileName', 'textContent', 'createdAt', 'modifiedAt', 'extension'],
       store: true,
     },
   })

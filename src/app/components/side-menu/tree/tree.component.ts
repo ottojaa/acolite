@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
-import { uniqBy } from 'lodash'
+import { intersection, uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Tree } from 'primeng/tree'
@@ -9,8 +9,9 @@ import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { TabService } from '../../../services/tab.service'
-import { TreeElement, ActiveIndent, FileEntity } from '../../../../../app/shared/interfaces'
+import { TreeElement, ActiveIndent, FileEntity, ConfirmDialogConfig } from '../../../../../app/shared/interfaces'
 import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/electron-utils/directory-utils'
+import { getBaseName } from '../../../../../app/electron-utils/file-utils'
 
 @Component({
   selector: 'app-tree',
@@ -144,8 +145,41 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     })
   }
 
-  filesDroppedFromOutside(filePaths: string[], node: TreeElement): void {
-    console.log(filePaths)
+  filesDroppedFromOutside(filePaths: string[], targetNode?: TreeElement): void {
+    if (!targetNode) targetNode = this.state.getStatePartValue('rootDirectory')
+    const conflicts = intersection(
+      targetNode.children.map((child) => getBaseName(child.data.filePath)),
+      filePaths.map((path) => getBaseName(path))
+    )
+
+    const copyRequest = () => {
+      this.electronService.copyFilesRequest({
+        filePathsToCopy: filePaths,
+        state: this.state.value,
+        target: targetNode,
+      })
+    }
+
+    if (conflicts.length) {
+      const bannedNodes = targetNode.children.filter((child) => conflicts.includes(getBaseName(child.data.filePath)))
+      this.ngZone.run(() => {
+        const config: ConfirmDialogConfig = {
+          title: 'The following file(s) already exist in the destination. Replace?',
+          fileList: bannedNodes,
+          buttonLabels: {
+            confirm: 'Replace',
+            cancel: 'Cancel',
+          },
+        }
+        this.dialogService.openConfirmDialog(config).subscribe((data) => {
+          if (data) {
+            copyRequest()
+          }
+        })
+      })
+    } else {
+      copyRequest()
+    }
   }
 
   createNewFolder(node: TreeElement): void {
@@ -179,15 +213,8 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     this.isDragging = false
   }
 
-  test(event: DragEvent): void {
-    event.stopPropagation()
-    event.stopImmediatePropagation()
-    event.preventDefault()
-  }
-
   onDragEnter(event: Event): void {
     this.isHovering = true
-
     event.preventDefault()
   }
 

@@ -1,5 +1,4 @@
 import { ElementRef, Injectable, NgZone } from '@angular/core'
-import { AbstractControl, ValidatorFn } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ConfirmDialogComponent } from 'app/components/dialogs/confirm-dialog/confirm-dialog.component'
@@ -7,7 +6,7 @@ import { TagEditorComponent } from 'app/components/top-bar/tag-editor/tag-editor
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { getBaseName } from '../../../app/electron-utils/file-utils'
-import { FilePathContainer, TreeElement } from '../../../app/shared/interfaces'
+import { ConfirmDialogConfig, FilePathContainer, TreeElement } from '../../../app/shared/interfaces'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
 import { ChangeDirectoryDialogComponent } from '../components/dialogs/change-directory-dialog/change-directory-dialog.component'
 import { DeleteFilesDialogComponent } from '../components/dialogs/delete-files-dialog/delete-files-dialog.component'
@@ -17,7 +16,6 @@ import { MoveFilesDialogComponent } from '../components/dialogs/move-files-dialo
 import { RenameFileDialogComponent } from '../components/dialogs/rename-file-dialog/rename-file-dialog.component'
 import { SearchBuilderDialogComponent } from '../components/dialogs/search-builder-dialog/search-builder-dialog.component'
 import { StateService } from './state.service'
-
 @Injectable({
   providedIn: 'root',
 })
@@ -123,8 +121,8 @@ export class AppDialogService {
     })
   }
 
-  openConfirmDialog(title: string): Observable<boolean> {
-    const ref = this.dialog.open(ConfirmDialogComponent, { data: title })
+  openConfirmDialog(config: ConfirmDialogConfig): Observable<boolean> {
+    const ref = this.dialog.open(ConfirmDialogComponent, { data: { ...config } })
     return ref.afterClosed().pipe(take(1))
   }
 

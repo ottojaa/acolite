@@ -1,6 +1,6 @@
 import { Component, Inject, NgZone } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { getBaseName, getExtension } from '../../../../../app/electron-utils/file-utils'
 import { FilePathContainer } from '../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
@@ -15,7 +15,7 @@ import { RenameFileDialogComponent } from '../rename-file-dialog/rename-file-dia
 export class DeleteFilesDialogComponent {
   toDeleteCount: number
   deleteText: string
-  displayTexts: { folders: string[]; files: string[] }
+  displayTexts: { folders: string[]; files: { name: string; extension: string }[] }
   constructor(
     public dialogRef: MatDialogRef<RenameFileDialogComponent>,
     public electronService: ElectronService,
@@ -27,14 +27,14 @@ export class DeleteFilesDialogComponent {
     this.displayTexts = this.getDisplayTexts()
   }
 
-  getDisplayTexts(): FilePathContainer {
+  getDisplayTexts(): { folders: string[]; files: { name: string; extension: string }[] } {
     const { folders, files } = this.data
     this.toDeleteCount = folders.length + files.length
     this.deleteText = this.getDeleteText(folders, files)
 
     return {
       folders: [...folders.map((folder) => getBaseName(folder))],
-      files: files.map((file) => getBaseName(file)),
+      files: files.map((file) => ({ name: getBaseName(file), extension: getExtension(file) })),
     }
   }
 

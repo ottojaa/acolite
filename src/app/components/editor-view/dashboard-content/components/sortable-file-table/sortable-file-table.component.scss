@@ -4,12 +4,12 @@
 
 table {
   width: 100%;
-  background: var(--backgroundPrimary);
+  background: none;
   color: var(--contrast);
 }
 
 .mat-paginator {
-  background: var(--backgroundPrimary);
+  background: none;
   color: var(--contrast);
 }
 
@@ -22,15 +22,14 @@ tr.detail-row {
   height: 0;
 }
 
-.item-row td {
-  border-bottom-width: 0;
+tr.item-row {
+  cursor: pointer;
 }
 
 .element-detail-row {
   display: flex;
   overflow: hidden;
   align-items: center;
-  border-bottom: 0;
 
   .extension-icon {
     width: 7rem;
@@ -52,26 +51,32 @@ tr.detail-row {
 
 td,
 th {
-  cursor: pointer;
   color: var(--contrast);
   border-bottom-color: var(--contrastLowerOpacity);
   &.mat-header-cell {
-    color: var(--buttonColor);
+    color: var(--contrast);
   }
 }
-.mat-column-fileName {
-  width: 35rem;
+
+.filename-column {
+  display: flex;
+  align-items: center;
+  .filename {
+    margin: 0 8px;
+  }
 }
 
+.filter {
+  color: var(--contrast);
+}
+
+.mat-column-fileName {
+  width: 40rem;
+}
 .mat-column-createdAt,
-.mat-column-modifiedAt {
-  width: 15rem;
-}
-.mat-column-filePath {
-  width: 35rem;
-}
-.mat-sort-header-container {
-  font-weight: bold;
+.mat-column-modifiedAt,
+.mat-column-size {
+  width: 20rem;
 }
 
 :host ::ng-deep {
@@ -89,6 +94,15 @@ th {
     padding: 5rem !important;
   }
   .mat-form-field-underline {
-    // background-color: var(--buttonColorLowerOpacity);
+    background-color: rgb(255 255 255 / 12%);
+  }
+
+  .mat-form-field.mat-focused .mat-form-field-ripple {
+    background-color: var(--buttonColor);
+  }
+
+  .mat-sort-header-content {
+    font-size: 1.1rem;
+    font-weight: bold;
   }
 }

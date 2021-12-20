@@ -3,6 +3,7 @@ import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { Observable, Subject } from 'rxjs'
 import { takeUntil, skip, debounceTime } from 'rxjs/operators'
+import { UpdateFileContent } from '../../../app/shared/actions'
 import { SelectedTab, State } from '../../../app/shared/interfaces'
 import { AbstractComponent } from './abstract-component'
 
@@ -20,9 +21,13 @@ export class AbstractEditor extends AbstractComponent {
   }
 
   initAutoSave(): void {
-    this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(1000)).subscribe((payload) => {
+    this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe((payload) => {
       this.electronService.updateFileContent({ ...payload, state: this.state.value })
     })
+  }
+
+  saveContent(payload: Omit<UpdateFileContent, 'type' | 'state'>): void {
+    this.electronService.updateFileContent({ ...payload, state: this.state.value })
   }
 
   selectedTabListener(): Observable<SelectedTab> {

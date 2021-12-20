@@ -18,8 +18,16 @@ import {
   updateFileContent,
   readAndSendTabData,
   openFileLocation,
+  copyFiles,
 } from './ipc-events/file-events'
-import { getEmptyIndex, initAppState, searchFiles, updateBookmarkedFiles, updateStore } from './ipc-events/store-events'
+import {
+  getBookmarkedFiles,
+  getEmptyIndex,
+  getRecentlyModifiedFiles,
+  initAppState,
+  searchFiles,
+  updateStore,
+} from './ipc-events/store-events'
 import { getFileData, getJoinedPath } from './electron-utils/file-utils'
 import {
   ContextMenuActions,
@@ -29,6 +37,7 @@ import {
   ReadFile,
   SearchActions,
   StoreActions,
+  StoreResponses,
   UpdateActionPayload,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
@@ -116,13 +125,15 @@ const FileActionChannels = [
   FileActions.ReadFile,
   FileActions.Update,
   FileActions.OpenFileLocation,
+  FileActions.CopyFiles,
 ]
 
 const StoreActionChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
   StoreActions.UpdateStore,
-  StoreActions.UpdateBookmarkedFiles,
+  StoreActions.GetBookmarkedFiles,
+  StoreActions.GetRecentlyModified,
 ]
 
 const ContextMenuChannels = [ContextMenuActions.ShowEditorContextMenu]
@@ -161,8 +172,16 @@ const StoreActionReducer = (action: StoreActions) => {
         updateStore(event, payload, configPath)
         break
       }
-      case StoreActions.UpdateBookmarkedFiles: {
-        updateBookmarkedFiles(event, payload)
+
+      case StoreActions.GetBookmarkedFiles: {
+        const { bookmarks } = payload
+        const bookmarkedFiles = getBookmarkedFiles(index, bookmarks)
+        event.sender.send(StoreResponses.GetBookmarkedFilesSuccess, { bookmarkedFiles })
+        break
+      }
+      case StoreActions.GetRecentlyModified: {
+        const recentlyModified = getRecentlyModifiedFiles(index)
+        event.sender.send(StoreResponses.GetRecentlyModifiedSuccess, { recentlyModified })
         break
       }
     }
@@ -222,6 +241,10 @@ const FileActionReducer = (action: FileActions) => {
       }
       case FileActions.OpenFileLocation: {
         openFileLocation(event, payload)
+        break
+      }
+      case FileActions.CopyFiles: {
+        copyFiles(event, payload, index)
         break
       }
     }
