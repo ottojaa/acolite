@@ -2,7 +2,7 @@ import { trigger, transition, style, animate } from '@angular/animations'
 import { Component, Input, NgZone } from '@angular/core'
 import { AppDialogService } from 'app/services/dialog.service'
 import { TabService } from 'app/services/tab.service'
-import { SearchResult } from '../../../../../../app/shared/interfaces'
+import { Doc, SearchResult } from '../../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-file-card',
@@ -10,12 +10,12 @@ import { SearchResult } from '../../../../../../app/shared/interfaces'
   styleUrls: ['./file-card.component.scss'],
 })
 export class FileCardComponent {
-  @Input() file: SearchResult
+  @Input() file: Doc
   @Input() showBookmark: boolean
 
   constructor(private tabService: TabService, private dialogService: AppDialogService, private zone: NgZone) {}
 
-  openInNewTab(file: SearchResult): void {
+  openInNewTab(file: Doc): void {
     this.tabService.openNewTab(file.filePath)
   }
 

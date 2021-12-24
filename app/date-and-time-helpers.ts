@@ -8,5 +8,5 @@ export const formatDate = (date: Date | string) => {
 }
 
 export const getDistance = (date: Date) => {
-  return 'Last updated ' + formatDistance(date, new Date(), { includeSeconds: true }) + ' ago'
+  return 'Updated succesfully ' + formatDistance(date, new Date(), { includeSeconds: true }) + ' ago'
 }

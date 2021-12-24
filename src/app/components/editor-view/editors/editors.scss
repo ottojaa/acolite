@@ -24,7 +24,6 @@ $toolbar-bg-light: #ffffffeb;
   width: 100%;
   height: 100%;
   display: flex;
-  padding: 1rem 2rem 3rem;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -37,46 +36,22 @@ $toolbar-bg-light: #ffffffeb;
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 10px;
 
   textarea {
     padding: 2rem;
     width: 100%;
     height: 100%;
     overflow-y: scroll;
-    box-shadow: $box-shadow;
     border: none;
     outline: none;
     resize: none;
     font-family: $font-family;
-    border-radius: 10px;
   }
   &.dark-theme textarea {
     background: var(--backgroundTertiary);
     color: $textarea-color-dark;
   }
   &.light-theme textarea {
-    background: $textarea-bg-light;
-    color: $textarea-color-light;
-  }
-
-  .contenteditable-div {
-    padding: 2rem;
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    box-shadow: $box-shadow;
-    border: none;
-    outline: none;
-    resize: none;
-    font-family: $font-family;
-    border-radius: 10px;
-  }
-  &.dark-theme .contenteditable-div {
-    background: var(--backgroundTertiary);
-    color: $textarea-color-dark;
-  }
-  &.light-theme .contenteditable-div {
     background: $textarea-bg-light;
     color: $textarea-color-light;
   }

@@ -2,7 +2,7 @@
 
 :host ::ng-deep .mat-tab-label {
   opacity: 1;
-  height: 3rem;
+  height: 40px;
   font-size: 1.1rem;
   .icon {
     width: 1.3rem;
@@ -15,7 +15,7 @@
 
 :host ::ng-deep .mat-tab-header {
   border-bottom: none;
-  overflow-x: scroll !important;
+  overflow-x: overlay !important;
 }
 
 :host ::ng-deep .mat-tab-label-container {
@@ -59,7 +59,7 @@
 ::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
 .mat-tab-nav-bar.mat-primary .mat-ink-bar {
   background-color: var(--buttonColor);
-  padding-top: 3px;
+  // padding-top: 3px;
 }
 
 :host ::ng-deep .mat-tab-body-wrapper,

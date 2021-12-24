@@ -41,6 +41,10 @@ export const getFileData = (filePath: string): Promise<Doc> => {
   })
 }
 
+export const getImageDataBase64 = (filePath: string): Promise<any> => {
+  return fs.promises.readFile(filePath, { encoding: 'base64' })
+}
+
 export const getFileDataSync = (filePath: string): Doc => {
   try {
     const textContent = fs.readFileSync(filePath, 'utf-8')

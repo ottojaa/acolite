@@ -31,7 +31,6 @@ export class FileTabsComponent extends AbstractComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.tabs)
     this.selectedTab$ = this.state.getStatePart('selectedTab').pipe(
       takeUntil(this.destroy$),
       tap((selectedTab) => this.scrollSelectedTabIntoView(selectedTab)),

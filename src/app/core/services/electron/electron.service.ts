@@ -171,4 +171,8 @@ export class ElectronService {
   async getFileData(payload: { filePath: string }): Promise<Doc> {
     return this.handle(HandlerAction.GetTabData, payload)
   }
+
+  async getImageData(payload: { filePath: string }): Promise<string> {
+    return this.handle(HandlerAction.GetImageBase64, payload)
+  }
 }

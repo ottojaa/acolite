@@ -28,13 +28,14 @@ import {
   searchFiles,
   updateStore,
 } from './ipc-events/store-events'
-import { getFileData, getJoinedPath } from './electron-utils/file-utils'
+import { getFileData, getImageDataBase64, getJoinedPath } from './electron-utils/file-utils'
 import {
   ContextMenuActions,
   FileActions,
   FolderActions,
   HandlerAction,
   ReadFile,
+  ReadImageData,
   SearchActions,
   StoreActions,
   StoreResponses,
@@ -265,6 +266,10 @@ const ContextMenuReducer = (action: ContextMenuActions) => {
 const IPCHandlerReducer = () => {
   ipcMain.handle(HandlerAction.GetTabData, async (_event, action: ReadFile) => {
     const result = await getFileData(action.filePath)
+    return result
+  })
+  ipcMain.handle(HandlerAction.GetImageBase64, async (_event, action: ReadImageData) => {
+    const result = await getImageDataBase64(action.filePath)
     return result
   })
 }

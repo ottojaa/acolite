@@ -31,6 +31,8 @@ export const editorTypes = [
     acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx'],
   },
   { editor: 'md', acceptedTypes: ['markdown', 'md'] },
+  { editor: 'json', acceptedTypes: ['json'] },
+  { editor: 'image', acceptedTypes: ['jpg', 'jpeg', 'png'] },
 ]
 
 export enum EntityTypes {

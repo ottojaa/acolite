@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
+import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TextEditorComponent } from './text-editor.component'
 import { TextFieldModule } from '@angular/cdk/text-field'
@@ -25,6 +25,5 @@ import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
     MatSlideToggleModule,
     EditorTopBarModule,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TextEditorModule {}

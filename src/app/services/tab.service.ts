@@ -94,6 +94,9 @@ export class TabService {
   }
 
   private getNewSelectedTab(selectedTab: SelectedTab, tabs: Doc[]): any {
+    if (selectedTab.index <= tabs.length) {
+      return { path: selectedTab.filePath, index: selectedTab.index }
+    }
     const newIndex = selectedTab.index - 1 >= 0 ? selectedTab.index - 1 : 0
     return tabs[newIndex] ? { path: tabs[newIndex].filePath, index: newIndex } : { path: '', index: 0 }
   }

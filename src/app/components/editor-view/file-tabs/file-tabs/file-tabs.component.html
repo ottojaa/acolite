@@ -32,7 +32,7 @@
           </ng-container>
 
           <ng-template #showEditor>
-            <ng-container [ngSwitch]="tab.extension">
+            <ng-container [ngSwitch]="tab.editorType">
               <div *ngSwitchCase="'txt'" class="editor">
                 <app-text-editor [tab]="tab"></app-text-editor>
               </div>
@@ -45,7 +45,11 @@
                 <app-json-editor [tab]="tab"></app-json-editor>
               </div>
 
-              <div *ngSwitchDefault>No editor for this type of file</div>
+              <div *ngSwitchCase="'image'" class="editor">
+                <app-image-editor [tab]="tab"></app-image-editor>
+              </div>
+
+              <div *ngSwitchDefault>No viewer for this type of file</div>
             </ng-container>
           </ng-template>
         </mat-tab>

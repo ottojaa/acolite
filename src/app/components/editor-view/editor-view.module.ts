@@ -9,7 +9,6 @@ import { MatTabsModule } from '@angular/material/tabs'
 import { MatListModule } from '@angular/material/list'
 import { SortableFileTableModule } from './dashboard-content/components/sortable-file-table/sortable-file-table.module'
 import { DashboardContentModule } from './dashboard-content/dashboard-content.module'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 
 @NgModule({

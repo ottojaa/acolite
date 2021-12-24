@@ -75,6 +75,12 @@ export interface ReadFile {
   state: State
 }
 
+export interface ReadImageData {
+  type: FileActions.ReadFile
+  filePath: string
+  state: State
+}
+
 export interface OpenFileLocation {
   type: FileActions.OpenFileLocation
   filePath: string
@@ -156,6 +162,7 @@ export enum FileActions {
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
   ReadFile = 'read-file',
+  ReadImageData = 'read-image-data',
   OpenFileLocation = 'open-file-location',
 }
 
@@ -177,6 +184,7 @@ export enum SearchActions {
 
 export enum HandlerAction {
   GetTabData = 'get-tab-data',
+  GetImageBase64 = 'get-image-base64',
 }
 
 export enum FileActionResponses {

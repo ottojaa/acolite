@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
-import { isPlainObject, cloneDeep, isEqual, uniqBy } from 'lodash'
+import { isPlainObject, cloneDeep, isEqual, uniqBy, omit } from 'lodash'
 import { Document } from 'flexsearch'
 import {
   getDefaultConfigJSON,
@@ -240,14 +240,24 @@ export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Doc
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
   const indexFile = await getFileData(newPath)
-  const { ino } = indexFile
+  const { ino, extension } = indexFile
+
+  const noIndexContentTypes = ['jpg', 'jpeg', 'png']
+  if (noIndexContentTypes.includes(extension)) {
+    indexFile.textContent = ''
+  }
 
   await index.updateAsync(ino, indexFile)
 }
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
-  const indexFile = await getFileData(filePath)
-  const { ino } = indexFile
+  let indexFile = await getFileData(filePath)
+  const { ino, extension } = indexFile
+
+  const noIndexContentTypes = ['jpg', 'jpeg', 'png']
+  if (noIndexContentTypes.includes(extension)) {
+    indexFile.textContent = ''
+  }
 
   await index.addAsync(ino, indexFile)
 }

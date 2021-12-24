@@ -4,20 +4,21 @@ $markdown-bg-dark: #272a2d;
 $markdown-color-dark: white;
 $toolbar-bg-dark: #2e3236;
 
-$markdown-bg-light: #ffffffe0;
+$markdown-bg-light: #ffffff;
 $markdown-color-light: black;
 $toolbar-bg-light: white;
 
 .editor-container {
   height: 100%;
   width: 100%;
-  padding: 1rem 2rem 0;
 
   .elevation {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    height: 100%;
+
     .top-bar {
       width: 100%;
       color: white;
@@ -60,8 +61,7 @@ $toolbar-bg-light: white;
 }
 
 ngx-markdown-editor {
-  min-height: 84vh;
-  max-height: 84vh;
+  min-height: 100%;
 }
 
 :host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
@@ -76,16 +76,11 @@ ngx-markdown-editor {
   background-color: var(--backgroundSecondary);
   padding: 0 0.8rem 0.5rem;
   box-shadow: $box-shadow-elevation;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
 }
 
 :host ::ng-deep .CodeMirror {
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-bottom-left-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
   background: var(--editorBg1);
+  border-radius: 0;
 }
 :host ::ng-deep .CodeMirror-scroll {
   padding-bottom: 0 !important;
@@ -93,12 +88,6 @@ ngx-markdown-editor {
 
 :host ::ng-deep .ngx-markdown-editor-wrapper > :first-child {
   border: none !important;
-}
-
-:host ::ng-deep .ngx-markdown-editor-wrapper {
-  box-shadow: $box-shadow-elevation;
-  border-bottom-left-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
 }
 
 :host ::ng-deep ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
@@ -109,6 +98,7 @@ ngx-markdown-editor {
     color: white;
     margin: 0;
     padding: 0.5rem;
+    background-color: var(--backgroundTertiary);
   }
   .ngx-markdown-editor-toolbar {
     background-color: var(--mdStatusToolbarBg);
