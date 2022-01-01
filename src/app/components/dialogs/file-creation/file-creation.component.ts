@@ -25,17 +25,17 @@ export class FileCreationComponent {
     {
       icon: 'text',
       value: 'txt',
-      label: 'Text (txt)',
+      label: 'Text (.txt)',
     },
     {
       icon: 'md',
       value: 'md',
-      label: 'Markdown (md)',
+      label: 'Markdown (.md)',
     },
     {
       icon: 'json',
       value: 'json',
-      label: 'JSON (json)',
+      label: 'JSON (.json)',
     },
     {
       icon: 'other',

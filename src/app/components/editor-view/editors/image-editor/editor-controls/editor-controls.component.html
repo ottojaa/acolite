@@ -1,0 +1,106 @@
+<div class="editor-controls">
+  <mat-list role="list">
+    <h1 mat-subheader>Options</h1>
+
+    <mat-list-item role="listitem">
+      <p>Output quality</p>
+      <mat-slider
+        min="0"
+        max="100"
+        thumbLabel="true"
+        [(ngModel)]="imageQuality"
+        (ngModelChange)="onChangeImageQuality($event)"
+      ></mat-slider>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Scale</p>
+      <mat-slider
+        value="1"
+        min="0.25"
+        max="5"
+        step="0.25"
+        thumbLabel="true"
+        (change)="onChangeScale($event)"
+      ></mat-slider>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Maintain aspect ratio</p>
+      <mat-checkbox
+        [(ngModel)]="maintainAspectRatio"
+        [checked]="maintainAspectRatio"
+        (ngModelChange)="onChangeMaintainAspectRatio($event)"
+      ></mat-checkbox>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Rotate</p>
+      <div class="icon-container">
+        <app-rounded-icon-button [icon]="'rotate_left'" (click)="rotate('neg')"></app-rounded-icon-button>
+        <app-rounded-icon-button [icon]="'rotate_right'" (click)="rotate('pos')"></app-rounded-icon-button>
+      </div>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Flip</p>
+      <div class="icon-container">
+        <app-rounded-icon-button [icon]="'flip'" (click)="flip('horizontal')"></app-rounded-icon-button>
+        <app-rounded-icon-button
+          style="transform: rotate(90deg)"
+          [icon]="'flip'"
+          (click)="flip('vertical')"
+        ></app-rounded-icon-button>
+      </div>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Format</p>
+      <mat-select [(ngModel)]="selectedFormat" name="food">
+        <mat-option *ngFor="let format of formats" [value]="format.value">
+          {{ format.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-list-item>
+
+    <mat-list-item role="listitem" class="margin-vertical">
+      <mat-form-field appearance="standard">
+        <mat-label class="output-name">Output name</mat-label>
+        <input matInput [formControl]="fileName" required />
+        <span *ngIf="selectedFormat" style="opacity: 0.7; font-size: 1.1rem; color: var(--contrast)" matSuffix
+          >.{{ selectedFormat }}</span
+        >
+      </mat-form-field>
+    </mat-list-item>
+
+    <div class="output-location">
+      <p>Output location</p>
+      <div class="output-path">
+        <p class="margin-horizontal">{{ outputPath | formatPath: basePath }}</p>
+        <mat-icon (click)="onChooseDir()">folder</mat-icon>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div mat-subheader>Result</div>
+
+    <mat-list-item role="listitem">
+      <p>Dimensions</p>
+      <div class="dimension-container">
+        <p>{{ originalImageDimensions?.width }} x {{ originalImageDimensions?.height }}</p>
+        <mat-icon>arrow_forward</mat-icon>
+        <p>{{ croppedImageDimensions?.width }} x {{ croppedImageDimensions?.height }}</p>
+      </div>
+    </mat-list-item>
+
+    <mat-list-item role="listitem">
+      <p>Output</p>
+      <p>{{ fileName.value }}.{{ selectedFormat }}</p>
+    </mat-list-item>
+
+    <mat-list-item role="listitem" class="margin-vertical">
+      <button class="cancel" mat-button (click)="onClickEditMode()">Cancel</button>
+    </mat-list-item>
+  </mat-list>
+</div>

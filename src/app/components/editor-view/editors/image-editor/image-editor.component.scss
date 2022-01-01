@@ -9,56 +9,6 @@
   align-items: center;
 }
 
-.cropper {
-  height: 100%;
-  .view-container {
-    height: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    .image-container {
-      width: 85%;
-      display: flex;
-      justify-content: flex-end;
-      &.editMode {
-        width: 70%;
-      }
-      img {
-        width: 90%;
-        box-shadow: $box-shadow-elevation;
-      }
-    }
-    .side-container {
-      width: 15%;
-      color: var(--contrast);
-      &.editMode {
-        width: 30%;
-      }
-    }
-  }
-  .margin {
-    margin: 1.5rem 0;
-  }
-  .dimension-container {
-    display: flex;
-    align-items: center;
-    > p {
-      color: var(--contrast);
-      font-size: 1.1rem;
-      margin: 0;
-      &:first-of-type {
-        opacity: 0.7;
-        text-decoration: line-through;
-      }
-    }
-    mat-icon {
-      color: var(--contrast);
-      opacity: 0.8;
-      transform: scale(0.8);
-    }
-  }
-}
-
 :host ::ng-deep {
   .mat-list-item {
     height: 36px;
@@ -76,7 +26,6 @@
       display: inline-block;
       &:first-of-type {
         opacity: 0.7;
-        // width: 75%;
       }
     }
     .mat-button {
@@ -85,70 +34,66 @@
       color: var(--contrast);
       margin: 3rem 0;
       line-height: 25px;
-      &.cancel {
-        background-color: $cancel-button-color;
-      }
-    }
-    .icon-container {
-      display: flex;
-    }
-    .mat-select {
-      width: 20%;
     }
   }
-  .ngx-ic-overlay {
-    outline: none !important;
-  }
-  image-cropper {
-    padding: 0;
-    width: 80%;
+}
+
+.view-container {
+  height: 80%;
+  width: 95%;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  position: relative;
+  img {
+    margin: 2rem;
+    max-width: 80%;
+    max-height: 100%;
     box-shadow: $box-shadow-elevation;
-    div {
-      background: none !important;
+  }
+  .side-container {
+    margin-left: 1rem;
+    width: 20%;
+    color: var(--contrast);
+    &.editMode {
+      width: 35%;
+      justify-content: flex-end;
+      min-width: 25rem;
     }
   }
-  .mat-slider-thumb {
-    background: var(--buttonColor);
-  }
-  .mat-slider-thumb-label,
-  .mat-slider-track-fill {
-    background-color: var(--buttonColorLowOpacity);
-  }
-  .mat-select-value {
-    color: var(--contrast);
-    opacity: 0.8;
-  }
-  .mat-select-arrow {
-    color: var(--contrast);
-    opacity: 0.8;
-  }
-  .mat-subheader {
-    color: var(--contrast);
-  }
-  .mat-divider {
-    margin: 1rem;
-  }
-  .mat-form-field {
+}
+.result-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  mat-divider {
     width: 100%;
   }
-  .mat-input-element {
-    font-size: 1.1rem;
-  }
-  .mat-form-field-label,
-  .mat-focused .mat-form-field-label,
-  input.mat-input-element {
+  h2 {
     color: var(--contrast);
-    opacity: 0.8;
   }
-  .mat-button:hover {
-    background-color: var(--buttonColor);
+  img {
+    margin: 2rem;
+    max-width: 80%;
+    box-shadow: $box-shadow-elevation;
   }
-  .mat-form-field-underline,
-  .mat-form-field-ripple {
-    background-color: var(--buttonColor);
-  }
-  .mat-focused .mat-form-field-ripple {
-    /*change color of underline when focused*/
-    background-color: var(--buttonColor) !important;
-  }
+}
+
+.output-name {
+  opacity: 1;
+}
+.margin-vertical {
+  margin: 1.5rem 0;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.output-path {
+  color: var(--contrast);
 }

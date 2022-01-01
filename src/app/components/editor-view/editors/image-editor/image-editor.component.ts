@@ -1,14 +1,16 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations'
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
+import { MatSliderChange } from '@angular/material/slider'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
-import { ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper'
-import { getBaseName } from '../../../../../../app/electron-utils/file-utils'
+import { ImageCroppedEvent, ImageTransform, LoadedImage } from 'ngx-image-cropper'
+import { getBaseName, getDirName } from '../../../../../../app/electron-utils/file-utils'
 import { nameValidationPattern } from '../../../../../../app/shared/constants'
 import { Doc } from '../../../../../../app/shared/interfaces'
+import { Dimensions } from './interfaces'
 
 @Component({
   selector: 'app-image-editor',
@@ -29,42 +31,27 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
   croppedImage: any = ''
   isChecked: boolean
-  notEditing = true
   imagePath: SafeResourceUrl
   imageBase64: string
 
+  cropperIsReady = false
   editMode = true
-  maintainAspectRatio = true
+  maintainAspectRatio = false
   imageQuality = 100
   selectedFormat: string
-  originalImageDimensions: { width: number; height: number } = { width: undefined, height: undefined }
-  croppedImageDimensions: { width: number; height: number } = { width: undefined, height: undefined }
+  originalImageDimensions: Dimensions = { width: undefined, height: undefined }
+  croppedImageDimensions: Dimensions = { width: undefined, height: undefined }
 
-  imageRotation: number
-  imageScale: number
+  canvasRotation = 0
+  imageTransform: ImageTransform = {
+    scale: 1,
+    rotate: 0,
+    flipH: false,
+    flipV: false,
+  }
 
-  formats = [
-    {
-      displayName: 'Png',
-      value: 'png',
-    },
-    {
-      displayName: 'Jpeg',
-      value: 'jpeg',
-    },
-    {
-      displayName: 'Webp',
-      value: 'webp',
-    },
-    {
-      displayName: 'Bmp',
-      value: 'bmp',
-    },
-    {
-      displayName: 'Ico',
-      value: 'ico',
-    },
-  ]
+  basePath: string
+  outputPath: string
 
   constructor(public electronService: ElectronService, public state: StateService, public cdRef: ChangeDetectorRef) {
     super(electronService, state)
@@ -81,8 +68,8 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
     this.selectedFormat =
       this.tab.extension === 'jpg' ? 'jpeg' : acceptedFormats.includes(this.tab.extension) ? this.tab.extension : ''
 
-    const baseName = getBaseName(this.tab.filePath).split('.')[0]
-    this.fileName.setValue(baseName + `_cropped_${new Date().toISOString()}`)
+    this.outputPath = getDirName(this.tab.filePath)
+    this.basePath = this.state.getStatePartValue('baseDir')
   }
 
   async getImageBase64(): Promise<void> {
@@ -91,32 +78,35 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
     this.cdRef.detectChanges()
   }
 
-  imageCropped(event: ImageCroppedEvent) {
-    const { base64, height, width } = event
-    this.croppedImage = base64
-    this.croppedImageDimensions.height = height
-    this.croppedImageDimensions.width = width
+  updateCroppedDimensions(dimensions: Dimensions) {
+    this.croppedImageDimensions = { ...dimensions }
   }
-  imageLoaded(image: LoadedImage) {
-    const { original } = image
-    const { width, height } = original.size
-    this.originalImageDimensions.width = width
-    this.originalImageDimensions.height = height
-    // show cropper
+
+  updateOriginalDimensions(dimensions: Dimensions) {
+    this.originalImageDimensions = { ...dimensions }
   }
-  cropperReady() {
-    console.log('cropper')
-    // cropper ready
-  }
-  loadImageFailed() {
-    // show message
+
+  updateImageTransform(args: Partial<ImageTransform>): void {
+    this.imageTransform = { ...this.imageTransform, ...args }
   }
 
   toggleEditMode(): void {
     this.editMode = !this.editMode
   }
 
-  onChange(event: any): void {
-    console.log(event)
+  onChooseOutputPath(path: string): void {
+    this.outputPath = path
+  }
+
+  onCrop(base64: string): void {
+    this.croppedImage = base64
+  }
+
+  onChangeQuality(quality: number): void {
+    this.imageQuality = quality
+  }
+
+  onChangeMaintainAspectRatio(value: boolean): void {
+    this.maintainAspectRatio = value
   }
 }

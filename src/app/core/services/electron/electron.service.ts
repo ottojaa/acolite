@@ -175,4 +175,8 @@ export class ElectronService {
   async getImageData(payload: { filePath: string }): Promise<string> {
     return this.handle(HandlerAction.GetImageBase64, payload)
   }
+
+  async getDirectoryPath(payload: { filePath: string }): Promise<string> {
+    return this.handle(HandlerAction.ChooseDirectory, payload)
+  }
 }

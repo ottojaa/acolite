@@ -81,6 +81,11 @@ export interface ReadImageData {
   state: State
 }
 
+export interface ChooseDirectory {
+  type: HandlerAction.ChooseDirectory
+  filePath: string
+}
+
 export interface OpenFileLocation {
   type: FileActions.OpenFileLocation
   filePath: string
@@ -185,6 +190,7 @@ export enum SearchActions {
 export enum HandlerAction {
   GetTabData = 'get-tab-data',
   GetImageBase64 = 'get-image-base64',
+  ChooseDirectory = 'choose-directory',
 }
 
 export enum FileActionResponses {

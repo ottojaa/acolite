@@ -1,0 +1,20 @@
+<div class="cropper">
+  <div class="cropper-not-ready" *ngIf="editMode && !cropperIsReady">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <image-cropper
+    [ngClass]="{ lowOpacity: !cropperIsReady }"
+    [maintainAspectRatio]="maintainAspectRatio"
+    [imageBase64]="imageBase64"
+    [imageQuality]="imageQuality"
+    [aspectRatio]="originalImageDimensions.width / originalImageDimensions.height"
+    [maintainAspectRatio]="maintainAspectRatio"
+    [format]="selectedFormat"
+    (imageCropped)="imageCropped($event)"
+    (imageLoaded)="imageLoaded($event)"
+    (cropperReady)="cropperReady()"
+    [backgroundColor]="'black'"
+    [transform]="imageTransform"
+  ></image-cropper>
+</div>

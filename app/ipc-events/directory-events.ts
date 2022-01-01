@@ -59,6 +59,14 @@ export const chooseDirectory = (event: IpcMainEvent, window: BrowserWindow, conf
     })
 }
 
+export const getDirectoryPath = async (window: BrowserWindow, defaultPath: string) => {
+  const result = await dialog.showOpenDialog(window, {
+    properties: ['openDirectory', 'createDirectory'],
+    defaultPath,
+  })
+  return result.canceled ? '' : result.filePaths[0]
+}
+
 export const setDefaultDirectory = (event: IpcMainEvent, configPath: string, workspacePath: string) => {
   const defaultConfig = getDefaultConfigJSON(workspacePath)
 

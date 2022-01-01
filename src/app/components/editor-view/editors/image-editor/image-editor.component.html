@@ -1,123 +1,73 @@
 <div class="image-cropper-container">
-  <span class="top-bar"></span>
+  <div class="view-container" *ngIf="imagePath; else loader" @componentLoaded>
+    <ng-container *ngIf="!editMode" @componentLoaded>
+      <img [src]="imagePath | safeUrl" />
+    </ng-container>
 
-  <div class="cropper" *ngIf="imagePath; else loader" @componentLoaded>
-    <div class="view-container">
-      <div class="image-container" [ngClass]="{ editMode: editMode }">
-        <ng-container *ngIf="!editMode" @componentLoaded>
-          <img [src]="imagePath | safeUrl" />
-        </ng-container>
+    <ng-container *ngIf="editMode" @componentLoaded>
+      <app-image-cropper
+        [maintainAspectRatio]="maintainAspectRatio"
+        [imageBase64]="imageBase64"
+        [imageQuality]="imageQuality"
+        [aspectRatio]="originalImageDimensions.width / originalImageDimensions.height"
+        [maintainAspectRatio]="maintainAspectRatio"
+        [selectedFormat]="selectedFormat"
+        [imageTransform]="imageTransform"
+        [originalImageDimensions]="originalImageDimensions"
+        [croppedImageDimensions]="croppedImageDimensions"
+        (croppedDimensions)="updateCroppedDimensions($event)"
+        (originalDimensions)="updateOriginalDimensions($event)"
+        (croppedImage)="onCrop($event)"
+        (onChangeQuality)="onChangeQuality($event)"
+      ></app-image-cropper>
+    </ng-container>
 
-        <ng-container *ngIf="editMode" @componentLoaded>
-          <image-cropper
-            [maintainAspectRatio]="true"
-            [imageBase64]="imageBase64"
-            [aspectRatio]="4 / 3"
-            [maintainAspectRatio]="maintainAspectRatio"
-            format="png"
-            (imageCropped)="imageCropped($event)"
-            (imageLoaded)="imageLoaded($event)"
-            (cropperReady)="cropperReady()"
-            (loadImageFailed)="loadImageFailed()"
-          ></image-cropper>
-        </ng-container>
-      </div>
+    <div class="side-container mat-typography" [ngClass]="{ editMode: editMode }">
+      <ng-container *ngIf="!editMode; else controls">
+        <mat-list role="list">
+          <mat-list-item role="listitem">
+            <p>Size</p>
+            <p>{{ tab.size | formatSize }}</p>
+          </mat-list-item>
+          <mat-list-item role="listitem">
+            <p>Created</p>
+            <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
+          </mat-list-item>
+          <mat-list-item role="listitem">
+            <p>Modified</p>
+            <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
+          </mat-list-item>
+          <mat-list-item role="listitem" class="margin-vertical">
+            <button mat-button (click)="toggleEditMode()">Crop</button>
+          </mat-list-item>
+        </mat-list>
+      </ng-container>
 
-      <div class="side-container mat-typography" [ngClass]="{ editMode: editMode }">
-        <ng-container *ngIf="!editMode; else controls">
-          <mat-list role="list">
-            <mat-list-item role="listitem">
-              <p>Size</p>
-              <p>{{ tab.size | formatSize }}</p>
-            </mat-list-item>
-            <mat-list-item role="listitem">
-              <p>Created</p>
-              <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
-            </mat-list-item>
-            <mat-list-item role="listitem">
-              <p>Modified</p>
-              <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
-            </mat-list-item>
-            <mat-list-item role="listitem" class="margin">
-              <button mat-button (click)="toggleEditMode()">Edit</button>
-            </mat-list-item>
-          </mat-list>
-        </ng-container>
-
-        <ng-template #controls>
-          <div class="editor-controls">
-            <mat-list role="list">
-              <div mat-subheader>Options</div>
-
-              <mat-list-item role="listitem">
-                <p>Quality</p>
-                <mat-slider min="0" max="100" thumbLabel="true" [(ngModel)]="imageQuality"></mat-slider>
-              </mat-list-item>
-
-              <mat-list-item role="listitem">
-                <p>Maintain aspect ratio</p>
-                <mat-checkbox [(ngModel)]="maintainAspectRatio" [checked]="maintainAspectRatio"></mat-checkbox>
-              </mat-list-item>
-
-              <mat-list-item role="listitem">
-                <p>Rotate</p>
-                <div class="icon-container">
-                  <app-rounded-icon-button [icon]="'rotate_left'"></app-rounded-icon-button>
-                  <app-rounded-icon-button [icon]="'rotate_right'"></app-rounded-icon-button>
-                </div>
-              </mat-list-item>
-
-              <mat-list-item role="listitem">
-                <p>Flip</p>
-                <div class="icon-container">
-                  <app-rounded-icon-button [icon]="'flip'"></app-rounded-icon-button>
-                  <app-rounded-icon-button style="transform: rotate(90deg)" [icon]="'flip'"></app-rounded-icon-button>
-                </div>
-              </mat-list-item>
-
-              <mat-list-item role="listitem">
-                <p>Format</p>
-                <mat-select [(ngModel)]="selectedFormat" name="food">
-                  <mat-option *ngFor="let format of formats" [value]="format.value">
-                    {{ format.displayName }}
-                  </mat-option>
-                </mat-select>
-              </mat-list-item>
-
-              <mat-list-item role="listitem" class="margin">
-                <mat-form-field appearance="standard">
-                  <mat-label>Output name</mat-label>
-                  <input matInput [formControl]="fileName" required />
-                </mat-form-field>
-              </mat-list-item>
-
-              <mat-divider></mat-divider>
-
-              <div mat-subheader>Result</div>
-
-              <mat-list-item role="listitem">
-                <p>Dimensions</p>
-                <div class="dimension-container">
-                  <p>{{ originalImageDimensions?.width }} x {{ originalImageDimensions?.height }}</p>
-                  <mat-icon>arrow_forward</mat-icon>
-                  <p>{{ croppedImageDimensions?.width }} x {{ croppedImageDimensions?.height }}</p>
-                </div>
-              </mat-list-item>
-
-              <mat-list-item role="listitem">
-                <p>Output</p>
-                <p>{{ fileName.value }}.{{ selectedFormat }}</p>
-              </mat-list-item>
-
-              <mat-list-item role="listitem" class="margin">
-                <button class="cancel" mat-button (click)="toggleEditMode()">Cancel</button>
-              </mat-list-item>
-            </mat-list>
-          </div>
-        </ng-template>
-      </div>
+      <ng-template #controls>
+        <app-editor-controls
+          [filePath]="tab.filePath"
+          [outputPath]="outputPath"
+          [basePath]="basePath"
+          [originalImageDimensions]="originalImageDimensions"
+          [croppedImageDimensions]="croppedImageDimensions"
+          [imageTransform]="imageTransform"
+          [selectedFormat]="selectedFormat"
+          [maintainAspectRatio]="maintainAspectRatio"
+          [imageQuality]="imageQuality"
+          (chooseOutputPath)="onChooseOutputPath($event)"
+          (changeMaintainAspectRatio)="onChangeMaintainAspectRatio($event)"
+          (toggleEditMode)="toggleEditMode()"
+          (updateImageTransform)="updateImageTransform($event)"
+        ></app-editor-controls>
+      </ng-template>
     </div>
   </div>
 
   <ng-template #loader> <p-progressSpinner></p-progressSpinner> </ng-template>
 </div>
+
+<span class="result-container" *ngIf="editMode">
+  <mat-divider></mat-divider>
+  <h2>Preview</h2>
+  <img [src]="croppedImage" />
+</span>

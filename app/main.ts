@@ -9,6 +9,7 @@ import {
   chooseDirectory,
   setDefaultDirectory,
   readAndSendMenuItemsFromBaseDirectory,
+  getDirectoryPath,
 } from './ipc-events/directory-events'
 import {
   createFile,
@@ -28,7 +29,7 @@ import {
   searchFiles,
   updateStore,
 } from './ipc-events/store-events'
-import { getFileData, getImageDataBase64, getJoinedPath } from './electron-utils/file-utils'
+import { getDirName, getFileData, getImageDataBase64, getJoinedPath } from './electron-utils/file-utils'
 import {
   ContextMenuActions,
   FileActions,
@@ -36,6 +37,7 @@ import {
   HandlerAction,
   ReadFile,
   ReadImageData,
+  ChooseDirectory,
   SearchActions,
   StoreActions,
   StoreResponses,
@@ -270,6 +272,11 @@ const IPCHandlerReducer = () => {
   })
   ipcMain.handle(HandlerAction.GetImageBase64, async (_event, action: ReadImageData) => {
     const result = await getImageDataBase64(action.filePath)
+    return result
+  })
+  ipcMain.handle(HandlerAction.ChooseDirectory, async (_event, action: ChooseDirectory) => {
+    const defaultPath = getDirName(action.filePath)
+    const result = await getDirectoryPath(win, defaultPath)
     return result
   })
 }
