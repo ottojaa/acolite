@@ -1,5 +1,5 @@
 <div class="image-cropper-container">
-  <div class="view-container" *ngIf="imagePath; else loader" @componentLoaded>
+  <div class="view-container" [ngClass]="{ editMode: editMode }" *ngIf="imagePath; else loader" @componentLoaded>
     <div class="image-container">
       <ng-container *ngIf="!editMode" @componentLoaded>
         <img [src]="imagePath | safeUrl" />
@@ -26,20 +26,27 @@
     <div class="side-container mat-typography" [ngClass]="{ editMode: editMode }">
       <ng-container *ngIf="!editMode; else controls">
         <div class="list">
+          <div class="">
+            <span>
+              <p>Size</p>
+              <p>{{ tab.size | formatSize }}</p>
+            </span>
+            <span>
+              <p>Created</p>
+              <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
+            </span>
+            <span>
+              <p>Modified</p>
+              <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
+            </span>
+          </div>
           <span>
-            <p>Size</p>
-            <p>{{ tab.size | formatSize }}</p>
-          </span>
-          <span>
-            <p>Created</p>
-            <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
-          </span>
-          <span>
-            <p>Modified</p>
-            <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
-          </span>
-          <span>
-            <button mat-button (click)="toggleEditMode()">Crop</button>
+            <app-rounded-icon-button
+              [icon]="'crop'"
+              [tooltip]="'Crop'"
+              [position]="'below'"
+              (click)="toggleEditMode()"
+            ></app-rounded-icon-button>
           </span>
         </div>
       </ng-container>
@@ -60,6 +67,7 @@
           (toggleEditMode)="toggleEditMode()"
           (updateImageTransform)="updateImageTransform($event)"
           (onChangeQuality)="onChangeQuality($event)"
+          (save)="onClickSave($event)"
         ></app-editor-controls>
       </ng-template>
     </div>

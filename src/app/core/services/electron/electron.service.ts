@@ -29,6 +29,7 @@ import {
   ContextMenuActions,
   CopyFiles,
   GetBookmarkedFiles,
+  CreateImageFile,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc } from '../../../../../app/shared/interfaces'
@@ -104,6 +105,10 @@ export class ElectronService {
 
   createNewFileRequest(payload: OmitActionType<CreateFile>): void {
     this.send(FileActions.Create, payload)
+  }
+
+  createNewImageRequest(payload: OmitActionType<CreateImageFile>): void {
+    this.send(FileActions.CreateImage, payload)
   }
 
   renameFileRequest(payload: OmitActionType<RenameFile>): void {

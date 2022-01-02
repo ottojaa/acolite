@@ -20,6 +20,7 @@ import {
   readAndSendTabData,
   openFileLocation,
   copyFiles,
+  createImageFile,
 } from './ipc-events/file-events'
 import {
   getBookmarkedFiles,
@@ -122,6 +123,7 @@ const FolderActionChannels = [
 
 const FileActionChannels = [
   FileActions.Create,
+  FileActions.CreateImage,
   FileActions.Rename,
   FileActions.DeleteFiles,
   FileActions.MoveFiles,
@@ -220,6 +222,10 @@ const FileActionReducer = (action: FileActions) => {
     switch (payload.type) {
       case FileActions.Create: {
         createFile(event, payload, index)
+        break
+      }
+      case FileActions.CreateImage: {
+        createImageFile(event, payload, index)
         break
       }
       case FileActions.Rename: {

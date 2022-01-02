@@ -107,7 +107,7 @@
     <mat-list-item role="listitem" class="margin-vertical">
       <div class="buttons">
         <button class="cancel" mat-button (click)="onClickEditMode()">Cancel</button>
-        <button class="save" mat-button (click)="onClickEditMode()">Save</button>
+        <button class="save" [disabled]="fileName.invalid" mat-button (click)="onSaveClick()">Save</button>
       </div>
     </mat-list-item>
   </mat-list>

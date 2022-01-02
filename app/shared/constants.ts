@@ -28,11 +28,11 @@ export const fileExtensionIcons: FileExtensionIcon[] = [
 export const editorTypes = [
   {
     editor: 'txt',
-    acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx'],
+    acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx', 'yaml'],
   },
   { editor: 'md', acceptedTypes: ['markdown', 'md'] },
   { editor: 'json', acceptedTypes: ['json'] },
-  { editor: 'image', acceptedTypes: ['jpg', 'jpeg', 'png'] },
+  { editor: 'image', acceptedTypes: ['jpg', 'jpeg', 'png', 'bmp', 'ico', 'webp'] },
 ]
 
 export enum EntityTypes {

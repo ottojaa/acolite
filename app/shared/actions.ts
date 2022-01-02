@@ -1,4 +1,4 @@
-import { Doc, SearchPreference, SearchResult, State, TreeElement } from './interfaces'
+import { SearchPreference, State, TreeElement } from './interfaces'
 
 export type UpdateActionPayload =
   | ReadDirectory
@@ -6,6 +6,7 @@ export type UpdateActionPayload =
   | ChooseDir
   | SetDefaultDir
   | CreateFile
+  | CreateImageFile
   | RenameFile
   | DeleteFiles
   | CopyFiles
@@ -27,6 +28,13 @@ export interface CreateFile {
   filePath: string
   openFileAfterCreation: boolean
   content?: string
+  state: State
+}
+
+export interface CreateImageFile {
+  type: FileActions.CreateImage
+  filePath: string
+  content: string
   state: State
 }
 export interface ReadDirectory {
@@ -161,6 +169,7 @@ export enum FolderActionResponses {
 
 export enum FileActions {
   Create = 'create-file',
+  CreateImage = 'create-image-file',
   Rename = 'rename-file',
   Update = 'update-file',
   CopyFiles = 'copy-files',

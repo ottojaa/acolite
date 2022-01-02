@@ -1,14 +1,10 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations'
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
-import { FormControl, Validators } from '@angular/forms'
-import { MatSliderChange } from '@angular/material/slider'
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
-import { ImageCroppedEvent, ImageTransform, LoadedImage, OutputFormat } from 'ngx-image-cropper'
-import { getBaseName, getDirName } from '../../../../../../app/electron-utils/file-utils'
-import { nameValidationPattern } from '../../../../../../app/shared/constants'
+import { ImageTransform, OutputFormat } from 'ngx-image-cropper'
+import { getDirName, getJoinedPath } from '../../../../../../app/electron-utils/file-utils'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { Dimensions } from './interfaces'
 
@@ -28,7 +24,7 @@ import { Dimensions } from './interfaces'
 export class ImageEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
 
-  fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
+  fileName: string
   croppedImage: any = ''
   isChecked: boolean
   imagePath: string
@@ -111,5 +107,16 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
 
   onChangeMaintainAspectRatio(value: boolean): void {
     this.maintainAspectRatio = value
+  }
+
+  onClickSave(filename: string): void {
+    const newFilePath = getJoinedPath([this.outputPath, filename])
+    const payload = {
+      filePath: newFilePath,
+      content: this.croppedImage,
+      state: this.state.value,
+    }
+
+    this.electronService.createNewImageRequest(payload)
   }
 }

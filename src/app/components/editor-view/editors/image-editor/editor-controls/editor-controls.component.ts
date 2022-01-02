@@ -28,6 +28,7 @@ export class EditorControlsComponent implements OnInit {
   @Output() changeMaintainAspectRatio = new EventEmitter<boolean>()
   @Output() onChangeQuality = new EventEmitter<number>()
   @Output() toggleEditMode = new EventEmitter()
+  @Output() save = new EventEmitter()
 
   formats = [
     {
@@ -103,5 +104,10 @@ export class EditorControlsComponent implements OnInit {
 
   onChangeMaintainAspectRatio(value: boolean): void {
     this.changeMaintainAspectRatio.emit(value)
+  }
+
+  onSaveClick(): void {
+    const name = this.fileName.value + '.' + this.selectedFormat
+    this.save.emit(name)
   }
 }

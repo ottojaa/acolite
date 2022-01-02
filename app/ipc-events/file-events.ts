@@ -43,6 +43,7 @@ import {
   FileActionResponses,
   FileActions,
   CopyFiles,
+  CreateImageFile,
 } from '../shared/actions'
 import { Doc, FileEntity, State, TreeElement } from '../shared/interfaces'
 import { resolve } from 'path/posix'
@@ -133,6 +134,28 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
     if (openFileAfterCreation) {
       readAndSendTabData(event, { state, filePath, type: FileActions.ReadFile })
     }
+  })
+}
+
+export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, index: Document<Doc, true>) => {
+  const { filePath, content, state } = action
+  const { rootDirectory } = state
+  const buffer = content.replace(/^data:([A-Za-z-+/]+);base64,/, '')
+
+  fs.writeFile(filePath, buffer, { encoding: 'base64' }, (err) => {
+    if (err) {
+      event.sender.send(FileActionResponses.CreateFailure, err)
+      return
+    }
+    const file = getFileEntityFromPath(filePath)
+    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
+      baseDir: rootDirectory.data.filePath,
+    })
+
+    const rootDir = first(updatedRootDirectory)
+    addToIndex(filePath, index)
+
+    event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
   })
 }
 
