@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { Doc } from '../../../../../../app/shared/interfaces'
 
@@ -21,11 +21,12 @@ export class PdfEditorComponent {
 
   pdfFile: Uint8Array
 
-  constructor(private electronService: ElectronService) {}
+  constructor(private electronService: ElectronService, private cdRef: ChangeDetectorRef) {}
 
   async initData(): Promise<void> {
     const imagePath = await this.electronService.getImageData({ filePath: this.tab.filePath })
     this.pdfFile = this.convertBase64ToByteArray(imagePath)
+    this.cdRef.detectChanges()
   }
 
   convertBase64ToByteArray(b64Data: string) {

@@ -1,3 +1,10 @@
 :host ::ng-deep iframe {
   border: none !important;
 }
+
+.loader-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
