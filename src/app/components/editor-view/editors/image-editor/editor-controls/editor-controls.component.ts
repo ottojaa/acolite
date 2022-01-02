@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatSliderChange } from '@angular/material/slider'
 import { ElectronService } from 'app/core/services'
+import { format } from 'date-fns'
 import { ImageTransform } from 'ngx-image-cropper'
 import { getBaseName } from '../../../../../../../app/electron-utils/file-utils'
 import { nameValidationPattern } from '../../../../../../../app/shared/constants'
@@ -59,7 +60,7 @@ export class EditorControlsComponent implements OnInit {
 
   ngOnInit(): void {
     const baseName = getBaseName(this.filePath).split('.')[0]
-    this.fileName.setValue(baseName + `_${new Date().toISOString()}`)
+    this.fileName.setValue(baseName + `_${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`)
   }
 
   flip(direction: 'horizontal' | 'vertical'): void {

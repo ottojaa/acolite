@@ -144,6 +144,7 @@ export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, in
 
   fs.writeFile(filePath, buffer, { encoding: 'base64' }, (err) => {
     if (err) {
+      console.error(err)
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
     }
