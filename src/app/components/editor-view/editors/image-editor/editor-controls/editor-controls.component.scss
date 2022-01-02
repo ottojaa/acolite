@@ -20,21 +20,29 @@
         // width: 75%;
       }
     }
-    .mat-button {
+    .buttons {
       width: 100%;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .mat-button {
       background-color: var(--buttonColor);
       color: var(--contrast);
-      margin: 3rem 0;
-      line-height: 25px;
+      line-height: 2.5rem;
+      margin: 0.3rem;
+
       &.cancel {
         background-color: $cancel-button-color;
+      }
+      &.save {
+        background-color: var(--buttonColor);
       }
     }
     .icon-container {
       display: flex;
     }
     .mat-select {
-      width: 25%;
+      width: 5rem;
     }
   }
 

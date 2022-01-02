@@ -1,17 +1,6 @@
 <div class="editor-controls">
   <mat-list role="list">
-    <h1 mat-subheader>Options</h1>
-
-    <mat-list-item role="listitem">
-      <p>Output quality</p>
-      <mat-slider
-        min="0"
-        max="100"
-        thumbLabel="true"
-        [(ngModel)]="imageQuality"
-        (ngModelChange)="onChangeImageQuality($event)"
-      ></mat-slider>
-    </mat-list-item>
+    <h1 mat-subheader>Modify</h1>
 
     <mat-list-item role="listitem">
       <p>Scale</p>
@@ -26,7 +15,7 @@
     </mat-list-item>
 
     <mat-list-item role="listitem">
-      <p>Maintain aspect ratio</p>
+      <p>Maintain aspect ratio when cropping</p>
       <mat-checkbox
         [(ngModel)]="maintainAspectRatio"
         [checked]="maintainAspectRatio"
@@ -54,6 +43,23 @@
       </div>
     </mat-list-item>
 
+    <mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list-item>
+
+    <h1 mat-subheader>Output options</h1>
+
+    <mat-list-item role="listitem">
+      <p>Quality</p>
+      <mat-slider
+        min="0"
+        max="100"
+        thumbLabel="true"
+        [(ngModel)]="imageQuality"
+        (ngModelChange)="onChangeImageQuality($event)"
+      ></mat-slider>
+    </mat-list-item>
+
     <mat-list-item role="listitem">
       <p>Format</p>
       <mat-select [(ngModel)]="selectedFormat" name="food">
@@ -65,7 +71,7 @@
 
     <mat-list-item role="listitem" class="margin-vertical">
       <mat-form-field appearance="standard">
-        <mat-label class="output-name">Output name</mat-label>
+        <mat-label class="output-name">File name</mat-label>
         <input matInput [formControl]="fileName" required />
         <span *ngIf="selectedFormat" style="opacity: 0.7; font-size: 1.1rem; color: var(--contrast)" matSuffix
           >.{{ selectedFormat }}</span
@@ -74,7 +80,7 @@
     </mat-list-item>
 
     <div class="output-location">
-      <p>Output location</p>
+      <p>Location</p>
       <div class="output-path">
         <p class="margin-horizontal">{{ outputPath | formatPath: basePath }}</p>
         <mat-icon (click)="onChooseDir()">folder</mat-icon>
@@ -95,12 +101,14 @@
     </mat-list-item>
 
     <mat-list-item role="listitem">
-      <p>Output</p>
+      <p>File name</p>
       <p>{{ fileName.value }}.{{ selectedFormat }}</p>
     </mat-list-item>
-
     <mat-list-item role="listitem" class="margin-vertical">
-      <button class="cancel" mat-button (click)="onClickEditMode()">Cancel</button>
+      <div class="buttons">
+        <button class="cancel" mat-button (click)="onClickEditMode()">Cancel</button>
+        <button class="save" mat-button (click)="onClickEditMode()">Save</button>
+      </div>
     </mat-list-item>
   </mat-list>
 </div>

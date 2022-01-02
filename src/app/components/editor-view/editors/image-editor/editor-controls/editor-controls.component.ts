@@ -52,7 +52,7 @@ export class EditorControlsComponent implements OnInit {
     },
   ]
 
-  fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
+  fileName = new FormControl('', [Validators.required])
 
   constructor(public electronService: ElectronService) {}
 

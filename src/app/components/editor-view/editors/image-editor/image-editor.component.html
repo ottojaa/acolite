@@ -1,46 +1,47 @@
 <div class="image-cropper-container">
   <div class="view-container" *ngIf="imagePath; else loader" @componentLoaded>
-    <ng-container *ngIf="!editMode" @componentLoaded>
-      <img [src]="imagePath | safeUrl" />
-    </ng-container>
+    <div class="image-container">
+      <ng-container *ngIf="!editMode" @componentLoaded>
+        <img [src]="imagePath | safeUrl" />
+      </ng-container>
 
-    <ng-container *ngIf="editMode" @componentLoaded>
-      <app-image-cropper
-        [maintainAspectRatio]="maintainAspectRatio"
-        [imageBase64]="imageBase64"
-        [imageQuality]="imageQuality"
-        [aspectRatio]="originalImageDimensions.width / originalImageDimensions.height"
-        [maintainAspectRatio]="maintainAspectRatio"
-        [selectedFormat]="selectedFormat"
-        [imageTransform]="imageTransform"
-        [originalImageDimensions]="originalImageDimensions"
-        [croppedImageDimensions]="croppedImageDimensions"
-        (croppedDimensions)="updateCroppedDimensions($event)"
-        (originalDimensions)="updateOriginalDimensions($event)"
-        (croppedImage)="onCrop($event)"
-        (onChangeQuality)="onChangeQuality($event)"
-      ></app-image-cropper>
-    </ng-container>
+      <ng-container *ngIf="editMode" @componentLoaded>
+        <app-image-cropper
+          [maintainAspectRatio]="maintainAspectRatio"
+          [imageBase64]="imageBase64"
+          [imageQuality]="imageQuality"
+          [aspectRatio]="originalImageDimensions.width / originalImageDimensions.height"
+          [maintainAspectRatio]="maintainAspectRatio"
+          [selectedFormat]="selectedFormat"
+          [imageTransform]="imageTransform"
+          [originalImageDimensions]="originalImageDimensions"
+          [croppedImageDimensions]="croppedImageDimensions"
+          (croppedDimensions)="updateCroppedDimensions($event)"
+          (originalDimensions)="updateOriginalDimensions($event)"
+          (croppedImage)="onCrop($event)"
+        ></app-image-cropper>
+      </ng-container>
+    </div>
 
     <div class="side-container mat-typography" [ngClass]="{ editMode: editMode }">
       <ng-container *ngIf="!editMode; else controls">
-        <mat-list role="list">
-          <mat-list-item role="listitem">
+        <div class="list">
+          <span>
             <p>Size</p>
             <p>{{ tab.size | formatSize }}</p>
-          </mat-list-item>
-          <mat-list-item role="listitem">
+          </span>
+          <span>
             <p>Created</p>
             <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
-          </mat-list-item>
-          <mat-list-item role="listitem">
+          </span>
+          <span>
             <p>Modified</p>
             <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
-          </mat-list-item>
-          <mat-list-item role="listitem" class="margin-vertical">
+          </span>
+          <span>
             <button mat-button (click)="toggleEditMode()">Crop</button>
-          </mat-list-item>
-        </mat-list>
+          </span>
+        </div>
       </ng-container>
 
       <ng-template #controls>
@@ -58,6 +59,7 @@
           (changeMaintainAspectRatio)="onChangeMaintainAspectRatio($event)"
           (toggleEditMode)="toggleEditMode()"
           (updateImageTransform)="updateImageTransform($event)"
+          (onChangeQuality)="onChangeQuality($event)"
         ></app-editor-controls>
       </ng-template>
     </div>

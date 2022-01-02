@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { ImageCroppedEvent, ImageTransform, LoadedImage } from 'ngx-image-cropper'
+import { ImageCroppedEvent, ImageTransform, LoadedImage, OutputFormat } from 'ngx-image-cropper'
 import { Dimensions } from '../interfaces'
 
 @Component({
@@ -11,7 +11,7 @@ export class ImageCropperComponent implements OnInit {
   @Input() editMode: boolean
   @Input() imageBase64: string
   @Input() imageQuality: number
-  @Input() selectedFormat: string
+  @Input() selectedFormat: OutputFormat
   @Input() imageTransform: ImageTransform
   @Input() maintainAspectRatio: boolean
   @Input() croppedImageDimensions: Dimensions

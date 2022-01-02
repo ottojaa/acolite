@@ -6,7 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
-import { ImageCroppedEvent, ImageTransform, LoadedImage } from 'ngx-image-cropper'
+import { ImageCroppedEvent, ImageTransform, LoadedImage, OutputFormat } from 'ngx-image-cropper'
 import { getBaseName, getDirName } from '../../../../../../app/electron-utils/file-utils'
 import { nameValidationPattern } from '../../../../../../app/shared/constants'
 import { Doc } from '../../../../../../app/shared/interfaces'
@@ -31,14 +31,14 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
   croppedImage: any = ''
   isChecked: boolean
-  imagePath: SafeResourceUrl
+  imagePath: string
   imageBase64: string
 
   cropperIsReady = false
-  editMode = true
+  editMode = false
   maintainAspectRatio = false
   imageQuality = 100
-  selectedFormat: string
+  selectedFormat: OutputFormat
   originalImageDimensions: Dimensions = { width: undefined, height: undefined }
   croppedImageDimensions: Dimensions = { width: undefined, height: undefined }
 
@@ -64,10 +64,13 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   }
 
   initData(): void {
-    const acceptedFormats = ['png', 'jpeg', 'jpg', 'webp', 'bmp', 'ico']
-    this.selectedFormat =
-      this.tab.extension === 'jpg' ? 'jpeg' : acceptedFormats.includes(this.tab.extension) ? this.tab.extension : ''
+    const getFormat = (extension: string): OutputFormat => {
+      const acceptedFormats = ['png', 'jpeg', 'webp', 'bmp', 'ico']
+      const selectedFormat = extension === 'jpg' ? 'jpeg' : acceptedFormats.includes(extension) ? extension : ''
+      return selectedFormat as OutputFormat
+    }
 
+    this.selectedFormat = getFormat(this.tab.extension)
     this.outputPath = getDirName(this.tab.filePath)
     this.basePath = this.state.getStatePartValue('baseDir')
   }
