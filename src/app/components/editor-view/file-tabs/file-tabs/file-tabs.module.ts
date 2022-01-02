@@ -10,6 +10,7 @@ import { MarkdownEditorContainerModule } from '../../editors/markdown-editor/mar
 import { IconModule } from 'app/components/common/icon/icon.module'
 import { JsonEditorModule } from '../../editors/json-editor/json-editor.module'
 import { ImageEditorModule } from '../../editors/image-editor/image-editor.module'
+import { PdfEditorModule } from '../../editors/pdf-editor/pdf-editor.module'
 
 @NgModule({
   declarations: [FileTabsComponent],
@@ -24,6 +25,7 @@ import { ImageEditorModule } from '../../editors/image-editor/image-editor.modul
     ContextMenuModule,
     MarkdownEditorContainerModule,
     ImageEditorModule,
+    PdfEditorModule,
     IconModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -1,0 +1,3 @@
+<ng-container *ngIf="pdfFile; else loader"> <app-pdf-viewer [pdfFile]="pdfFile"></app-pdf-viewer> </ng-container>
+
+<ng-template #loader> <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar> </ng-template>

@@ -31,6 +31,7 @@ export const editorTypes = [
     acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx', 'yaml'],
   },
   { editor: 'md', acceptedTypes: ['markdown', 'md'] },
+  { editor: 'pdf', acceptedTypes: ['pdf'] },
   { editor: 'json', acceptedTypes: ['json'] },
   { editor: 'image', acceptedTypes: ['jpg', 'jpeg', 'png', 'bmp', 'ico', 'webp'] },
 ]
