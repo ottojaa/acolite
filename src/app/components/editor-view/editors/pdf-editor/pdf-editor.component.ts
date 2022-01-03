@@ -26,6 +26,7 @@ export class PdfEditorComponent {
   async initData(): Promise<void> {
     const imagePath = await this.electronService.getImageData({ filePath: this.tab.filePath })
     this.pdfFile = this.convertBase64ToByteArray(imagePath)
+    console.log(this.tab.textContent)
     this.cdRef.detectChanges()
   }
 

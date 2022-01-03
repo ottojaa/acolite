@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { editorTypes } from '../shared/constants'
+import { binaryTypes, editorTypes } from '../shared/constants'
 import { Doc } from '../shared/interfaces'
 
 export const getDirName = (filePath: string) => path.dirname(filePath)
@@ -16,14 +16,16 @@ export const getEditorType = (extension: string) =>
   editorTypes.find((type) => type.acceptedTypes.includes(extension))?.editor || ''
 
 export const getFileData = (filePath: string): Promise<Doc> => {
+  const extension = getExtensionSplit(filePath)
+  const encoding = binaryTypes.includes(extension) ? 'binary' : 'utf-8'
+
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, textContent) => {
+    fs.readFile(filePath, encoding, (err, textContent) => {
       if (err) {
         reject(err)
         return
       }
       const fileStats = fs.statSync(filePath)
-      const extension = getExtensionSplit(filePath)
       const editorType = getEditorType(extension)
 
       resolve({
@@ -47,9 +49,11 @@ export const getImageDataBase64 = (filePath: string): Promise<any> => {
 
 export const getFileDataSync = (filePath: string): Doc => {
   try {
-    const textContent = fs.readFileSync(filePath, 'utf-8')
-    const fileStats = fs.statSync(filePath)
     const extension = getExtensionSplit(filePath)
+    const encoding = binaryTypes.includes(extension) ? 'binary' : 'utf-8'
+
+    const fileStats = fs.statSync(filePath)
+    const textContent = fs.readFileSync(filePath, encoding)
     const editorType = getEditorType(extension)
 
     return {

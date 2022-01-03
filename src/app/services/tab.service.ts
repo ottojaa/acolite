@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { getSelectedTabEntityFromIndex } from '../../../app/electron-utils/utils'
+import { binaryTypes } from '../../../app/shared/constants'
 import { Doc, SelectedTab, State } from '../../../app/shared/interfaces'
 import { ElectronService } from '../core/services'
 import { AppDialogService } from './dialog.service'
@@ -45,7 +46,7 @@ export class TabService {
   }
 
   revertDelete(tab: Doc): void {
-    const { textContent, filePath } = tab
+    const { textContent, filePath, extension } = tab
     const { tabs, selectedTab } = this.state.value
     const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
     if (tabIdx > -1) {
@@ -58,7 +59,12 @@ export class TabService {
         openFileAfterCreation: false,
         state: this.state.value,
       }
-      this.electronService.createNewFileRequest(payload)
+
+      if (binaryTypes.includes(extension)) {
+        this.electronService.createNewImageRequest({ ...payload, encoding: 'binary' })
+      } else {
+        this.electronService.createNewFileRequest(payload)
+      }
     }
   }
 

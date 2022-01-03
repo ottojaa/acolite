@@ -60,7 +60,7 @@ export class EditorControlsComponent implements OnInit {
 
   ngOnInit(): void {
     const baseName = getBaseName(this.filePath).split('.')[0]
-    this.fileName.setValue(baseName + `_${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`)
+    this.fileName.setValue(baseName + `_cropped_${format(new Date(), 'HH-mm-ss')}`)
   }
 
   flip(direction: 'horizontal' | 'vertical'): void {

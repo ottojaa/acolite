@@ -36,6 +36,8 @@ export interface CreateImageFile {
   filePath: string
   content: string
   state: State
+  encoding?: 'binary' | 'base64'
+  isPDF?: boolean
 }
 export interface ReadDirectory {
   type: FolderActions.ReadDir

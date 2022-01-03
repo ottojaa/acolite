@@ -41,6 +41,9 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
+// Types that should be encoded / decoded with encoding: 'binary'. Base64 seems to cause performance problems with async FS api readFile api
+export const binaryTypes = ['pdf', 'jpg', 'jpeg', 'png', 'ico', 'bmp', 'webp']
+
 export const defaultSpliceLength = 50
 
 export const allowedConfigKeys: string[] = [

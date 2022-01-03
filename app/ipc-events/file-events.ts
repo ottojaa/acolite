@@ -22,7 +22,6 @@ import {
   getUpdatedMenuItemsRecursive,
   getUpdatedFilePathsRecursive,
   moveRecursive,
-  folderStructureToMenuItems,
   replaceTreeNodeRecursive,
 } from '../electron-utils/menu-utils'
 import {
@@ -30,7 +29,6 @@ import {
   getFileEntityFromPath,
   getSelectedTabEntityFromIndex,
   getTreeElementsFromFilePath,
-  getTreeStructureFromBaseDirectory,
 } from '../electron-utils/utils'
 import {
   ReadFile,
@@ -45,8 +43,7 @@ import {
   CopyFiles,
   CreateImageFile,
 } from '../shared/actions'
-import { Doc, FileEntity, State, TreeElement } from '../shared/interfaces'
-import { resolve } from 'path/posix'
+import { Doc, State, TreeElement } from '../shared/interfaces'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action
@@ -138,11 +135,12 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
 }
 
 export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, index: Document<Doc, true>) => {
-  const { filePath, content, state } = action
+  const { filePath, content, state, encoding } = action
   const { rootDirectory } = state
+  const imageEncoding = encoding === 'binary' ? 'binary' : 'base64'
   const buffer = content.replace(/^data:([A-Za-z-+/]+);base64,/, '')
 
-  fs.writeFile(filePath, buffer, { encoding: 'base64' }, (err) => {
+  fs.writeFile(filePath, buffer, imageEncoding, (err) => {
     if (err) {
       console.error(err)
       event.sender.send(FileActionResponses.CreateFailure, err)
