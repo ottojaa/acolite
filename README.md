@@ -22,7 +22,7 @@ Acolite is a local file management system and text editor made with ElectronJS 1
 
 ### Image Cropper
 
-![Alt text](/samples/cropper_sample.png?raw=true 'Image cropper')
+![Alt text](/samples/image_cropper_sample.png?raw=true 'Image cropper')
 
 ### JSON Editor
 

@@ -12,7 +12,7 @@ import { getFileData, getFileDataSync, getJoinedPath, getPathSeparator } from '.
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
 import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
-import { defaultSpliceLength } from '../shared/constants'
+import { binaryTypes, defaultSpliceLength, indexFileSizeLimit } from '../shared/constants'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -240,10 +240,9 @@ export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Doc
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
   const indexFile = await getFileData(newPath)
-  const { ino, extension } = indexFile
+  const { ino, extension, size } = indexFile
 
-  const noIndexContentTypes = ['jpg', 'jpeg', 'png']
-  if (noIndexContentTypes.includes(extension)) {
+  if (!shouldIndex(extension, size)) {
     indexFile.textContent = ''
   }
 
@@ -252,14 +251,22 @@ export const updateIndex = async (newPath: string, index: Document<Doc, true>) =
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
   let indexFile = await getFileData(filePath)
-  const { ino, extension } = indexFile
+  const { ino, extension, size } = indexFile
 
-  const noIndexContentTypes = ['jpg', 'jpeg', 'png']
-  if (noIndexContentTypes.includes(extension)) {
+  if (!shouldIndex(extension, size)) {
     indexFile.textContent = ''
   }
 
   await index.addAsync(ino, indexFile)
+}
+
+// binary and other type of files
+const shouldIndex = (extension: string, size: number) => {
+  if (binaryTypes.includes(extension)) {
+    return false
+  }
+
+  return size < indexFileSizeLimit
 }
 
 export const updateIndexesRecursive = async (filePaths: string[], index: Document<Doc, true>) => {
