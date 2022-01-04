@@ -1,4 +1,4 @@
-name: 'Windows Build'
+name: 'MacOS & Windows Build'
 
 on:
   push:
@@ -11,15 +11,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        node-version: [14.x]
-
-    runs-on: windows-latest
+        os: [macos-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out Git repository
+        uses: actions/checkout@v2
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -33,17 +34,15 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Dependencies
-        run: npm i
+          node-version: 14
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
-          build_script_name: 'build:prod'
+          build_script_name: build:prod
           github_token: ${{ secrets.github_token }}
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),

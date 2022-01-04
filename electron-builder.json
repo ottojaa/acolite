@@ -12,11 +12,6 @@
       "filter": ["**/*"]
     }
   ],
-  "publish": {
-    "provider": "github",
-    "owner": "ottojaa",
-    "repo": "acolite"
-  },
   "win": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
     "target": ["nsis"],
