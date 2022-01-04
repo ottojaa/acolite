@@ -26,8 +26,5 @@
   "linux": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
     "target": ["AppImage"]
-  },
-  "publish": {
-    "GH_TOKEN": ""
   }
 }

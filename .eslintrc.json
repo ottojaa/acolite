@@ -24,7 +24,7 @@
       ],
       "rules": {
         "prefer-arrow/prefer-arrow-functions": 0,
-        "quotes": ["single"],
+        "quotes": [2, "single"],
         "@angular-eslint/directive-selector": 0,
         "@angular-eslint/component-selector": [
           "error",
