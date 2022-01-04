@@ -2,7 +2,34 @@
   <div class="view-container" [ngClass]="{ editMode: editMode }" *ngIf="imagePath; else loader" @componentLoaded>
     <div class="image-container">
       <ng-container *ngIf="!editMode" @componentLoaded>
-        <img [src]="imagePath | safeUrl" />
+        <div class="non-editmode-container">
+          <img [src]="imagePath | safeUrl" />
+
+          <div class="list">
+            <div class="">
+              <span>
+                <p>Size</p>
+                <p>{{ tab.size | formatSize }}</p>
+              </span>
+              <span>
+                <p>Created</p>
+                <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
+              </span>
+              <span>
+                <p>Modified</p>
+                <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
+              </span>
+            </div>
+            <span>
+              <app-rounded-icon-button
+                [icon]="'crop'"
+                [tooltip]="'Crop'"
+                [position]="'below'"
+                (click)="toggleEditMode()"
+              ></app-rounded-icon-button>
+            </span>
+          </div>
+        </div>
       </ng-container>
 
       <ng-container *ngIf="editMode" @componentLoaded>
@@ -24,34 +51,7 @@
     </div>
 
     <div class="side-container mat-typography" [ngClass]="{ editMode: editMode }">
-      <ng-container *ngIf="!editMode; else controls">
-        <div class="list">
-          <div class="">
-            <span>
-              <p>Size</p>
-              <p>{{ tab.size | formatSize }}</p>
-            </span>
-            <span>
-              <p>Created</p>
-              <p>{{ tab.createdAt | date: 'mediumDate' }}</p>
-            </span>
-            <span>
-              <p>Modified</p>
-              <p>{{ tab.modifiedAt | date: 'mediumDate' }}</p>
-            </span>
-          </div>
-          <span>
-            <app-rounded-icon-button
-              [icon]="'crop'"
-              [tooltip]="'Crop'"
-              [position]="'below'"
-              (click)="toggleEditMode()"
-            ></app-rounded-icon-button>
-          </span>
-        </div>
-      </ng-container>
-
-      <ng-template #controls>
+      <ng-container *ngIf="editMode">
         <app-editor-controls
           [filePath]="tab.filePath"
           [outputPath]="outputPath"
@@ -69,7 +69,7 @@
           (onChangeQuality)="onChangeQuality($event)"
           (save)="onClickSave($event)"
         ></app-editor-controls>
-      </ng-template>
+      </ng-container>
     </div>
   </div>
 

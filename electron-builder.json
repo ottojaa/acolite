@@ -1,5 +1,6 @@
 {
   "asar": false,
+  "appId": "acolite",
   "directories": {
     "output": "release/"
   },
@@ -13,7 +14,7 @@
   ],
   "win": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
-    "target": ["portable"]
+    "target": ["nsis"]
   },
   "portable": {
     "splashImage": "dist/assets/icons/acolite.bmp"
@@ -25,5 +26,8 @@
   "linux": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
     "target": ["AppImage"]
+  },
+  "publish": {
+    "GH_TOKEN": ""
   }
 }

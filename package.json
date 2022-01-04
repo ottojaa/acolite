@@ -63,6 +63,7 @@
     "cropperjs": "1.5.12",
     "custom-electron-titlebar": "github:ottojaa/custom-electron-titlebar",
     "date-fns": "2.27.0",
+    "electron-updater": "4.6.1",
     "faker": "5.5.3",
     "flatted": "3.2.2",
     "flexsearch": "0.7.21",
