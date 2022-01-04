@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { ThemeOption } from '../../../app/shared/interfaces'
 import themes from '../../assets/themes/theme-options.json'
 
 @Injectable({
@@ -9,7 +8,7 @@ export class ThemeService {
   constructor() {}
 
   setTheme(theme: string): void {
-    const selectedTheme = <ThemeOption>themes.find((option) => option.name === theme)
+    const selectedTheme = themes.find((option) => option.name === theme)
     if (selectedTheme) {
       const { styles } = selectedTheme
       Object.keys(styles).forEach((key) => {

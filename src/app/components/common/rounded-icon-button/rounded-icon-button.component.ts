@@ -11,11 +11,6 @@ export class RoundedIconButtonComponent {
   @Input() tooltip: string
   @Input() scale? = 1
   @Input() position?: TooltipPosition = 'right'
-  @Output() onClick: EventEmitter<void> = new EventEmitter()
 
   className: string
-
-  handleClick(): void {
-    this.onClick.emit()
-  }
 }

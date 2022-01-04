@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { promises as fsp } from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { first, cloneDeep } from 'lodash'
@@ -359,10 +360,7 @@ export const copyFiles = (event: IpcMainEvent, payload: CopyFiles, index: Docume
 }
 
 export const copyDirectory = async (src: string, dest: string, index: Document<Doc, true>) => {
-  const [entries] = await Promise.all([
-    fs.promises.readdir(src, { withFileTypes: true }),
-    fs.promises.mkdir(dest, { recursive: true }),
-  ])
+  const [entries] = await Promise.all([fsp.readdir(src, { withFileTypes: true }), fsp.mkdir(dest, { recursive: true })])
 
   await Promise.all(
     entries.map(async (entry) => {
@@ -370,7 +368,7 @@ export const copyDirectory = async (src: string, dest: string, index: Document<D
       const destPath = getJoinedPath([dest, entry.name])
 
       const copyFileFunc = async () => {
-        await fs.promises.copyFile(srcPath, destPath)
+        await fsp.copyFile(srcPath, destPath)
         addToIndex(destPath, index)
       }
 

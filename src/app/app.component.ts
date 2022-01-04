@@ -226,7 +226,7 @@ export class AppComponent implements OnInit {
       if (response.searchPreferences?.length) {
         const convertIsoStringToDate = (range: { start?: string; end?: string }) => {
           const { start, end } = range
-          let payload = {
+          const payload = {
             start: undefined,
             end: undefined,
           }
@@ -242,7 +242,7 @@ export class AppComponent implements OnInit {
 
         response.searchPreferences = response.searchPreferences.map((pref) => {
           if (pref.range) {
-            pref.range = convertIsoStringToDate(<any>pref.range)
+            pref.range = convertIsoStringToDate(pref.range as any)
           }
           return pref
         })

@@ -98,9 +98,8 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
       return `<pre><code>${highlighted.value}</code></pre>`
     }
     // webContents.setWindowOpenHandler will not catch the event unless "_blank" is specified
-    this.markdownService.renderer.link = (href: string, _title: string, text: string) => {
-      return `<a href="${href}" target="_blank">${text}</a>`
-    }
+    this.markdownService.renderer.link = (href: string, _title: string, text: string) =>
+      `<a href="${href}" target="_blank">${text}</a>`
   }
 
   private initSelectedTabListener(): void {

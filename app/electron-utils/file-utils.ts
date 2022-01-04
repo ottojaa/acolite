@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
+import { promises as fsp } from 'fs'
 import { binaryTypes, editorTypes } from '../shared/constants'
 import { Doc } from '../shared/interfaces'
 
@@ -44,7 +45,7 @@ export const getFileData = (filePath: string): Promise<Doc> => {
 }
 
 export const getImageDataBase64 = (filePath: string): Promise<any> => {
-  return fs.promises.readFile(filePath, { encoding: 'base64' })
+  return fsp.readFile(filePath, { encoding: 'base64' })
 }
 
 export const getFileDataSync = (filePath: string): Doc => {

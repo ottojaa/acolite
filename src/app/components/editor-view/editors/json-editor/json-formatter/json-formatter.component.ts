@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { getObjectName, getPreview, getType, getValuePreview } from './formatter-utils'
 
-const JSONFormatterConfig = {
+const JsonFormatterConfig = {
   hoverPreviewEnabled: false,
   hoverPreviewArrayCount: 100,
   hoverPreviewFieldCount: 5,
@@ -91,14 +91,14 @@ export class JsonFormatterComponent implements OnInit {
 
   getThumbnail() {
     if (this.isArray) {
-      if (this.json.length > JSONFormatterConfig.hoverPreviewArrayCount) {
+      if (this.json.length > JsonFormatterConfig.hoverPreviewArrayCount) {
         return 'Array[' + this.json.length + ']'
       } else {
         return '[' + this.json.map(getPreview).join(', ') + ']'
       }
     } else {
       // the first five keys (like Chrome Developer Tool)
-      const narrowKeys = this.keys.slice(0, JSONFormatterConfig.hoverPreviewFieldCount)
+      const narrowKeys = this.keys.slice(0, JsonFormatterConfig.hoverPreviewFieldCount)
       // json value schematic information
       const kvs = narrowKeys.map((key) => key + ':' + getPreview(this.json[key]))
 

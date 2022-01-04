@@ -1,16 +1,41 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core'
 
 /**
- * Allows setting focus to normally untargetable elements like <li>. By default sets focus on the elements, but e.g checkboxes need to be clicked instead.
+ * Allows setting focus to normally untargetable elements like <li>. By default sets focus on the elements,
+ * but e.g checkboxes need to be clicked instead.
  */
 
 @Directive({
   selector: '[keyboardNavigationList]',
 })
 export class KeyboardNavigationListDirective {
-  @Input('keyboardNavigationType') type: 'focus' | 'click' = 'click'
-
   currentIndex: number | undefined
+
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent) {
+    if (!this.items.length) {
+      return
+    }
+
+    switch (event.key) {
+      case 'ArrowUp': {
+        this.previous()
+        event.preventDefault()
+        break
+      }
+      case 'ArrowDown': {
+        this.next()
+        event.preventDefault()
+        break
+      }
+      case 'Enter': {
+        this.clickCurrent()
+        event.preventDefault()
+        break
+      }
+      default:
+    }
+  }
 
   get items(): HTMLElement[] {
     return Array.from(this.element.nativeElement.getElementsByClassName('keyboard-navigation-item'))
@@ -98,32 +123,6 @@ export class KeyboardNavigationListDirective {
     const currentItem = this.items[this.currentIndex]
     if (currentItem) {
       currentItem.click()
-    }
-  }
-
-  @HostListener('window:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent) {
-    if (!this.items.length) {
-      return
-    }
-
-    switch (event.key) {
-      case 'ArrowUp': {
-        this.previous()
-        event.preventDefault()
-        break
-      }
-      case 'ArrowDown': {
-        this.next()
-        event.preventDefault()
-        break
-      }
-      case 'Enter': {
-        this.clickCurrent()
-        event.preventDefault()
-        break
-      }
-      default:
     }
   }
 }

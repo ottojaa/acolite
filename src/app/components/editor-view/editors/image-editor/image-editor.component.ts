@@ -101,7 +101,7 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
     this.croppedImage = base64
   }
 
-  onChangeQuality(quality: number): void {
+  changeQuality(quality: number): void {
     this.imageQuality = quality
   }
 

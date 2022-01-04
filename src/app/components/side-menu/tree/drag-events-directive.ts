@@ -6,7 +6,7 @@ import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angu
 @Directive({
   selector: '[dragEvents]',
 })
-export class DragEvents {
+export class DragEventsDirective {
   @Output() filesDroppedFromOutside = new EventEmitter<string[]>()
   elRef: ElementRef
 

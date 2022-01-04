@@ -146,7 +146,9 @@ export class TreeComponent extends AbstractComponent implements OnInit {
   }
 
   filesDroppedFromOutside(filePaths: string[], targetNode?: TreeElement): void {
-    if (!targetNode) targetNode = this.state.getStatePartValue('rootDirectory')
+    if (!targetNode) {
+      targetNode = this.state.getStatePartValue('rootDirectory')
+    }
     const conflicts = intersection(
       targetNode.children.map((child) => getBaseName(child.data.filePath)),
       filePaths.map((path) => getBaseName(path))

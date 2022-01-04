@@ -11,7 +11,7 @@ export class IconComponent implements OnInit {
   @Input() extension?: string
   @Input() scale?: number = 0.8
   iconName: string
-  iconColor: string = 'white'
+  iconColor = 'white'
   scaleString: string
 
   constructor() {}
@@ -28,7 +28,7 @@ export class IconComponent implements OnInit {
     this.scaleString = `transform: scale(${this.scale.toString()})`
 
     const extString = extension.replace('.', '')
-    const icon = fileExtensionIcons.find((icon) => icon.acceptedExtensions.includes(extString))
+    const icon = fileExtensionIcons.find((extensionIcon) => extensionIcon.acceptedExtensions.includes(extString))
 
     if (!icon) {
       this.iconName = 'file-document'

@@ -1,40 +1,38 @@
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 
-import { MainComponent } from "./main.component";
-import { TranslateModule } from "@ngx-translate/core";
+import { MainComponent } from './main.component'
+import { TranslateModule } from '@ngx-translate/core'
 
-import { RouterTestingModule } from "@angular/router/testing";
+import { RouterTestingModule } from '@angular/router/testing'
 
-describe("DetailComponent", () => {
-  let component: MainComponent;
-  let fixture: ComponentFixture<MainComponent>;
+describe('DetailComponent', () => {
+  let component: MainComponent
+  let fixture: ComponentFixture<MainComponent>
 
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [MainComponent],
         imports: [TranslateModule.forRoot(), RouterTestingModule],
-      }).compileComponents();
+      }).compileComponents()
     })
-  );
+  )
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MainComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(MainComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
-  it("should create", () => {
-    expect(component).toBeTruthy();
-  });
+  it('should create', () => {
+    expect(component).toBeTruthy()
+  })
 
   it(
-    "should render title in a h1 tag",
+    'should render title in a h1 tag',
     waitForAsync(() => {
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.querySelector("h1").textContent).toContain(
-        "PAGES.DETAIL.TITLE"
-      );
+      const compiled = fixture.debugElement.nativeElement
+      expect(compiled.querySelector('h1').textContent).toContain('PAGES.DETAIL.TITLE')
     })
-  );
-});
+  )
+})

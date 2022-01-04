@@ -1,6 +1,6 @@
 {
   "asar": false,
-  "appId": "acolite",
+  "appId": "com.electron.acolite",
   "directories": {
     "output": "release/"
   },
@@ -12,16 +12,23 @@
       "filter": ["**/*"]
     }
   ],
+  "publish": {
+    "provider": "github",
+    "owner": "ottojaa",
+    "repo": "acolite"
+  },
   "win": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
-    "target": ["nsis"]
+    "target": ["nsis"],
+    "publish": ["github"]
   },
   "portable": {
     "splashImage": "dist/assets/icons/acolite.bmp"
   },
   "mac": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
-    "target": ["dmg"]
+    "target": ["dmg"],
+    "publish": ["github"]
   },
   "linux": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",

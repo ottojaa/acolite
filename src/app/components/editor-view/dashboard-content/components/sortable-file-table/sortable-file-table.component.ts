@@ -37,12 +37,12 @@ export class SortableFileListComponent implements AfterViewInit {
   }
   @Input() basePath: string
 
+  @ViewChild(MatPaginator) paginator: MatPaginator
+  @ViewChild(MatSort) sort: MatSort
+
   displayedColumns: string[] = ['fileName', 'createdAt', 'modifiedAt', 'size']
   dataSource: MatTableDataSource<Doc>
   expandedElement: Doc | null
-
-  @ViewChild(MatPaginator) paginator: MatPaginator
-  @ViewChild(MatSort) sort: MatSort
 
   constructor(private tabService: TabService) {
     this.dataSource = new MatTableDataSource([])

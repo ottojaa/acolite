@@ -1,11 +1,7 @@
 <div class="container">
   <button [matTooltip]="tooltip" [matTooltipPosition]="position" mat-icon-button>
-    <i
-      class="material-icons icons"
-      fontSet="material-icons-outlined"
-      [style.transform]="'scale(' + scale + ')'"
-      (click)="handleClick()"
-      >{{ icon }}</i
-    >
+    <i class="material-icons icons" fontSet="material-icons-outlined" [style.transform]="'scale(' + scale + ')'">{{
+      icon
+    }}</i>
   </button>
 </div>

@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { MatMenu } from '@angular/material/menu'
 import { Observable, Subject } from 'rxjs'
-import { debounceTime, take, takeUntil } from 'rxjs/operators'
+import { debounceTime, takeUntil } from 'rxjs/operators'
 import { SearchResult } from '../../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../../abstract/abstract-component'
 import { ElectronService } from '../../../core/services'
@@ -15,11 +15,11 @@ import { TabService } from '../../../services/tab.service'
 })
 export class AutocompleteComponent extends AbstractComponent {
   @ViewChild('searchbar', { read: ElementRef, static: false }) searchbar: MatMenu
-  openDrop: boolean = false
+  openDrop = false
   selectedItem: File
   searchResults$: Observable<SearchResult[]>
   searchQuery: string
-  dialogOpen: boolean = false
+  dialogOpen = false
   debouncedSearch$ = new Subject<string>()
 
   constructor(private electronService: ElectronService, private state: StateService, private tabService: TabService) {

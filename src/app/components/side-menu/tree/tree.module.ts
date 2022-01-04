@@ -8,12 +8,12 @@ import { ClickOutsideModule } from 'ng-click-outside'
 import { TreeComponent } from './tree.component'
 import { FileCreationModule } from '../../dialogs/file-creation/file-creation.module'
 import { MatIconModule } from '@angular/material/icon'
-import { ShiftSelect } from './shift-select-directive'
+import { ShiftSelectDirective } from './shift-select-directive'
 import { IconModule } from 'app/components/common/icon/icon.module'
-import { DragEvents } from './drag-events-directive'
+import { DragEventsDirective } from './drag-events-directive'
 
 @NgModule({
-  declarations: [TreeComponent, ShiftSelect, DragEvents],
+  declarations: [TreeComponent, ShiftSelectDirective, DragEventsDirective],
   exports: [TreeComponent],
   providers: [TreeDragDropService],
   imports: [

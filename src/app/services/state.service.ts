@@ -137,11 +137,10 @@ export class StateService extends AbstractComponent {
         const allKeys = updateStateParts.map((el) => el.key)
         const newState = updateStateParts.reduce((acc: State, curr: StateUpdate<State>) => {
           const { key, payload } = curr
-          const newState = {
+          return {
             ...acc,
             [key]: payload,
           }
-          return newState
         }, state)
 
         console.log({ oldState: state, newState })
@@ -159,13 +158,14 @@ export class StateService extends AbstractComponent {
     return keys.reduce((acc, curr) => {
       acc[curr] = getStateValue(curr)
       return acc
-    }, <State>{})
+    }, {} as State)
   }
 
   /**
    * In case certain keys in the state were updated, we may want to do certain side effects after the state is updated instead of before,
    * in case the callback takes time that is clearly visible on the UI (e.g 100ms+).
    * @param triggerKeys they keys that triggered the state update
+   *
    */
   handleCallbacks(state: State, triggerKeys: (keyof State)[]): void {
     const { selectedTab, rootDirectory, bookmarks } = state

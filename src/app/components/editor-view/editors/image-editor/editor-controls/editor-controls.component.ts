@@ -27,7 +27,7 @@ export class EditorControlsComponent implements OnInit {
   @Output() updateImageTransform = new EventEmitter<Partial<ImageTransform>>()
   @Output() chooseOutputPath = new EventEmitter<string>()
   @Output() changeMaintainAspectRatio = new EventEmitter<boolean>()
-  @Output() onChangeQuality = new EventEmitter<number>()
+  @Output() changeQuality = new EventEmitter<number>()
   @Output() toggleEditMode = new EventEmitter()
   @Output() save = new EventEmitter()
 
@@ -66,9 +66,11 @@ export class EditorControlsComponent implements OnInit {
   flip(direction: 'horizontal' | 'vertical'): void {
     const { flipH, flipV } = this.imageTransform
 
-    direction === 'horizontal'
-      ? this.updateImageTransform.emit({ flipH: !flipH })
-      : this.updateImageTransform.emit({ flipV: !flipV })
+    if (direction === 'horizontal') {
+      this.updateImageTransform.emit({ flipH: !flipH })
+    } else {
+      this.updateImageTransform.emit({ flipV: !flipV })
+    }
   }
 
   rotate(direction: 'pos' | 'neg'): void {
@@ -100,7 +102,7 @@ export class EditorControlsComponent implements OnInit {
   }
 
   onChangeImageQuality(change: MatSliderChange): void {
-    this.onChangeQuality.emit(change.value)
+    this.changeQuality.emit(change.value)
   }
 
   onChangeMaintainAspectRatio(value: boolean): void {

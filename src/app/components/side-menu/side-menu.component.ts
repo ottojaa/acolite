@@ -16,7 +16,7 @@ import { StateService } from '../../services/state.service'
   styleUrls: ['./side-menu.component.scss'],
 })
 export class SideMenuComponent extends AbstractComponent implements OnInit {
-  menuLoading: boolean = true
+  menuLoading = true
   files: TreeElement[]
   workspaceName: string
   activeIndent$: Observable<ActiveIndent>

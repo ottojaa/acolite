@@ -23,8 +23,8 @@ export function getObjectName(object) {
     return object.__proto__.constructor.name
   }
 
-  var funcNameRegex = /function (.{1,})\(/
-  var results = funcNameRegex.exec(object.constructor.toString())
+  const funcNameRegex = /function (.{1,})\(/
+  const results = funcNameRegex.exec(object.constructor.toString())
   if (results && results.length > 1) {
     return results[1]
   } else {
@@ -40,7 +40,7 @@ export function getType(object) {
 }
 
 export function getValuePreview(object, value) {
-  var type = getType(object)
+  const type = getType(object)
 
   if (type === 'null' || type === 'undefined') {
     return type
@@ -62,7 +62,7 @@ export function getValuePreview(object, value) {
 }
 
 export function getPreview(object) {
-  var value = ''
+  let value = ''
   if (typeof object === 'object') {
     value = getObjectName(object)
     if (Array.isArray(object)) {

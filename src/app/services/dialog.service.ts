@@ -127,8 +127,8 @@ export class AppDialogService {
   }
 
   getBannedFileNames(node: TreeElement, action: 'rename' | 'create'): any {
-    const getBannedNodes = (action: 'rename' | 'create') => {
-      switch (action) {
+    const getBannedNodes = (actionType: 'rename' | 'create') => {
+      switch (actionType) {
         case 'rename': {
           if (!node.parent) {
             const rootDirectory = this.state.getStatePartValue('rootDirectory')

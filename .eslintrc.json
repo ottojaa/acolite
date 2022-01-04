@@ -25,6 +25,7 @@
       "rules": {
         "prefer-arrow/prefer-arrow-functions": 0,
         "quotes": [2, "single"],
+        "semi": [0, "never"],
         "@angular-eslint/directive-selector": 0,
         "@angular-eslint/component-selector": [
           "error",
@@ -33,7 +34,29 @@
             "prefix": "app",
             "style": "kebab-case"
           }
-        ]
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+          "error",
+          {
+            "multiline": {
+              "delimiter": "none",
+              "requireLast": true
+            },
+            "singleline": {
+              "delimiter": "semi",
+              "requireLast": false
+            }
+          }
+        ],
+        "@typescript-eslint/consistent-type-assertions": [
+          "error",
+          {
+            "assertionStyle": "as"
+          }
+        ],
+        "no-underscore-dangle": "off",
+        "@typescript-eslint/adjacent-overload-signatures": false,
+        "max-len": "off"
       }
     },
     {

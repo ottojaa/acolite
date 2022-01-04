@@ -52,6 +52,7 @@ export class LoaderComponent {
     return this._animating
   }
 
+  @Input() noContent: boolean
   @Input()
   set show(value: boolean) {
     if (value) {
@@ -61,7 +62,6 @@ export class LoaderComponent {
       this.state = 'hidden'
     }
   }
-  @Input() noContent: boolean
 
   animationDone(event: AnimationEvent) {
     this._animating = false

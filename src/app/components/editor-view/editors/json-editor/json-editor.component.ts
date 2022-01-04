@@ -20,12 +20,11 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
 
   isChecked: boolean
   textContent: string
-  formattedResult: Object
+  formattedResult: object
   highlightedContent: any
   isValidJson: boolean
   previewMode: 'json' | 'raw' = 'json'
   openCount = 1
-  viewInit = false
   previewWidth = 40
   editorWidth = 60
 
@@ -42,10 +41,6 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.initThemeListener()
     this.initSelectedTabListener()
     this.updateJSONPreview(this.textContent)
-  }
-
-  ngAfterViewInit(): void {
-    this.viewInit = true
   }
 
   hidePreview(): void {
@@ -84,7 +79,7 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.updateJSONPreview(event)
   }
 
-  formatJSON(textContent: string): Object {
+  formatJSON(textContent: string): object {
     try {
       return JSON.parse(textContent)
     } catch {
@@ -104,14 +99,6 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     } catch {}
   }
 
-  private initThemeListener(): void {
-    this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))
-  }
-
-  private initSelectedTabListener(): void {
-    this.selectedTabListener().subscribe(() => this.initContentIfInView())
-  }
-
   initContentIfInView(): void {
     setTimeout(() => {
       const queryString = `ngx-codemirror-${this.tab.filePath}`
@@ -122,5 +109,13 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
         this.initialized$.unsubscribe()
       }
     })
+  }
+
+  private initThemeListener(): void {
+    this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))
+  }
+
+  private initSelectedTabListener(): void {
+    this.selectedTabListener().subscribe(() => this.initContentIfInView())
   }
 }

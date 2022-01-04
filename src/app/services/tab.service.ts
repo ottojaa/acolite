@@ -48,7 +48,7 @@ export class TabService {
   revertDelete(tab: Doc): void {
     const { textContent, filePath, extension } = tab
     const { tabs, selectedTab } = this.state.value
-    const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
+    const tabIdx = tabs.findIndex((fileTab) => fileTab.filePath === filePath)
     if (tabIdx > -1) {
       tabs[tabIdx].deleted = false
       this.update(selectedTab, tabs)
@@ -99,14 +99,6 @@ export class TabService {
     return tabs.filter((tab) => tab.filePath !== tabToClose)
   }
 
-  private getNewSelectedTab(selectedTab: SelectedTab, tabs: Doc[]): any {
-    if (selectedTab.index <= tabs.length) {
-      return { path: selectedTab.filePath, index: selectedTab.index }
-    }
-    const newIndex = selectedTab.index - 1 >= 0 ? selectedTab.index - 1 : 0
-    return tabs[newIndex] ? { path: tabs[newIndex].filePath, index: newIndex } : { path: '', index: 0 }
-  }
-
   toggleBookmark(tab: Doc): void {
     const { filePath, fileName } = tab
     const { bookmarks } = this.state.getStateParts(['bookmarks'])
@@ -141,5 +133,13 @@ export class TabService {
     this.state.updateState$.next([
       { key: 'selectedTab', payload: { ...selectedTab, forceDashboard: !selectedTab.forceDashboard } },
     ])
+  }
+
+  private getNewSelectedTab(selectedTab: SelectedTab, tabs: Doc[]): any {
+    if (selectedTab.index <= tabs.length) {
+      return { path: selectedTab.filePath, index: selectedTab.index }
+    }
+    const newIndex = selectedTab.index - 1 >= 0 ? selectedTab.index - 1 : 0
+    return tabs[newIndex] ? { path: tabs[newIndex].filePath, index: newIndex } : { path: '', index: 0 }
   }
 }

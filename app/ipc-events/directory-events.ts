@@ -2,6 +2,7 @@ import { BrowserWindow, dialog, IpcMainEvent } from 'electron'
 import { first } from 'lodash'
 import * as path from 'path'
 import * as fs from 'fs'
+import { promises as fsp } from 'fs'
 import { addFilesToIndex } from './store-events'
 import { Document } from 'flexsearch'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
@@ -15,7 +16,7 @@ export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirect
   const { rootDirectory, baseDir } = state
   const directoryPath = path.join(parentPath ? parentPath : baseDir, directoryName)
 
-  fs.promises
+  fsp
     .mkdir(directoryPath, { recursive: true })
     .then(() => {
       const newDir = getFileEntityFromPath(directoryPath)
