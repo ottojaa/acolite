@@ -39,4 +39,22 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   private initThemeListener(): void {
     this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))
   }
+
+  handleKeydown(event: any) {
+    if (event.key == 'Tab') {
+      event.preventDefault()
+      let start = event.target.selectionStart
+      let end = event.target.selectionEnd
+      if (event.shiftKey) {
+        if (event.target.value.substring(start - 1, start) !== '\t') {
+          return
+        }
+        event.target.value = event.target.value.substring(0, start - 1) + event.target.value.substring(end)
+        event.target.selectionStart = event.target.selectionEnd = start - 1
+      } else {
+        event.target.value = event.target.value.substring(0, start) + '\t' + event.target.value.substring(end)
+        event.target.selectionStart = event.target.selectionEnd = start + 1
+      }
+    }
+  }
 }

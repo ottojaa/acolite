@@ -3,9 +3,18 @@
   .layout-selector-container {
     display: flex;
     justify-content: space-between;
-    > h2 {
-      color: var(--buttonColor);
+    .title {
+      display: flex;
+      align-items: center;
+      > h2 {
+        color: var(--contrast);
+        margin: 0 0.5rem 0 0;
+      }
+      mat-icon {
+        color: var(--iconColor);
+      }
     }
+
     .layout-selector {
       color: var(--contrast);
       opacity: 0.9;

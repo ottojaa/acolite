@@ -25,8 +25,8 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
   isValidJson: boolean
   previewMode: 'json' | 'raw' = 'json'
   openCount = 1
-  previewWidth = 40
-  editorWidth = 60
+  previewWidth = 0
+  editorWidth = 100
 
   get filePath(): string {
     return this.tab.filePath

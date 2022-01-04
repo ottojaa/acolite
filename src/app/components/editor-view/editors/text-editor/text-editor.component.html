@@ -4,6 +4,7 @@
   <div class="area-container dark-theme" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'">
     <textarea
       #editor
+      (keydown)="handleKeydown($event)"
       [(ngModel)]="textContent"
       (ngModelChange)="onInputChange()"
       (contextmenu)="showContextMenu($event)"

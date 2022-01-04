@@ -1,6 +1,6 @@
 import { Component, Inject, NgZone, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { getBaseName, getExtension } from '../../../../../app/electron-utils/file-utils'
 import { FilePathContainer, TreeElement } from '../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
@@ -15,7 +15,7 @@ import { RenameFileDialogComponent } from '../rename-file-dialog/rename-file-dia
 export class MoveFilesDialogComponent implements OnInit {
   toMoveCount: number
   moveText: string
-  displayTexts: FilePathContainer
+  displayTexts: any
   pathsToBeMoved: FilePathContainer = { folders: [], files: [] }
 
   constructor(
@@ -41,8 +41,8 @@ export class MoveFilesDialogComponent implements OnInit {
     this.moveText = this.getMoveText(folders, files, target)
 
     return {
-      folders: [...folders.map((path) => getBaseName(path))],
-      files: files.map((path) => getBaseName(path)),
+      folders: [...folders.map((path) => ({ name: getBaseName(path), extension: getExtension(path) }))],
+      files: files.map((path) => ({ name: getBaseName(path), extension: getExtension(path) })),
     }
   }
 

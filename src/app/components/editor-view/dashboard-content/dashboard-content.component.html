@@ -1,7 +1,11 @@
 <div class="container mat-typography">
   <section class="recently-modified-section">
     <span class="layout-selector-container">
-      <h2>Recently updated</h2>
+      <span class="title">
+        <h2>Recently updated</h2>
+        <mat-icon>restore</mat-icon>
+      </span>
+
       <div class="layout-selector">
         <mat-icon (click)="recentlyModifiedLayout = 'card'" [ngClass]="{ selected: recentlyModifiedLayout === 'card' }"
           >view_module</mat-icon
@@ -31,7 +35,10 @@
 
   <section class="bookmarks-section">
     <span class="layout-selector-container">
-      <h2>Bookmarks</h2>
+      <span class="title">
+        <h2>Bookmarks</h2>
+        <mat-icon>bookmark</mat-icon>
+      </span>
       <div class="layout-selector">
         <mat-icon [ngClass]="{ selected: bookmarksLayout === 'card' }" (click)="bookmarksLayout = 'card'"
           >view_carousel</mat-icon

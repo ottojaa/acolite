@@ -9,7 +9,7 @@ export class KeyboardEventsDirective {
 
   @HostListener('keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
-    if (event.metaKey && event.key === 's') {
+    if ((event.metaKey || event.ctrlKey) && event.key === 's') {
       this.save.emit()
     }
   }
