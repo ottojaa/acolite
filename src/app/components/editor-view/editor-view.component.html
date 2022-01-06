@@ -7,15 +7,6 @@
         </ng-container>
 
         <ng-template #showDefault>
-          <ng-container *ngIf="hideTabs">
-            <div class="banner">
-              <h3>
-                {{ tabs.length }} tabs hidden, click <span (click)="onClickBanner()" class="emphasis">here</span> to
-                reveal
-              </h3>
-            </div>
-          </ng-container>
-
           <app-dashboard-content
             [recentlyModified]="recentlyModified$ | async"
             [bookmarks]="bookmarked$ | async"

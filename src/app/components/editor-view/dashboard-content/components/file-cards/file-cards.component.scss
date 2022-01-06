@@ -10,28 +10,17 @@
   }
 }
 
-h1:not(:first-child) {
-  margin-top: 4rem;
-}
-
-.section-title {
-  margin: 0;
-  padding: 1rem 2rem 0;
-  color: var(--buttonColor);
-}
-
 .no-content {
-  height: 15rem;
-  padding: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--contrast);
-  border-bottom: 1px solid #4845456b;
-}
-
-.files-header {
-  display: flex;
-  justify-content: center;
-  color: var(--contrast);
+  padding-top: 2rem;
+  h4 {
+    color: var(--contrast);
+    opacity: 0.7;
+    margin: 0 !important;
+  }
+  mat-icon {
+    color: var(--contrast);
+    transform: scale(0.7);
+  }
 }

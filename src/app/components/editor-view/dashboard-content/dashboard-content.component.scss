@@ -1,8 +1,11 @@
 .container {
-  padding: 2rem;
+  .recently-modified-section,
+  .bookmarks-section {
+    margin-left: 2rem;
+  }
   .layout-selector-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     .title {
       display: flex;
       align-items: center;
@@ -42,4 +45,13 @@
     // border-bottom: 1px solid var(--backgroundTertiary);
     opacity: 0.3;
   }
+}
+
+:host ::ng-deep .mat-tab-label {
+  color: var(--contrast);
+}
+
+::ng-deep .mat-tab-group.mat-primary .mat-ink-bar,
+.mat-tab-nav-bar.mat-primary .mat-ink-bar {
+  background-color: var(--buttonColor);
 }

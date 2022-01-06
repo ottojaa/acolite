@@ -31,8 +31,8 @@
 
 .banner {
   display: flex;
-  justify-content: center;
-  h3 {
+  justify-content: flex-end;
+  h4 {
     color: var(--contrast);
   }
   .emphasis {

@@ -1,66 +1,62 @@
 <div class="container mat-typography">
-  <section class="recently-modified-section">
-    <span class="layout-selector-container">
-      <span class="title">
-        <h2>Recently updated</h2>
-        <mat-icon>restore</mat-icon>
-      </span>
+  <mat-tab-group>
+    <mat-tab label="Recently modified">
+      <section class="recently-modified-section">
+        <span class="layout-selector-container">
+          <div class="layout-selector">
+            <mat-icon
+              (click)="recentlyModifiedLayout = 'card'"
+              [ngClass]="{ selected: recentlyModifiedLayout === 'card' }"
+              >view_module</mat-icon
+            >
+            <mat-icon
+              (click)="recentlyModifiedLayout = 'table'"
+              [ngClass]="{ selected: recentlyModifiedLayout === 'table' }"
+              >list</mat-icon
+            >
+          </div>
+        </span>
 
-      <div class="layout-selector">
-        <mat-icon (click)="recentlyModifiedLayout = 'card'" [ngClass]="{ selected: recentlyModifiedLayout === 'card' }"
-          >view_module</mat-icon
-        >
-        <mat-icon
-          (click)="recentlyModifiedLayout = 'table'"
-          [ngClass]="{ selected: recentlyModifiedLayout === 'table' }"
-          >list</mat-icon
-        >
-      </div>
-    </span>
+        <ng-container [ngSwitch]="recentlyModifiedLayout">
+          <div *ngSwitchCase="'card'" class="editor">
+            <app-file-cards [files]="recentlyModified"></app-file-cards>
+          </div>
 
-    <ng-container [ngSwitch]="recentlyModifiedLayout">
-      <div *ngSwitchCase="'card'" class="editor">
-        <app-file-cards [files]="recentlyModified"></app-file-cards>
-      </div>
+          <div *ngSwitchCase="'table'" class="editor">
+            <app-sortable-file-list [files]="recentlyModified" [basePath]="basePath"></app-sortable-file-list>
+          </div>
 
-      <div *ngSwitchCase="'table'" class="editor">
-        <app-sortable-file-list [files]="recentlyModified" [basePath]="basePath"></app-sortable-file-list>
-      </div>
+          <div *ngSwitchDefault><app-file-cards [files]="recentlyModified"></app-file-cards></div>
+        </ng-container>
+      </section>
+    </mat-tab>
+    <mat-tab label="Bookmarks">
+      <section class="bookmarks-section">
+        <span class="layout-selector-container">
+          <div class="layout-selector">
+            <mat-icon [ngClass]="{ selected: bookmarksLayout === 'card' }" (click)="bookmarksLayout = 'card'"
+              >view_carousel</mat-icon
+            >
+            <mat-icon [ngClass]="{ selected: bookmarksLayout === 'table' }" (click)="bookmarksLayout = 'table'"
+              >view_module</mat-icon
+            >
+          </div>
+        </span>
 
-      <div *ngSwitchDefault><app-file-cards [files]="recentlyModified"></app-file-cards></div>
-    </ng-container>
-  </section>
+        <ng-container [ngSwitch]="bookmarksLayout">
+          <div *ngSwitchCase="'card'" class="editor">
+            <app-file-cards [files]="bookmarks" [showBookmark]="true"></app-file-cards>
+          </div>
 
-  <div class="separator-el"></div>
+          <div *ngSwitchCase="'table'" class="editor">
+            <app-sortable-file-list [files]="bookmarks" [basePath]="basePath"></app-sortable-file-list>
+          </div>
 
-  <section class="bookmarks-section">
-    <span class="layout-selector-container">
-      <span class="title">
-        <h2>Bookmarks</h2>
-        <mat-icon>bookmark</mat-icon>
-      </span>
-      <div class="layout-selector">
-        <mat-icon [ngClass]="{ selected: bookmarksLayout === 'card' }" (click)="bookmarksLayout = 'card'"
-          >view_carousel</mat-icon
-        >
-        <mat-icon [ngClass]="{ selected: bookmarksLayout === 'table' }" (click)="bookmarksLayout = 'table'"
-          >view_module</mat-icon
-        >
-      </div>
-    </span>
-
-    <ng-container [ngSwitch]="bookmarksLayout">
-      <div *ngSwitchCase="'card'" class="editor">
-        <app-file-cards [files]="bookmarks" [showBookmark]="true"></app-file-cards>
-      </div>
-
-      <div *ngSwitchCase="'table'" class="editor">
-        <app-sortable-file-list [files]="bookmarks" [basePath]="basePath"></app-sortable-file-list>
-      </div>
-
-      <div *ngSwitchDefault><app-file-cards [files]="recentlyModified"></app-file-cards></div>
-    </ng-container>
-  </section>
+          <div *ngSwitchDefault><app-file-cards [files]="recentlyModified"></app-file-cards></div>
+        </ng-container>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
 </div>
 
 <ng-template #loader>

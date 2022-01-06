@@ -78,8 +78,13 @@ const readConfigData = (configPath: string): Promise<AppConfig> => {
       if (err) {
         reject(err)
       }
-      const parsedData = JSON.parse(configData) as AppConfig
-      resolve(parsedData)
+      try {
+        const parsedData = JSON.parse(configData) as AppConfig
+        resolve(parsedData)
+      } catch (error) {
+        console.error('readConfigData failed', error)
+        reject(error)
+      }
     })
   })
 }

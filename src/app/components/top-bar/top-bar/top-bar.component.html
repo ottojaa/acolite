@@ -2,7 +2,7 @@
   <div class="filler">
     <img
       (click)="forceDashboard()"
-      [matTooltip]="'Show dashboard'"
+      [matTooltip]="tooltipText$ | async"
       src="assets/icons/acolite-logo-white.png"
       width="110px"
     />

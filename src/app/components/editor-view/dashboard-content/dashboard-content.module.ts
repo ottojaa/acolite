@@ -9,6 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatIconModule } from '@angular/material/icon'
+import { MatTabsModule } from '@angular/material/tabs'
 
 @NgModule({
   declarations: [DashboardContentComponent],
@@ -19,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon'
     SortableFileTableModule,
     FileCardsModule,
     MatProgressBarModule,
+    MatTabsModule,
     BrowserAnimationsModule,
     MatExpansionModule,
     MatIconModule,

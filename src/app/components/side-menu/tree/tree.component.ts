@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input, NgZone, ViewChild } from '@angular/core'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Tree } from 'primeng/tree'
@@ -19,7 +19,7 @@ import { uniqBy, intersection } from 'lodash'
   styleUrls: ['./tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreeComponent extends AbstractComponent implements OnInit {
+export class TreeComponent extends AbstractComponent {
   @Input() files: TreeElement[]
   @Input() workspace: string | undefined
   @Input() activeIndent: ActiveIndent
@@ -40,14 +40,9 @@ export class TreeComponent extends AbstractComponent implements OnInit {
     private electronService: ElectronService,
     private dialogService: AppDialogService,
     private tabService: TabService,
-    private cdRef: ChangeDetectorRef,
     private ngZone: NgZone
   ) {
     super()
-  }
-
-  ngOnInit(): void {
-    this.dropZoneContextMenuItems = this.getDropZoneContextMenuItems()
   }
 
   onSelectFile(event: { node: TreeElement; originalEvent: MouseEvent }): void {
@@ -120,6 +115,7 @@ export class TreeComponent extends AbstractComponent implements OnInit {
 
   onRightClickDropZone(event: MouseEvent): void {
     this.cm.hide()
+    this.dropZoneContextMenuItems = this.getDropZoneContextMenuItems()
     this.cmDropZone.show(event)
   }
 

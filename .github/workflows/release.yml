@@ -46,7 +46,7 @@ jobs:
 
         with:
           build_script_name: 'build:prod'
-          args: '-p always' # configuration override for electron-builder: always publish the build
+          args: '-p always'
           github_token: ${{ secrets.github_token }}
 
           mac_certs: ${{ secrets.mac_certs }}
