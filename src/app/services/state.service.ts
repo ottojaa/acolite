@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { cloneDeep } from 'lodash'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators'
 import { expandNodeRecursive } from '../../../app/electron-utils/utils'

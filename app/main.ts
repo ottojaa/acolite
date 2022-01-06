@@ -83,14 +83,7 @@ function createWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
-  if (serve) {
-    win.webContents.openDevTools()
-    require('electron-reload')(__dirname, {
-      electron: require(path.join(__dirname, '/../node_modules/electron')),
-    })
-    win.loadURL('http://localhost:4200')
-  } else {
-    // Path when running electron executable
+  const loadURLWhenRunningExecutable = () => {
     const pathExists = fs.existsSync(path.join(__dirname, '../dist/index.html'))
     const pathIndex = pathExists ? '../dist/index.html' : './index.html'
 
@@ -102,6 +95,20 @@ function createWindow(): BrowserWindow {
       })
     )
   }
+
+  if (serve) {
+    win.webContents.openDevTools()
+    require('electron-reload')(__dirname, {
+      electron: require(path.join(__dirname, '/../node_modules/electron')),
+    })
+    win.loadURL('http://localhost:4200')
+  } else {
+    loadURLWhenRunningExecutable()
+  }
+
+  win.webContents.on('did-fail-load', () => {
+    loadURLWhenRunningExecutable()
+  })
 
   // Emitted when the window is closed.
   win.on('closed', () => {

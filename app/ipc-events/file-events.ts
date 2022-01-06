@@ -2,7 +2,6 @@ import * as fs from 'fs'
 import { promises as fsp } from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
-import { first, cloneDeep } from 'lodash'
 import { Document } from 'flexsearch'
 import {
   addToIndex,
@@ -45,6 +44,7 @@ import {
   CreateImageFile,
 } from '../shared/actions'
 import { Doc, State, TreeElement } from '../shared/interfaces'
+import { first, cloneDeep } from 'lodash'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action

@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit, ViewChild } from '@angular/core'
-import { intersection, uniqBy } from 'lodash'
 import { MenuItem, TreeNode } from 'primeng/api'
 import { ContextMenu } from 'primeng/contextmenu'
 import { Tree } from 'primeng/tree'
@@ -12,6 +11,7 @@ import { TabService } from '../../../services/tab.service'
 import { TreeElement, ActiveIndent, FileEntity, ConfirmDialogConfig } from '../../../../../app/shared/interfaces'
 import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/electron-utils/directory-utils'
 import { getBaseName } from '../../../../../app/electron-utils/file-utils'
+import { uniqBy, intersection } from 'lodash'
 
 @Component({
   selector: 'app-tree',

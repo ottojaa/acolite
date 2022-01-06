@@ -1,5 +1,4 @@
 import { BrowserWindow, dialog, IpcMainEvent } from 'electron'
-import { first } from 'lodash'
 import * as path from 'path'
 import * as fs from 'fs'
 import { promises as fsp } from 'fs'
@@ -10,6 +9,7 @@ import { getFileEntityFromPath, getRootDirectory } from '../electron-utils/utils
 import { getUpdatedMenuItemsRecursive } from '../electron-utils/menu-utils'
 import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../shared/actions'
 import { Doc } from '../shared/interfaces'
+import { first } from 'lodash'
 
 export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirectory) => {
   const { directoryName, parentPath, state } = payload

@@ -1,6 +1,5 @@
 import * as fs from 'fs'
 import { IpcMainEvent } from 'electron'
-import { isPlainObject, cloneDeep, isEqual, uniqBy, omit } from 'lodash'
 import { Document } from 'flexsearch'
 import {
   getDefaultConfigJSON,
@@ -10,9 +9,10 @@ import {
 import { formatDate } from '../date-and-time-helpers'
 import { getFileData, getFileDataSync, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
-import { AppConfig, SearchPreference, SearchResult, FileEntity, TreeElement, Doc, State } from '../shared/interfaces'
+import { AppConfig, SearchPreference, SearchResult, TreeElement, Doc } from '../shared/interfaces'
 import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
 import { binaryTypes, defaultSpliceLength, indexFileSizeLimit } from '../shared/constants'
+import { isPlainObject, cloneDeep, uniqBy, isEqual } from 'lodash'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {

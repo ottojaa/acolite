@@ -1,4 +1,3 @@
-import { dialog } from 'electron'
 import { cloneDeep } from 'lodash'
 import { TreeElement, FilePathContainer } from '../shared/interfaces'
 import { getDirName, getPathSeparator } from './file-utils'

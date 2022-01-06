@@ -6,7 +6,6 @@ import { ipcRenderer, webFrame } from 'electron'
 import * as remote from '@electron/remote'
 import * as childProcess from 'child_process'
 import * as fs from 'fs'
-import { pick } from 'lodash'
 import {
   ActionType,
   ReadDirectory,
@@ -33,6 +32,7 @@ import {
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc } from '../../../../../app/shared/interfaces'
+import { pick } from 'lodash'
 
 type OmitActionType<T> = Omit<T, 'type'>
 @Injectable({

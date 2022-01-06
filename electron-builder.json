@@ -1,6 +1,7 @@
 {
   "asar": false,
   "appId": "com.electron.acolite",
+  "afterSign": "electron-builder-notarize",
   "directories": {
     "output": "release/"
   },
@@ -23,7 +24,10 @@
   "mac": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
     "target": ["dmg"],
-    "publish": ["github"]
+    "publish": ["github"],
+    "entitlements": "./build/entitlements.mac.plist",
+    "entitlementsInherit": "./build/entitlements.mac.plist",
+    "hardenedRuntime": true
   },
   "linux": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
