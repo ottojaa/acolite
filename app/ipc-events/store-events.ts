@@ -219,6 +219,7 @@ export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemP
 
 export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, true>) => {
   const files = flattenTreeStructure(treeStruct)
+
   files.forEach((file) => {
     if (file.data.type === 'file') {
       addToIndex(file.data.filePath, index)

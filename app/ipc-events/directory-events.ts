@@ -2,7 +2,7 @@ import { BrowserWindow, dialog, IpcMainEvent } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import { promises as fsp } from 'fs'
-import { addFilesToIndex } from './store-events'
+import { addFilesToIndexSynchronous } from './store-events'
 import { Document } from 'flexsearch'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
 import { getFileEntityFromPath, getRootDirectory } from '../electron-utils/utils'
@@ -80,16 +80,17 @@ export const setDefaultDirectory = (event: IpcMainEvent, configPath: string, wor
   })
 }
 
-export const readAndSendMenuItemsFromBaseDirectory = (
+export const readAndSendMenuItemsFromBaseDirectory = async (
   event: IpcMainEvent,
   action: ReadDirectory,
   index: Document<Doc, true>
 ) => {
   try {
-    const { baseDir, bookmarks } = action.state
+    const { baseDir } = action.state
     const rootDirectory = getRootDirectory(baseDir)
+    await addFilesToIndexSynchronous(rootDirectory?.children, index)
+
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, { rootDirectory })
-    addFilesToIndex(rootDirectory?.children, index)
   } catch (err) {
     console.log(err)
     event.sender.send(FolderActionResponses.ReadDirectoryFailure, err)

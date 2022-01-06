@@ -1,14 +1,12 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core'
-import { MarkdownEditorComponent, Options } from '@mdefy/ngx-markdown-editor'
+import { MarkdownEditorComponent, Options, ToolbarItem, ToolbarItemName } from '@mdefy/ngx-markdown-editor'
 import { MarkdownService } from 'ngx-markdown'
-import { Subject } from 'rxjs'
-import { debounceTime, skip, takeUntil } from 'rxjs/operators'
-import { AbstractComponent } from '../../../../abstract/abstract-component'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
 import hljs from 'highlight.js/lib/common'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
+import { ToolbarItemDef } from '@mdefy/ngx-markdown-editor/lib/types/toolbar'
 
 @Component({
   selector: 'app-markdown-editor',
@@ -27,6 +25,7 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
   isChecked: boolean
   editorOptions: Options
   viewInit = false
+  toolbar: (ToolbarItem | ToolbarItemName)[]
 
   constructor(
     public state: StateService,
@@ -41,6 +40,11 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
     this.editorOptions = this.getDefaultOptions()
+    this.toolbar = this.constructToolbar()
+  }
+
+  exportAsPdf(): void {
+    console.log('clicked')
   }
 
   /*  async initTabData(): Promise<void> {
@@ -80,6 +84,55 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
         this.initialized$.unsubscribe()
       }
     })
+  }
+
+  constructToolbar(): ToolbarItemDef[] {
+    return [
+      'setHeadingLevel',
+      'toggleHeadingLevel',
+      'increaseHeadingLevel',
+      'decreaseHeadingLevel',
+      'toggleBold',
+      'toggleItalic',
+      'toggleStrikethrough',
+      '|',
+      'toggleUnorderedList',
+      'toggleOrderedList',
+      'toggleCheckList',
+      '|',
+      'toggleQuote',
+      'toggleInlineCode',
+      'insertCodeBlock',
+      '|',
+      'insertLink',
+      'insertImageLink',
+      'insertTable',
+      'insertHorizontalRule',
+      '|',
+      'toggleRichTextMode',
+      'formatContent',
+      '|',
+      'downloadAsFile',
+      'importFromFile',
+      '|',
+      'togglePreview',
+      'toggleSideBySidePreview',
+      '|',
+      'undo',
+      'redo',
+      '|',
+      'openMarkdownGuide',
+      {
+        name: 'Export as pdf',
+        action: () => this.exportAsPdf(),
+        shortcut: 'Alt-B',
+        tooltip: 'Export as PDF`',
+        icon: {
+          format: 'material',
+          iconName: 'picture_as_pdf',
+        },
+      },
+    ]
   }
 
   initMarkdownDefaultBehaviorOverride(): void {
