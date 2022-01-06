@@ -28,6 +28,7 @@
             "assets": [
               "src/acolite-logo.ico",
               "src/assets",
+              "src/assets/icons/deleted.svg",
               { "glob": "mdi.svg", "input": "./node_modules/@mdi/angular-material", "output": "./assets" },
               { "glob": "**/*", "input": "node_modules/ng2-pdfjs-viewer/pdfjs", "output": "/assets/pdfjs" }
             ],

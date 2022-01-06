@@ -29,6 +29,7 @@ export interface WorkspaceConfig {
   sideMenuWidth?: number
   selectedTab?: SelectedTab
   editorTheme?: 'dark' | 'light'
+  appTheme?: string
   searchPreferences?: SearchPreference[]
   bookmarks?: string[]
 }
@@ -45,6 +46,7 @@ export interface State {
   initialized: boolean
   selectedTab: SelectedTab
   editorTheme: 'dark' | 'light'
+  appTheme: string
   sideMenuWidth: number
   searchPreferences: SearchPreference[]
   searchResults: SearchResult[]

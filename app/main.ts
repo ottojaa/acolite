@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
+import updateApp from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
@@ -302,6 +303,8 @@ try {
   app.on('ready', () => setTimeout(createWindow, 400))
 
   startIPCChannelListeners()
+
+  updateApp()
 
   index = getEmptyIndex()
 

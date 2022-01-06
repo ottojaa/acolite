@@ -55,4 +55,5 @@ export const allowedConfigKeys: string[] = [
   'selectedTab',
   'searchPreferences',
   'bookmarks',
+  'appTheme',
 ]

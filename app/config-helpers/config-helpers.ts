@@ -151,6 +151,9 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       case 'bookmarks': {
         return validateBookmarks(workspaceConfig)
       }
+      case 'appTheme': {
+        return validateAppTheme(workspaceConfig)
+      }
       default: {
         break
       }
@@ -191,6 +194,13 @@ const validateEditorTheme = (config: WorkspaceConfig) => {
   const isValid = editorTheme === 'dark' || editorTheme === 'light'
 
   return isValid ? editorTheme : 'dark'
+}
+
+const validateAppTheme = (config: WorkspaceConfig) => {
+  const { appTheme } = config
+  const isValid = appTheme === 'Dark blue green' || appTheme === 'Light grey pink'
+
+  return isValid ? appTheme : 'Dark blue green'
 }
 
 const validateSelectedTab = (config: WorkspaceConfig) => {

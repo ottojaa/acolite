@@ -44,6 +44,7 @@ export class StateService extends AbstractComponent {
       forceDashboard: false,
     },
     editorTheme: 'dark',
+    appTheme: 'Dark blue green',
     sideMenuWidth: 20,
     searchResults: [],
     tabs: [],

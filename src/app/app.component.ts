@@ -8,6 +8,8 @@ import { StateService, StateUpdate } from './services/state.service'
 import { Router } from '@angular/router'
 import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/shared/actions'
 import { State } from '../../app/shared/interfaces'
+import { takeUntil } from 'rxjs/operators'
+import { AbstractComponent } from './abstract/abstract-component'
 
 type IPCEvent = Electron.IpcMessageEvent
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
@@ -16,7 +18,7 @@ type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses 
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent extends AbstractComponent implements OnInit {
   initialized = false
 
   constructor(
@@ -28,6 +30,7 @@ export class AppComponent implements OnInit {
     public dialogService: AppDialogService,
     public zone: NgZone
   ) {
+    super()
     this.electronService.initApp()
     this.translate.setDefaultLang('en')
     console.log('APP_CONFIG', APP_CONFIG)
@@ -44,7 +47,12 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.themeService.setTheme('Dark blue green')
+    this.state
+      .getStatePart('appTheme')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((theme) => {
+        this.themeService.setTheme(theme)
+      })
   }
 
   initIPCMainListeners(): void {

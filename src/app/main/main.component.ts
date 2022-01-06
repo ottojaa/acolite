@@ -28,7 +28,6 @@ export class MainComponent extends AbstractComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialized$ = this.state.getStatePart('initialized')
-    this.themeService.setTheme('Light grey')
     this.initSplitterSizes()
   }
 
