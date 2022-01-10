@@ -243,3 +243,13 @@ export enum SearchResponses {
   QuerySuccess = 'query-success',
   QueryFailure = 'query-failure',
 }
+
+export enum AutoUpdateEvents {
+  StartAutoUpdater = 'start-auto-updater',
+  CheckingForUpdates = 'checking-for-updates',
+  UpdateAvailable = 'update-available',
+  UpdateNotAvailable = 'update-not-available',
+  UpdateDownloaded = 'update-downloaded',
+  DownloadProgress = 'download-progress',
+  Error = 'error',
+}

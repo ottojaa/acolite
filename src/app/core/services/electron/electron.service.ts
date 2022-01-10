@@ -29,6 +29,7 @@ import {
   CopyFiles,
   GetBookmarkedFiles,
   CreateImageFile,
+  AutoUpdateEvents,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc } from '../../../../../app/shared/interfaces'
@@ -171,6 +172,10 @@ export class ElectronService {
     payload: T
   ): T & { type: ActionType } {
     return { ...payload, type: channel }
+  }
+
+  startAutoUpdater(): void {
+    this.ipcRenderer.send(AutoUpdateEvents.StartAutoUpdater)
   }
 
   async getFileData(payload: { filePath: string }): Promise<Doc> {
