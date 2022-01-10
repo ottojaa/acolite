@@ -1,0 +1,12 @@
+<div class="container" *ngIf="showLoader">
+  <span class="top-container">
+    <h3>{{ statusText }}</h3>
+    <button mat-button *ngIf="updateDownloaded">Apply and restart<mat-icon>restart_alt</mat-icon></button>
+  </span>
+
+  <mat-progress-bar
+    [ngClass]="{ show: showProgressBar }"
+    mode="determinate"
+    [value]="downloadProgress"
+  ></mat-progress-bar>
+</div>

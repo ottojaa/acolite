@@ -23,7 +23,7 @@
   },
   "mac": {
     "icon": "dist/assets/icons/acolite-logo-ellipse.png",
-    "target": ["dmg"],
+    "target": ["dmg", "zip"],
     "publish": ["github"],
     "entitlements": "./build/entitlements.mac.plist",
     "entitlementsInherit": "./build/entitlements.mac.plist",

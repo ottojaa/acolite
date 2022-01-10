@@ -44,6 +44,7 @@ import {
   StoreActions,
   StoreResponses,
   UpdateActionPayload,
+  AutoUpdateEvents,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -161,6 +162,7 @@ const startIPCChannelListeners = () => {
   ContextMenuChannels.forEach((channel) => ContextMenuReducer(channel))
 
   IPCHandlerReducer()
+  AutoUpdateListener()
 }
 
 const SearchActionReducer = (action: SearchActions) => {
@@ -171,6 +173,12 @@ const SearchActionReducer = (action: SearchActions) => {
         break
       }
     }
+  })
+}
+
+const AutoUpdateListener = () => {
+  ipcMain.on(AutoUpdateEvents.StartAutoUpdater, (_event: IpcMainEvent, _payload: null) => {
+    updateApp(win)
   })
 }
 
@@ -303,8 +311,6 @@ try {
   app.on('ready', () => setTimeout(createWindow, 400))
 
   startIPCChannelListeners()
-
-  updateApp()
 
   index = getEmptyIndex()
 
