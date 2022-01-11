@@ -21,7 +21,7 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
   // CodeMirror being available. SetTimeOut used as a bandaid fix for this
   @ViewChild(MarkdownEditorComponent) ngxMde: MarkdownEditorComponent
 
-  textContent: string
+  fileContent: string
   isChecked: boolean
   editorOptions: Options
   viewInit = false
@@ -47,17 +47,13 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
     console.log('clicked')
   }
 
-  /*  async initTabData(): Promise<void> {
-    const data = await this.electronService.getFileData({ filePath: this.tab.filePath })
-  } */
-
   onEditorContentChange(): void {
     if (!this.ngxMde) {
       return
     }
-    this.textContent = this.ngxMde.mde.cm.getValue()
+    this.fileContent = this.ngxMde.mde.cm.getValue()
     if (this.viewInit) {
-      this.autoSave$.next({ filePath: this.tab.filePath, content: this.textContent })
+      this.autoSave$.next({ filePath: this.tab.filePath, content: this.fileContent })
     }
     this.viewInit = true
   }
@@ -66,6 +62,7 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
     return {
       highlightTokens: true,
       shortcutsEnabled: 'all',
+      lineNumbers: true,
     }
   }
 
@@ -74,12 +71,12 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
    * even if the editor is hidden by *ngIf, which causes problems if the editor shown on pageload is not a markdown editor.
    * Unsubscribe from the listener after content is set to each CodeMirror instance
    */
-  initTextContentIfNgxMdeInView(): void {
-    setTimeout(() => {
+  async initfileContentIfNgxMdeInView(): Promise<void> {
+    setTimeout(async () => {
       const queryString = `ngx-markdown-editor-${this.tab.filePath}`
       const editor = document.getElementById(queryString)
       if (editor && this.ngxMde) {
-        this.ngxMde.mde.setContent(this.tab.textContent)
+        this.ngxMde.mde.setContent(this.tab.fileContent)
         this.initialized$.next(true)
         this.initialized$.unsubscribe()
       }
@@ -156,7 +153,7 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
   }
 
   private initSelectedTabListener(): void {
-    this.selectedTabListener().subscribe(() => this.initTextContentIfNgxMdeInView())
+    this.selectedTabListener().subscribe(() => this.initfileContentIfNgxMdeInView())
   }
 
   private initThemeListener(): void {

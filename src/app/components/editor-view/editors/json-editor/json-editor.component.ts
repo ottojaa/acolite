@@ -19,7 +19,7 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
   @ViewChild('codeMirror') codeMirror: CodemirrorComponent
 
   isChecked: boolean
-  textContent: string
+  fileContent: string
   formattedResult: object
   highlightedContent: any
   isValidJson: boolean
@@ -37,10 +37,10 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
   }
 
   ngOnInit(): void {
-    this.textContent = this.tab.textContent
+    this.fileContent = this.tab.fileContent
     this.initThemeListener()
     this.initSelectedTabListener()
-    this.updateJSONPreview(this.textContent)
+    this.updateJSONPreview(this.fileContent)
   }
 
   hidePreview(): void {
@@ -79,9 +79,9 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.updateJSONPreview(event)
   }
 
-  formatJSON(textContent: string): object {
+  formatJSON(fileContent: string): object {
     try {
-      return JSON.parse(textContent)
+      return JSON.parse(fileContent)
     } catch {
       return null
     }
@@ -89,22 +89,22 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
 
   lint(): void {
     try {
-      const replaced = this.textContent.replace(/\'/g, '"')
+      const replaced = this.fileContent.replace(/\'/g, '"')
       const textJson = JSON.parse(replaced)
       if (textJson) {
-        this.textContent = JSON.stringify(textJson, null, 4)
-        this.saveContent({ filePath: this.filePath, content: this.textContent })
+        this.fileContent = JSON.stringify(textJson, null, 4)
+        this.saveContent({ filePath: this.filePath, content: this.fileContent })
         this.updateJSONPreview(replaced)
       }
     } catch {}
   }
 
   initContentIfInView(): void {
-    setTimeout(() => {
+    setTimeout(async () => {
       const queryString = `ngx-codemirror-${this.tab.filePath}`
       const editor = document.getElementById(queryString)
       if (editor && this.codeMirror) {
-        this.codeMirror.codeMirror.setValue(this.textContent)
+        this.codeMirror.codeMirror.setValue(this.tab.fileContent)
         this.initialized$.next(true)
         this.initialized$.unsubscribe()
       }

@@ -46,7 +46,7 @@ export class TabService {
   }
 
   revertDelete(tab: Doc): void {
-    const { textContent, filePath, extension } = tab
+    const { fileContent, filePath, extension } = tab
     const { tabs, selectedTab } = this.state.value
     const tabIdx = tabs.findIndex((fileTab) => fileTab.filePath === filePath)
     if (tabIdx > -1) {
@@ -55,7 +55,7 @@ export class TabService {
 
       const payload = {
         filePath,
-        content: textContent,
+        content: fileContent,
         openFileAfterCreation: false,
         state: this.state.value,
       }

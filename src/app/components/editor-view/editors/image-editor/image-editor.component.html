@@ -1,9 +1,9 @@
 <div class="image-cropper-container">
-  <div class="view-container" [ngClass]="{ editMode: editMode }" *ngIf="imagePath; else loader" @componentLoaded>
+  <div class="view-container" [ngClass]="{ editMode: editMode }" *ngIf="tab.fileContent; else loader" @componentLoaded>
     <div class="image-container">
       <ng-container *ngIf="!editMode" @componentLoaded>
         <div class="non-editmode-container">
-          <img [src]="imagePath | safeUrl" />
+          <img [src]="tab.fileContent | safeUrl" />
 
           <div class="list">
             <div class="">

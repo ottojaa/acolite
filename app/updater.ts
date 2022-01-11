@@ -27,6 +27,7 @@ export default function updateApp(window: BrowserWindow): void {
 
     autoUpdater.on(AutoUpdateEvents.DownloadProgress, (progressInfo: ProgressInfo) => {
       const { percent } = progressInfo
+      console.log(progressInfo)
       window.webContents.send(AutoUpdateEvents.DownloadProgress, Math.round(percent))
     })
   } catch (err) {
@@ -35,6 +36,10 @@ export default function updateApp(window: BrowserWindow): void {
       throw err
     }
   }
+}
+
+export function quitAndInstall(): void {
+  autoUpdater.quitAndInstall()
 }
 
 const mockDownloadProgress = (window: BrowserWindow) => {

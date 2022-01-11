@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
+import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ElectronService } from 'app/core/services'
+import { StateService } from 'app/services/state.service'
 import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
@@ -7,7 +9,7 @@ import { Doc } from '../../../../../../app/shared/interfaces'
   templateUrl: './pdf-editor.component.html',
   styleUrls: ['./pdf-editor.component.scss'],
 })
-export class PdfEditorComponent {
+export class PdfEditorComponent extends AbstractEditor {
   @Input() set tab(tab: Doc) {
     this._tab = tab
     this.initData()
@@ -21,11 +23,12 @@ export class PdfEditorComponent {
 
   pdfFile: Uint8Array
 
-  constructor(private electronService: ElectronService, private cdRef: ChangeDetectorRef) {}
+  constructor(public electronService: ElectronService, public state: StateService, private cdRef: ChangeDetectorRef) {
+    super(electronService, state)
+  }
 
   async initData(): Promise<void> {
-    const imagePath = await this.electronService.getImageData({ filePath: this.tab.filePath })
-    this.pdfFile = this.convertBase64ToByteArray(imagePath)
+    this.pdfFile = this.convertBase64ToByteArray(this.tab.fileContent)
     this.cdRef.detectChanges()
   }
 

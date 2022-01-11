@@ -7,11 +7,17 @@ import {
   updateSelectedWorkspaceConfig,
 } from '../config-helpers/config-helpers'
 import { formatDate } from '../date-and-time-helpers'
-import { getFileData, getFileDataSync, getJoinedPath, getPathSeparator } from '../electron-utils/file-utils'
+import {
+  getFileData,
+  getFileDataSync,
+  getFileDataToIndex,
+  getJoinedPath,
+  getPathSeparator,
+} from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, TreeElement, Doc } from '../shared/interfaces'
 import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
-import { binaryTypes, defaultSpliceLength, indexFileSizeLimit } from '../shared/constants'
+import { defaultSpliceLength, indexFileSizeLimit, indexFileTypes } from '../shared/constants'
 import { isPlainObject, cloneDeep, uniqBy, isEqual } from 'lodash'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
@@ -68,14 +74,14 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
 
 export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index: Document<Doc, true>) => {
   const { searchOpts } = query
-  const { textContent, baseDir, searchPreferences } = searchOpts
+  const { fileContent, baseDir, searchPreferences } = searchOpts
 
   const replacePath = (pathToReplace: string) => {
     return pathToReplace.replace(getJoinedPath([baseDir, getPathSeparator()]), '')
   }
 
   const getSearchPayload = (searchPreferences: SearchPreference[]) => {
-    const indexedFields = ['textContent', 'filePath', 'fileName', 'extension']
+    const indexedFields = ['fileContent', 'filePath', 'fileName', 'extension']
     const selectedOptions = searchPreferences.filter((preference) => preference.selected)
 
     if (!selectedOptions.length) {
@@ -148,7 +154,7 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   }
 
   const searchPayload = getSearchPayload(searchPreferences)
-  const searchResult = await index.searchAsync(textContent, searchPayload)
+  const searchResult = await index.searchAsync(fileContent, searchPayload)
   const mappedResult = searchResult.map((res) => res.result)
   const uniqueElements = uniqBy(
     mappedResult.reduce((acc: SearchResult[], curr: any) => acc.concat([...curr.map((el) => el.doc)]), []),
@@ -159,7 +165,7 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
   const defaultHighlights = {
     fileName: true,
     filePath: true,
-    textContent: true,
+    fileContent: true,
   }
 
   const shouldHighlight = searchPreferences.length
@@ -170,12 +176,12 @@ export const searchFiles = async (event: IpcMainEvent, query: SearchQuery, index
     : defaultHighlights
 
   const mappedResults = filteredResults.map((file) => {
-    file.highlightContentText = shouldHighlight['textContent']
-      ? getHighlightContentText(file.textContent, textContent)
+    file.highlightContentText = shouldHighlight['fileContent']
+      ? getHighlightContentText(file.fileContent, fileContent)
       : ''
-    file.highlightTitleText = shouldHighlight['fileName'] ? getHighlightText(file.fileName, textContent) : ''
+    file.highlightTitleText = shouldHighlight['fileName'] ? getHighlightText(file.fileName, fileContent) : ''
     file.highlightPathText = shouldHighlight['filePath']
-      ? getHighlightText(replacePath(file.filePath), textContent)
+      ? getHighlightText(replacePath(file.filePath), fileContent)
       : ''
 
     return file
@@ -240,34 +246,17 @@ export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Doc
 }
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
-  const indexFile = await getFileData(newPath)
-  const { ino, extension, size } = indexFile
-
-  if (!shouldIndex(extension, size)) {
-    indexFile.textContent = ''
-  }
+  const indexFile = await getFileDataToIndex(newPath)
+  const { ino } = indexFile
 
   await index.updateAsync(ino, indexFile)
 }
 
 export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
-  let indexFile = await getFileData(filePath)
-  const { ino, extension, size } = indexFile
-
-  if (!shouldIndex(extension, size)) {
-    indexFile.textContent = ''
-  }
+  let indexFile = await getFileDataToIndex(filePath)
+  const { ino } = indexFile
 
   await index.addAsync(ino, indexFile)
-}
-
-// binary and other type of files
-const shouldIndex = (extension: string, size: number) => {
-  if (binaryTypes.includes(extension)) {
-    return false
-  }
-
-  return size < indexFileSizeLimit
 }
 
 export const updateIndexesRecursive = async (filePaths: string[], index: Document<Doc, true>) => {
@@ -304,7 +293,7 @@ export const getEmptyIndex = (): Document<Doc, true> => {
     optimize: true,
     document: {
       id: 'id',
-      index: ['filePath', 'fileName', 'textContent', 'createdAt', 'modifiedAt', 'extension'],
+      index: ['filePath', 'fileName', 'fileContent', 'createdAt', 'modifiedAt', 'extension'],
       store: true,
     },
   })
@@ -337,14 +326,14 @@ export const updateStore = (event: IpcMainEvent, updateData: UpdateStore, config
 
 /**
  * generates a highlight text that is shown alongside other file data. Attempts to truncate the text while keeping the highlighted part intact
- * @param textContent the file's text content
+ * @param fileContent the file's text content
  * @param query search query
  */
-const getHighlightContentText = (textContent: string, query: string): string => {
-  if (!textContent) {
+const getHighlightContentText = (fileContent: string, query: string): string => {
+  if (!fileContent) {
     return ''
   }
-  const highlightText = textContent.replace(
+  const highlightText = fileContent.replace(
     new RegExp(query, 'gi'),
     (match) => '<span class="highlightText">' + match + '</span>'
   )
@@ -371,6 +360,6 @@ const getHighlightContentText = (textContent: string, query: string): string => 
   return prefix + highlightString + suffix
 }
 
-const getHighlightText = (textContent: string, query: string) => {
-  return textContent.replace(new RegExp(query, 'gi'), (match) => '<span class="highlightText">' + match + '</span>')
+const getHighlightText = (fileContent: string, query: string) => {
+  return fileContent.replace(new RegExp(query, 'gi'), (match) => '<span class="highlightText">' + match + '</span>')
 }

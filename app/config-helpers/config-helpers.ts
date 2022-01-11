@@ -211,7 +211,8 @@ const validateSelectedTab = (config: WorkspaceConfig) => {
 
 const validateSearchPreferences = (config: WorkspaceConfig) => {
   const { searchPreferences } = config
-  const isValid = searchPreferences.every((preference) => preference.value)
+  const validValues = ['fileName', 'fileContent', 'filePath', 'createdAt', 'modifiedAt']
+  const isValid = searchPreferences.every((preference) => preference.value && validValues.includes(preference.value))
   return isValid ? searchPreferences : []
 }
 

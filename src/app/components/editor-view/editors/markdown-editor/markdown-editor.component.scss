@@ -89,6 +89,11 @@ ngx-markdown-editor {
   border: none !important;
 }
 
+:host ::ng-deep .CodeMirror-gutters {
+  background-color: var(--backgroundTertiary);
+  border: none;
+}
+
 :host ::ng-deep ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
   border: none;
 }

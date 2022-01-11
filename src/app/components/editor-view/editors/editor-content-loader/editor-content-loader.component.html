@@ -1,0 +1,25 @@
+<div style="height: 100%" *ngIf="tabData$ | async as tabData">
+  <ng-container [ngSwitch]="tabData.editorConfig.editorType">
+    <div *ngSwitchCase="'txt'" class="editor">
+      <app-text-editor [tab]="tabData"></app-text-editor>
+    </div>
+
+    <div *ngSwitchCase="'md'" class="editor">
+      <app-markdown-editor [tab]="tabData"></app-markdown-editor>
+    </div>
+
+    <div *ngSwitchCase="'json'" class="editor">
+      <app-json-editor [tab]="tabData"></app-json-editor>
+    </div>
+
+    <div *ngSwitchCase="'pdf'" class="editor">
+      <app-pdf-editor [tab]="tabData"></app-pdf-editor>
+    </div>
+
+    <div *ngSwitchCase="'image'" class="editor">
+      <app-image-editor [tab]="tabData"></app-image-editor>
+    </div>
+
+    <div *ngSwitchDefault>No viewer for this type of file: {{ tabData.extension }}</div>
+  </ng-container>
+</div>

@@ -32,7 +32,7 @@ import {
   AutoUpdateEvents,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
-import { Doc } from '../../../../../app/shared/interfaces'
+import { Doc, Encoding } from '../../../../../app/shared/interfaces'
 import { pick } from 'lodash'
 
 type OmitActionType<T> = Omit<T, 'type'>
@@ -178,12 +178,12 @@ export class ElectronService {
     this.ipcRenderer.send(AutoUpdateEvents.StartAutoUpdater)
   }
 
-  async getFileData(payload: { filePath: string }): Promise<Doc> {
-    return this.handle(HandlerAction.GetTabData, payload)
+  quitAndInstall(): void {
+    this.ipcRenderer.send(AutoUpdateEvents.QuitAndInstall)
   }
 
-  async getImageData(payload: { filePath: string }): Promise<string> {
-    return this.handle(HandlerAction.GetImageBase64, payload)
+  async getFileData(payload: { filePath: string; encoding: Encoding }): Promise<string> {
+    return this.handle(HandlerAction.GetFileData, payload)
   }
 
   async getDirectoryPath(payload: { filePath: string }): Promise<string> {

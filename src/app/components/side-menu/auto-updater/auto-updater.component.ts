@@ -69,4 +69,8 @@ export class AutoUpdaterComponent implements OnInit {
       }
     })
   }
+
+  quitAndInstall(): void {
+    this.electronService.quitAndInstall()
+  }
 }

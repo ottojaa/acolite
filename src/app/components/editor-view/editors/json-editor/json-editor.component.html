@@ -10,7 +10,7 @@
           <ngx-codemirror
             #codeMirror
             id="ngx-codemirror-{{ tab.filePath }}"
-            [(ngModel)]="textContent"
+            [(ngModel)]="fileContent"
             (ngModelChange)="onInputChange($event)"
             (contextmenu)="showContextMenu($event)"
             [options]="{

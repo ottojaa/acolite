@@ -24,37 +24,15 @@
           <ng-container *ngIf="tab.deleted; else showEditor">
             <div class="deleted">
               <h2 class="deleted-text">
-                This file appears to be deleted! If this was a mistake, press
+                This file appears to be deleted!<!--  If this was a mistake, press
                 <span aria-label="bring-deleted-file-back" class="bring-back" (click)="revertDelete(tab)">here</span>
-                to bring it back
+                to bring it back -->
               </h2>
             </div>
           </ng-container>
 
           <ng-template #showEditor>
-            <ng-container [ngSwitch]="tab.editorType">
-              <div *ngSwitchCase="'txt'" class="editor">
-                <app-text-editor [tab]="tab"></app-text-editor>
-              </div>
-
-              <div *ngSwitchCase="'md'" class="editor">
-                <app-markdown-editor [tab]="tab"></app-markdown-editor>
-              </div>
-
-              <div *ngSwitchCase="'json'" class="editor">
-                <app-json-editor [tab]="tab"></app-json-editor>
-              </div>
-
-              <div *ngSwitchCase="'pdf'" class="editor">
-                <app-pdf-editor [tab]="tab"></app-pdf-editor>
-              </div>
-
-              <div *ngSwitchCase="'image'" class="editor">
-                <app-image-editor [tab]="tab"></app-image-editor>
-              </div>
-
-              <div *ngSwitchDefault>No viewer for this type of file: {{ tab.editorType }}</div>
-            </ng-container>
+            <app-editor-content-loader [tab]="tab"></app-editor-content-loader>
           </ng-template>
         </mat-tab>
       </div>

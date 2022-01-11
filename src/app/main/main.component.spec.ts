@@ -32,7 +32,7 @@ describe('DetailComponent', () => {
     'should render title in a h1 tag',
     waitForAsync(() => {
       const compiled = fixture.debugElement.nativeElement
-      expect(compiled.querySelector('h1').textContent).toContain('PAGES.DETAIL.TITLE')
+      expect(compiled.querySelector('h1').fileContent).toContain('PAGES.DETAIL.TITLE')
     })
   )
 })

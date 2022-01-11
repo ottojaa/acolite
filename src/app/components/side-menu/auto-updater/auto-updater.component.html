@@ -1,7 +1,9 @@
 <div class="container" *ngIf="showLoader">
   <span class="top-container">
     <h3>{{ statusText }}</h3>
-    <button mat-button *ngIf="updateDownloaded">Apply and restart<mat-icon>restart_alt</mat-icon></button>
+    <button mat-button *ngIf="updateDownloaded" (click)="quitAndInstall()">
+      Apply and restart<mat-icon>restart_alt</mat-icon>
+    </button>
   </span>
 
   <mat-progress-bar

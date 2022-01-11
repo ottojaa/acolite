@@ -4,10 +4,10 @@
   ::ng-deep {
     .CodeMirror {
       height: 100%;
-      background-color: var(--backgroundPrimary);
+      background-color: var(--backgroundTertiary);
     }
     .CodeMirror-gutters {
-      background-color: var(--backgroundPrimary);
+      background-color: var(--backgroundTertiary);
     }
     .as-split-gutter {
       z-index: 999;

@@ -4,7 +4,7 @@ import { StateService } from 'app/services/state.service'
 import { Observable, Subject } from 'rxjs'
 import { takeUntil, skip, debounceTime } from 'rxjs/operators'
 import { UpdateFileContent } from '../../../app/shared/actions'
-import { SelectedTab, State } from '../../../app/shared/interfaces'
+import { Encoding, SelectedTab, State } from '../../../app/shared/interfaces'
 import { AbstractComponent } from './abstract-component'
 
 @Component({

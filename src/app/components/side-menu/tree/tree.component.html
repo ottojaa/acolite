@@ -87,6 +87,7 @@
 <p-contextMenu
   #contextMenu
   [model]="contextMenuItems"
+  appendTo="body"
   [triggerEvent]="'none'"
   (unselectFile)="onUnselectFile()"
 ></p-contextMenu>

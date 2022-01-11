@@ -78,7 +78,7 @@ export interface SelectedTab {
 export interface SearchResult {
   fileName: string
   extension: string
-  textContent: string
+  fileContent: string
   filePath: string
   createdAt: Date
   modifiedAt: Date
@@ -107,16 +107,21 @@ export interface FilePathContainer {
   files: string[]
 }
 
+export interface EditorConfig {
+  editorType: string
+  encoding: Encoding | undefined
+}
+
 export interface Doc {
   ino: number
   filePath: string
   fileName: string
   extension: string
-  editorType: string
+  editorConfig: EditorConfig
   modifiedAt: Date
   createdAt: Date
   size: number
-  textContent?: string
+  fileContent?: string
   deleted?: boolean
 }
 
@@ -124,3 +129,5 @@ export interface ThemeOption {
   name: string
   styles: Record<string, string>
 }
+
+export type Encoding = 'utf-8' | 'binary' | 'base64'

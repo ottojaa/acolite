@@ -25,15 +25,16 @@ export const fileExtensionIcons: FileExtensionIcon[] = [
   { name: 'file-document', acceptedExtensions: ['default'], color: 'white' },
 ]
 
-export const editorTypes = [
+export const editorConfigs = [
   {
-    editor: 'txt',
-    acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx', 'yaml'],
+    editorType: 'txt',
+    encoding: 'utf-8',
+    acceptedTypes: ['txt', 'text', 'html', 'yml', 'doc', 'docx', 'yaml', 'csv'],
   },
-  { editor: 'md', acceptedTypes: ['markdown', 'md'] },
-  { editor: 'pdf', acceptedTypes: ['pdf'] },
-  { editor: 'json', acceptedTypes: ['json'] },
-  { editor: 'image', acceptedTypes: ['jpg', 'jpeg', 'png', 'bmp', 'ico', 'webp'] },
+  { editorType: 'md', encoding: 'utf-8', acceptedTypes: ['markdown', 'md'] },
+  { editorType: 'pdf', encoding: 'base64', acceptedTypes: ['pdf'] },
+  { editorType: 'json', encoding: 'utf-8', acceptedTypes: ['json'] },
+  { editorType: 'image', encoding: 'base64', acceptedTypes: ['jpg', 'jpeg', 'png', 'bmp', 'ico', 'webp'] },
 ]
 
 export enum EntityTypes {
@@ -41,9 +42,11 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
+export const indexFileTypes = ['txt', 'md', 'markdown', 'json', 'ts', 'js', 'css', 'scss', 'csv']
+
 // Types that should be encoded / decoded with encoding: 'binary'. Base64 seems to cause performance problems with async FS api readFile api
 export const binaryTypes = ['pdf', 'jpg', 'jpeg', 'png', 'ico', 'bmp', 'webp']
-export const indexFileSizeLimit = 10000
+export const indexFileSizeLimit = 100000
 
 export const defaultSpliceLength = 50
 

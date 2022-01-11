@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import updateApp from './updater'
+import updateApp, { quitAndInstall } from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
@@ -31,20 +31,20 @@ import {
   searchFiles,
   updateStore,
 } from './ipc-events/store-events'
-import { getDirName, getFileData, getImageDataBase64, getJoinedPath } from './electron-utils/file-utils'
+import { getDirName, getFileContent, getFileData, getJoinedPath } from './electron-utils/file-utils'
 import {
   ContextMenuActions,
   FileActions,
   FolderActions,
   HandlerAction,
   ReadFile,
-  ReadImageData,
   ChooseDirectory,
   SearchActions,
   StoreActions,
   StoreResponses,
   UpdateActionPayload,
   AutoUpdateEvents,
+  ReadFileContent,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -180,6 +180,9 @@ const AutoUpdateListener = () => {
   ipcMain.on(AutoUpdateEvents.StartAutoUpdater, (_event: IpcMainEvent, _payload: null) => {
     updateApp(win)
   })
+  ipcMain.on(AutoUpdateEvents.QuitAndInstall, (_event) => {
+    quitAndInstall()
+  })
 }
 
 const StoreActionReducer = (action: StoreActions) => {
@@ -288,12 +291,9 @@ const ContextMenuReducer = (action: ContextMenuActions) => {
 }
 
 const IPCHandlerReducer = () => {
-  ipcMain.handle(HandlerAction.GetTabData, async (_event, action: ReadFile) => {
-    const result = await getFileData(action.filePath)
-    return result
-  })
-  ipcMain.handle(HandlerAction.GetImageBase64, async (_event, action: ReadImageData) => {
-    const result = await getImageDataBase64(action.filePath)
+  ipcMain.handle(HandlerAction.GetFileData, async (_event, action: ReadFileContent) => {
+    const { filePath, encoding } = action
+    const result = await getFileContent(filePath, encoding)
     return result
   })
   ipcMain.handle(HandlerAction.ChooseDirectory, async (_event, action: ChooseDirectory) => {

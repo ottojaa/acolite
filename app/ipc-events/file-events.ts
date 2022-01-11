@@ -101,7 +101,7 @@ const updateTabData = (tabs: Doc[], oldTabPath: string, newContent?: string, new
     }
 
     if (newContent) {
-      tabs[tabIdx].textContent = newContent
+      tabs[tabIdx].fileContent = newContent
     }
     if (newPath) {
       tabs[tabIdx].filePath = newPath
@@ -112,9 +112,9 @@ const updateTabData = (tabs: Doc[], oldTabPath: string, newContent?: string, new
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
   const { filePath, openFileAfterCreation, content, state } = action
   const { rootDirectory } = state
-  const textContent = content || ''
+  const fileContent = content || ''
 
-  fs.writeFile(filePath, textContent, (err) => {
+  fs.writeFile(filePath, fileContent, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.CreateFailure, err)
       return

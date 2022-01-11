@@ -72,8 +72,7 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   }
 
   async getImageBase64(): Promise<void> {
-    this.imagePath = await this.electronService.getImageData({ filePath: this.tab.filePath })
-    this.imageBase64 = `data:image/png;base64,${this.imagePath}`
+    this.imageBase64 = `data:image/png;base64,${this.tab.fileContent}`
     this.cdRef.detectChanges()
   }
 

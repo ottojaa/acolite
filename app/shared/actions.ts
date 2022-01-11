@@ -1,4 +1,4 @@
-import { SearchPreference, State, TreeElement } from './interfaces'
+import { Encoding, SearchPreference, State, TreeElement } from './interfaces'
 
 export type UpdateActionPayload =
   | ReadDirectory
@@ -85,6 +85,12 @@ export interface ReadFile {
   state: State
 }
 
+export interface ReadFileContent {
+  type: FileActions.ReadFileContent
+  filePath: string
+  encoding?: Encoding
+}
+
 export interface ReadImageData {
   type: FileActions.ReadFile
   filePath: string
@@ -145,7 +151,7 @@ export interface Handler {
 }
 
 interface SearchOptions {
-  textContent?: string
+  fileContent?: string
   baseDir?: string
   searchPreferences: SearchPreference[]
 }
@@ -178,6 +184,7 @@ export enum FileActions {
   DeleteFiles = 'delete-files',
   MoveFiles = 'move-files',
   ReadFile = 'read-file',
+  ReadFileContent = 'read-file-content',
   ReadImageData = 'read-image-data',
   OpenFileLocation = 'open-file-location',
 }
@@ -199,8 +206,7 @@ export enum SearchActions {
 }
 
 export enum HandlerAction {
-  GetTabData = 'get-tab-data',
-  GetImageBase64 = 'get-image-base64',
+  GetFileData = 'get-file-data',
   ChooseDirectory = 'choose-directory',
 }
 
@@ -245,6 +251,7 @@ export enum SearchResponses {
 }
 
 export enum AutoUpdateEvents {
+  QuitAndInstall = 'quit-and-install-update',
   StartAutoUpdater = 'start-auto-updater',
   CheckingForUpdates = 'checking-for-updates',
   UpdateAvailable = 'update-available',

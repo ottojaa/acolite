@@ -48,7 +48,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
   debouncedSave$ = new Subject()
 
   get atLeastOneSearchOptionSelected(): boolean {
-    const searchOptions = ['filePath', 'fileName', 'textContent']
+    const searchOptions = ['filePath', 'fileName', 'fileContent']
 
     return this.listItems
       .filter(this.isOptionItem)
@@ -109,7 +109,7 @@ export class SearchBuilderDialogComponent extends AbstractComponent implements O
       },
       {
         type: 'item',
-        value: 'textContent',
+        value: 'fileContent',
         text: 'Content',
         selected: true,
       },

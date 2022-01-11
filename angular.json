@@ -37,12 +37,14 @@
               "node_modules/primeng/resources/themes/bootstrap4-dark-purple/theme.css",
               "node_modules/highlight.js/styles/github.css",
               "node_modules/highlight.js/styles/default.css",
-              "node_modules/cropperjs/dist/cropper.css"
+              "node_modules/cropperjs/dist/cropper.css",
+              "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css"
             ],
             "scripts": [
               "node_modules/marked/lib/marked.js",
               "node_modules/highlight.js/lib/core.js",
-              "node_modules/cropperjs/dist/cropper.js"
+              "node_modules/cropperjs/dist/cropper.js",
+              "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.js"
             ],
             "customWebpackConfig": {
               "path": "./angular.webpack.js"

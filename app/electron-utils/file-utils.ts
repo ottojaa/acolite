@@ -1,8 +1,8 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { promises as fsp } from 'fs'
-import { binaryTypes, editorTypes } from '../shared/constants'
-import { Doc } from '../shared/interfaces'
+import { editorConfigs, indexFileTypes } from '../shared/constants'
+import { Doc, Encoding } from '../shared/interfaces'
 
 export const getDirName = (filePath: string) => path.dirname(filePath)
 export const getExtension = (filePath: string) => path.extname(filePath)
@@ -13,28 +13,31 @@ export const getExtensionSplit = (filename: string) => {
 export const getBaseName = (filePath: string) => path.basename(filePath)
 export const getJoinedPath = (paths: string[]) => path.join(...paths)
 export const getPathSeparator = () => path.sep
-export const getEditorType = (extension: string) =>
-  editorTypes.find((type) => type.acceptedTypes.includes(extension))?.editor || ''
+export const getEditorConfig = (extension: string) => {
+  const match = editorConfigs.find((type) => type.acceptedTypes.includes(extension)) || {
+    editorType: '',
+    encoding: undefined,
+  }
+  const { editorType, encoding } = match
+  return { editorType, encoding }
+}
 
 export const getFileData = (filePath: string): Promise<Doc> => {
   const extension = getExtensionSplit(filePath)
-  const encoding = binaryTypes.includes(extension) ? 'binary' : 'utf-8'
 
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, encoding, (err, textContent) => {
+    fs.stat(filePath, (err, fileStats) => {
       if (err) {
         reject(err)
         return
       }
-      const fileStats = fs.statSync(filePath)
-      const editorType = getEditorType(extension)
+      const editorConfig = getEditorConfig(extension)
 
       resolve({
         fileName: getBaseName(filePath),
         filePath,
-        textContent,
         extension,
-        editorType,
+        editorConfig,
         size: fileStats.size,
         ino: fileStats.ino,
         modifiedAt: fileStats.mtime,
@@ -44,25 +47,53 @@ export const getFileData = (filePath: string): Promise<Doc> => {
   })
 }
 
-export const getImageDataBase64 = (filePath: string): Promise<any> => {
-  return fsp.readFile(filePath, { encoding: 'base64' })
+export const getFileDataToIndex = (filePath: string): Promise<Doc> => {
+  const extension = getExtensionSplit(filePath)
+
+  // If file type is not marked to be indexed, only index the meta data
+  if (!indexFileTypes.includes(extension)) {
+    return getFileData(filePath)
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, fileContent) => {
+      if (err) {
+        reject(err)
+        return
+      }
+      const fileStats = fs.statSync(filePath)
+      const editorConfig = getEditorConfig(extension)
+
+      resolve({
+        fileName: getBaseName(filePath),
+        filePath,
+        fileContent,
+        extension,
+        editorConfig,
+        size: fileStats.size,
+        ino: fileStats.ino,
+        modifiedAt: fileStats.mtime,
+        createdAt: fileStats.birthtime,
+      })
+    })
+  })
+}
+
+export const getFileContent = (filePath: string, encoding: Encoding) => {
+  return fsp.readFile(filePath, { encoding })
 }
 
 export const getFileDataSync = (filePath: string): Doc => {
   try {
     const extension = getExtensionSplit(filePath)
-    const encoding = binaryTypes.includes(extension) ? 'binary' : 'utf-8'
-
     const fileStats = fs.statSync(filePath)
-    const textContent = fs.readFileSync(filePath, encoding)
-    const editorType = getEditorType(extension)
+    const editorConfig = getEditorConfig(extension)
 
     return {
       fileName: getBaseName(filePath),
       filePath,
-      textContent,
       extension,
-      editorType,
+      editorConfig,
       ino: fileStats.ino,
       size: fileStats.size,
       modifiedAt: fileStats.mtime,
