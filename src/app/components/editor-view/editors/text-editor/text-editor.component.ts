@@ -24,17 +24,12 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initfileContent()
+    this.fileContent = this.tab.fileContent
     this.initThemeListener()
   }
 
   onInputChange(): void {
     this.autoSave$.next({ filePath: this.filePath, content: this.fileContent })
-  }
-
-  async initfileContent(): Promise<void> {
-    this.fileContent = this.tab.fileContent
-    console.log(this.fileContent)
   }
 
   private initThemeListener(): void {

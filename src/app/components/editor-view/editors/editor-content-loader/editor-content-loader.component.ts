@@ -26,6 +26,6 @@ export class EditorContentLoaderComponent implements OnInit {
         filePath: tab.filePath,
         encoding: tab.editorConfig.encoding,
       })
-    ).pipe(map((fileContent) => ({ ...tab, fileContent: fileContent })))
+    ).pipe(map((fileContent) => ({ ...tab, fileContent })))
   }
 }
