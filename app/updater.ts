@@ -1,11 +1,11 @@
-import { BrowserWindow } from 'electron'
+import { App, BrowserWindow, IpcMain } from 'electron'
 import logger from 'electron-log'
 import { autoUpdater, ProgressInfo } from 'electron-updater'
 import { AutoUpdateEvents } from './shared/actions'
 
 autoUpdater.logger = logger
 
-export default function updateApp(window: BrowserWindow): void {
+export default function updateApp(window: BrowserWindow, ipcMain: IpcMain, app: App): void {
   try {
     autoUpdater.checkForUpdatesAndNotify()
 
@@ -27,8 +27,15 @@ export default function updateApp(window: BrowserWindow): void {
 
     autoUpdater.on(AutoUpdateEvents.DownloadProgress, (progressInfo: ProgressInfo) => {
       const { percent } = progressInfo
-      console.log(progressInfo)
+      logger.info(`progressInfo.percent: ${percent}`)
       window.webContents.send(AutoUpdateEvents.DownloadProgress, Math.round(percent))
+    })
+    ipcMain.on(AutoUpdateEvents.QuitAndInstall, () => {
+      logger.info(autoUpdater)
+      setImmediate(() => {
+        app.removeAllListeners('window-all-closed')
+        autoUpdater.quitAndInstall()
+      })
     })
   } catch (err) {
     // Ignore errors thrown because user is not connected to internet
@@ -36,10 +43,6 @@ export default function updateApp(window: BrowserWindow): void {
       throw err
     }
   }
-}
-
-export function quitAndInstall(): void {
-  autoUpdater.quitAndInstall()
 }
 
 const mockDownloadProgress = (window: BrowserWindow) => {

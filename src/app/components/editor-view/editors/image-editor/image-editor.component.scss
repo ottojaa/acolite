@@ -88,10 +88,11 @@
     align-items: center;
     background: linear-gradient(
       0deg,
-      rgba(0, 0, 0, 0.7401670140712535) 0%,
-      rgba(0, 0, 0, 0.5160773782169117) 80%,
-      rgba(0, 0, 0, 0.3199989468443627) 100%
+      rgba(26, 26, 26, 0.927608543417367) 0%,
+      rgba(26, 26, 26, 0.2497373949579832) 56%,
+      rgba(0, 0, 0, 0) 84%
     );
+    backdrop-filter: blur(3px);
     transition: opacity 300ms;
     > div {
       display: flex;
