@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, NgZone, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { AutoUpdateEvents } from '../../../../../app/shared/actions'
 
@@ -15,7 +15,7 @@ export class AutoUpdaterComponent implements OnInit {
   showProgressBar = false
   updateDownloaded = false
 
-  constructor(public electronService: ElectronService) {
+  constructor(public electronService: ElectronService, public zone: NgZone) {
     this.electronService.startAutoUpdater()
   }
 
@@ -40,33 +40,34 @@ export class AutoUpdaterComponent implements OnInit {
   eventReducer(action: AutoUpdateEvents): void {
     this.electronService.on(action, (_event, response?: number) => {
       this.showLoader = true
-
-      switch (action) {
-        case AutoUpdateEvents.UpdateAvailable: {
-          this.statusText = 'Update available'
-          break
+      this.zone.run(() => {
+        switch (action) {
+          case AutoUpdateEvents.UpdateAvailable: {
+            this.statusText = 'Update available'
+            break
+          }
+          case AutoUpdateEvents.UpdateNotAvailable: {
+            this.showLoader = false
+            break
+          }
+          case AutoUpdateEvents.CheckingForUpdates: {
+            this.statusText = 'Checking for updates...'
+            break
+          }
+          case AutoUpdateEvents.DownloadProgress: {
+            this.showProgressBar = true
+            this.statusText = 'Downloading update'
+            this.downloadProgress = response
+            break
+          }
+          case AutoUpdateEvents.UpdateDownloaded: {
+            this.showProgressBar = false
+            this.updateDownloaded = true
+            this.statusText = 'Update downloaded'
+            break
+          }
         }
-        case AutoUpdateEvents.UpdateNotAvailable: {
-          this.showLoader = false
-          break
-        }
-        case AutoUpdateEvents.CheckingForUpdates: {
-          this.statusText = 'Checking for updates...'
-          break
-        }
-        case AutoUpdateEvents.DownloadProgress: {
-          this.showProgressBar = true
-          this.statusText = 'Downloading update'
-          this.downloadProgress = response
-          break
-        }
-        case AutoUpdateEvents.UpdateDownloaded: {
-          this.showProgressBar = false
-          this.updateDownloaded = true
-          this.statusText = 'Update downloaded'
-          break
-        }
-      }
+      })
     })
   }
 

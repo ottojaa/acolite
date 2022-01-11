@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import updateApp from './updater'
+import updateApp, { quitAndInstall } from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
@@ -43,6 +43,7 @@ import {
   StoreResponses,
   UpdateActionPayload,
   ReadFileContent,
+  AutoUpdateEvents,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -162,6 +163,7 @@ const startIPCChannelListeners = () => {
   ContextMenuChannels.forEach((channel) => ContextMenuReducer(channel))
 
   IPCHandlerReducer()
+  AutoUpdateListener()
 }
 
 const SearchActionReducer = (action: SearchActions) => {
@@ -290,6 +292,15 @@ const IPCHandlerReducer = () => {
     const defaultPath = getDirName(action.filePath)
     const result = await getDirectoryPath(win, defaultPath)
     return result
+  })
+}
+
+const AutoUpdateListener = () => {
+  ipcMain.on(AutoUpdateEvents.StartAutoUpdater, (_event: IpcMainEvent, _payload: null) => {
+    updateApp(win)
+  })
+  ipcMain.on(AutoUpdateEvents.QuitAndInstall, (_event) => {
+    quitAndInstall()
   })
 }
 
