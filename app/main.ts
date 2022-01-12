@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
+import updateApp from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
@@ -42,11 +43,9 @@ import {
   StoreResponses,
   UpdateActionPayload,
   ReadFileContent,
-  AutoUpdateEvents,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
-import checkForUpdates from './updater'
 
 // Initialize remote module
 require('@electron/remote/main').initialize()
@@ -118,6 +117,8 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null
   })
+
+  updateApp(win, ipcMain, app)
 
   return win
 }
@@ -297,13 +298,7 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => {
-    setTimeout(createWindow, 400)
-
-    app.setAppUserModelId(`com.electron.acolite.${app.getVersion()}`)
-    app.setAsDefaultProtocolClient('electron-acolite')
-    checkForUpdates()
-  })
+  app.on('ready', () => setTimeout(createWindow, 400))
 
   startIPCChannelListeners()
 
