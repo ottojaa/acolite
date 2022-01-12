@@ -1,6 +1,14 @@
-import { Component, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
-import { AutoUpdateEvents } from '../../../../../app/shared/actions'
+import { ProgressInfo } from 'electron-updater'
+import { AutoUpdateEvent } from '../../../../../app/shared/actions'
+
+interface DownloaderState {
+  statusText: string
+  status: 'available' | 'checking' | 'downloading' | 'not-available' | 'downloaded' | undefined
+  showLoader: boolean
+  downloadProgress: number | undefined
+}
 
 @Component({
   selector: 'app-auto-updater',
@@ -8,14 +16,14 @@ import { AutoUpdateEvents } from '../../../../../app/shared/actions'
   styleUrls: ['./auto-updater.component.scss'],
 })
 export class AutoUpdaterComponent implements OnInit {
-  statusText: string
-  downloadProgress: number
+  downloaderState: DownloaderState = {
+    statusText: '',
+    status: undefined,
+    showLoader: false,
+    downloadProgress: undefined,
+  }
 
-  showLoader = false
-  showProgressBar = false
-  updateDownloaded = false
-
-  constructor(public electronService: ElectronService) {
+  constructor(public electronService: ElectronService, public cdRef: ChangeDetectorRef) {
     this.electronService.startAutoUpdater()
   }
 
@@ -25,11 +33,11 @@ export class AutoUpdaterComponent implements OnInit {
 
   startUpdateListeners(): void {
     const channels = [
-      AutoUpdateEvents.UpdateAvailable,
-      AutoUpdateEvents.UpdateNotAvailable,
-      AutoUpdateEvents.CheckingForUpdates,
-      AutoUpdateEvents.DownloadProgress,
-      AutoUpdateEvents.UpdateDownloaded,
+      AutoUpdateEvent.UpdateAvailable,
+      AutoUpdateEvent.UpdateNotAvailable,
+      AutoUpdateEvent.CheckingForUpdates,
+      AutoUpdateEvent.DownloadProgress,
+      AutoUpdateEvent.UpdateDownloaded,
     ]
 
     channels.forEach((channel) => {
@@ -37,40 +45,53 @@ export class AutoUpdaterComponent implements OnInit {
     })
   }
 
-  eventReducer(action: AutoUpdateEvents): void {
-    this.electronService.on(action, (_event, response?: number) => {
-      this.showLoader = true
+  eventReducer(action: AutoUpdateEvent): void {
+    this.electronService.on(action, (_event, response?: ProgressInfo) => {
+      if (action === AutoUpdateEvent.UpdateNotAvailable) {
+        this.updateDownloaderState({ showLoader: false })
+        return
+      } else {
+        this.updateDownloaderState({ showLoader: true })
+      }
 
       switch (action) {
-        case AutoUpdateEvents.UpdateAvailable: {
-          this.statusText = 'Update available'
+        case AutoUpdateEvent.UpdateAvailable: {
+          this.updateDownloaderState({ statusText: 'Update available', status: 'available' })
           break
         }
-        case AutoUpdateEvents.UpdateNotAvailable: {
-          this.showLoader = false
+        case AutoUpdateEvent.CheckingForUpdates: {
+          this.updateDownloaderState({ statusText: 'Checking for updates...', status: 'checking' })
           break
         }
-        case AutoUpdateEvents.CheckingForUpdates: {
-          this.statusText = 'Checking for updates...'
+        case AutoUpdateEvent.DownloadProgress: {
+          this.updateDownloaderState({
+            statusText: 'Downloading update',
+            status: 'downloading',
+            downloadProgress: response.percent,
+          })
           break
         }
-        case AutoUpdateEvents.DownloadProgress: {
-          this.showProgressBar = true
-          this.statusText = 'Downloading update'
-          this.downloadProgress = response
-          break
-        }
-        case AutoUpdateEvents.UpdateDownloaded: {
-          this.showProgressBar = false
-          this.updateDownloaded = true
-          this.statusText = 'Update downloaded'
+        case AutoUpdateEvent.UpdateDownloaded: {
+          this.updateDownloaderState({
+            statusText: 'Update downloaded',
+            status: 'downloaded',
+          })
           break
         }
       }
     })
   }
 
+  updateDownloaderState(state: Partial<DownloaderState>): void {
+    this.downloaderState = { ...this.downloaderState, ...state }
+    this.cdRef.detectChanges()
+  }
+
   quitAndInstall(): void {
     this.electronService.quitAndInstall()
+  }
+
+  downloadUpdate(): void {
+    this.electronService.downloadUpdate()
   }
 }

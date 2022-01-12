@@ -14,7 +14,7 @@ export const getBaseName = (filePath: string) => path.basename(filePath)
 export const getJoinedPath = (paths: string[]) => path.join(...paths)
 export const getPathSeparator = () => path.sep
 export const getEditorConfig = (extension: string) => {
-  const match = editorConfigs.find((type) => type.acceptedTypes.includes(extension)) || {
+  const match = editorConfigs.find((type) => type.acceptedTypes.includes(extension?.toLowerCase())) || {
     editorType: '',
     encoding: undefined,
   }

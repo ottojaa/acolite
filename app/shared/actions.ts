@@ -250,13 +250,14 @@ export enum SearchResponses {
   QueryFailure = 'query-failure',
 }
 
-export enum AutoUpdateEvents {
+export enum AutoUpdateEvent {
   QuitAndInstall = 'quit-and-install-update',
   StartAutoUpdater = 'start-auto-updater',
   CheckingForUpdates = 'checking-for-updates',
   UpdateAvailable = 'update-available',
   UpdateNotAvailable = 'update-not-available',
   UpdateDownloaded = 'update-downloaded',
+  DownloadUpdate = 'download-update',
   DownloadProgress = 'download-progress',
   Error = 'error',
 }

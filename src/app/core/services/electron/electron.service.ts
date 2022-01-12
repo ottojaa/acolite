@@ -29,7 +29,7 @@ import {
   CopyFiles,
   GetBookmarkedFiles,
   CreateImageFile,
-  AutoUpdateEvents,
+  AutoUpdateEvent,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc, Encoding } from '../../../../../app/shared/interfaces'
@@ -175,11 +175,15 @@ export class ElectronService {
   }
 
   startAutoUpdater(): void {
-    this.ipcRenderer.send(AutoUpdateEvents.StartAutoUpdater)
+    this.ipcRenderer.send(AutoUpdateEvent.StartAutoUpdater)
+  }
+
+  downloadUpdate(): void {
+    this.ipcRenderer.send(AutoUpdateEvent.DownloadUpdate)
   }
 
   quitAndInstall(): void {
-    this.ipcRenderer.send(AutoUpdateEvents.QuitAndInstall)
+    this.ipcRenderer.send(AutoUpdateEvent.QuitAndInstall)
   }
 
   async getFileData(payload: { filePath: string; encoding: Encoding }): Promise<string> {

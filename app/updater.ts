@@ -1,62 +1,62 @@
 import { App, BrowserWindow, IpcMain } from 'electron'
 import logger from 'electron-log'
 import { autoUpdater, ProgressInfo } from 'electron-updater'
-import { AutoUpdateEvents } from './shared/actions'
+import { AutoUpdateEvent } from './shared/actions'
 
 autoUpdater.logger = logger
+autoUpdater.autoDownload = false
 
-export default function updateApp(window: BrowserWindow, ipcMain: IpcMain, app: App): void {
+export function checkForUpdates(window: BrowserWindow): void {
   try {
     autoUpdater.checkForUpdatesAndNotify()
 
-    autoUpdater.on(AutoUpdateEvents.CheckingForUpdates, () => {
-      window.webContents.send(AutoUpdateEvents.CheckingForUpdates)
-    })
-
-    autoUpdater.on(AutoUpdateEvents.UpdateAvailable, () => {
-      window.webContents.send(AutoUpdateEvents.UpdateAvailable)
-    })
-
-    autoUpdater.on(AutoUpdateEvents.UpdateNotAvailable, () => {
-      window.webContents.send(AutoUpdateEvents.UpdateNotAvailable)
-    })
-
-    autoUpdater.on(AutoUpdateEvents.UpdateDownloaded, () => {
-      window.webContents.send(AutoUpdateEvents.UpdateDownloaded)
-    })
-
-    autoUpdater.on(AutoUpdateEvents.DownloadProgress, (progressInfo: ProgressInfo) => {
-      const { percent } = progressInfo
-      logger.info(`progressInfo.percent: ${percent}`)
-      window.webContents.send(AutoUpdateEvents.DownloadProgress, Math.round(percent))
-    })
-    ipcMain.on(AutoUpdateEvents.QuitAndInstall, () => {
-      logger.info(autoUpdater)
-      setImmediate(() => {
-        app.removeAllListeners('window-all-closed')
-        autoUpdater.quitAndInstall()
-      })
-    })
+    startAutoUpdaterEventListeners(window)
   } catch (err) {
     // Ignore errors thrown because user is not connected to internet
     if (err.message !== 'net::ERR_INTERNET_DISCONNECTED') {
+      logger.info('an error prevented the update from proceeding: ', err.message)
       throw err
     }
   }
 }
 
-const mockDownloadProgress = (window: BrowserWindow) => {
-  let intervalId: NodeJS.Timer
-  let progress = 0
-
-  const sendAndUpdateProgress = () => {
-    if (progress < 100) {
-      progress++
-      window.webContents.send(AutoUpdateEvents.DownloadProgress, progress++)
-    } else if (progress === 100) {
-      clearInterval(intervalId)
-      window.webContents.send(AutoUpdateEvents.UpdateDownloaded)
-    }
+const startAutoUpdaterEventListeners = (window: BrowserWindow) => {
+  const sendContentsToWindow = (autoUpdateEvent: AutoUpdateEvent, content?: any) => {
+    window.webContents.send(autoUpdateEvent, content)
   }
-  intervalId = setInterval(sendAndUpdateProgress, 100)
+
+  autoUpdater.on(AutoUpdateEvent.CheckingForUpdates, () => {
+    sendContentsToWindow(AutoUpdateEvent.CheckingForUpdates)
+  })
+
+  autoUpdater.on(AutoUpdateEvent.UpdateAvailable, () => {
+    sendContentsToWindow(AutoUpdateEvent.UpdateAvailable)
+  })
+
+  autoUpdater.on(AutoUpdateEvent.UpdateNotAvailable, () => {
+    sendContentsToWindow(AutoUpdateEvent.UpdateNotAvailable)
+  })
+
+  autoUpdater.on(AutoUpdateEvent.UpdateDownloaded, () => {
+    sendContentsToWindow(AutoUpdateEvent.UpdateDownloaded)
+  })
+
+  autoUpdater.on(AutoUpdateEvent.DownloadProgress, (progressInfo: ProgressInfo) => {
+    const { percent, transferred, total } = progressInfo
+    const progressObj = { percent: Math.round(percent), progressTotal: `${transferred}/${total}` }
+    logger.info(`progressInfo.percent: ${percent}`)
+
+    sendContentsToWindow(AutoUpdateEvent.DownloadProgress, progressObj)
+  })
+}
+
+export const downloadUpdate = () => {
+  autoUpdater.downloadUpdate()
+}
+
+export const quitAndInstall = (app: App) => {
+  setImmediate(() => {
+    app.removeAllListeners('window-all-closed')
+    autoUpdater.quitAndInstall()
+  })
 }

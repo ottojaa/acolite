@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import updateApp from './updater'
+import { checkForUpdates, downloadUpdate, quitAndInstall } from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
 import {
@@ -31,7 +31,7 @@ import {
   searchFiles,
   updateStore,
 } from './ipc-events/store-events'
-import { getDirName, getFileContent, getFileData, getJoinedPath } from './electron-utils/file-utils'
+import { getDirName, getFileContent, getJoinedPath } from './electron-utils/file-utils'
 import {
   ContextMenuActions,
   FileActions,
@@ -43,6 +43,7 @@ import {
   StoreResponses,
   UpdateActionPayload,
   ReadFileContent,
+  AutoUpdateEvent,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -118,8 +119,6 @@ function createWindow(): BrowserWindow {
     win = null
   })
 
-  updateApp(win, ipcMain, app)
-
   return win
 }
 
@@ -162,6 +161,7 @@ const startIPCChannelListeners = () => {
   ContextMenuChannels.forEach((channel) => ContextMenuReducer(channel))
 
   IPCHandlerReducer()
+  AutoUpdateListener()
 }
 
 const SearchActionReducer = (action: SearchActions) => {
@@ -199,6 +199,18 @@ const StoreActionReducer = (action: StoreActions) => {
         break
       }
     }
+  })
+}
+
+const AutoUpdateListener = () => {
+  ipcMain.on(AutoUpdateEvent.StartAutoUpdater, (_event: IpcMainEvent) => {
+    checkForUpdates(win)
+  })
+  ipcMain.on(AutoUpdateEvent.DownloadUpdate, (_event: IpcMainEvent) => {
+    downloadUpdate()
+  })
+  ipcMain.on(AutoUpdateEvent.QuitAndInstall, (_event: IpcMainEvent) => {
+    quitAndInstall(app)
   })
 }
 

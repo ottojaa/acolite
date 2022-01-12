@@ -1,14 +1,19 @@
-<div class="container" *ngIf="showLoader">
+<div class="container" *ngIf="downloaderState.showLoader">
   <span class="top-container">
-    <h3 *ngIf="!updateDownloaded">{{ statusText }}</h3>
-    <button mat-button *ngIf="updateDownloaded" (click)="quitAndInstall()">
-      Apply and restart<mat-icon>restart_alt</mat-icon>
+    <p *ngIf="downloaderState.status !== 'downloaded'">{{ downloaderState.statusText }}</p>
+
+    <button mat-button *ngIf="downloaderState.status === 'available'" (click)="downloadUpdate()">
+      Download <mat-icon>download</mat-icon>
+    </button>
+
+    <button mat-button *ngIf="downloaderState.status === 'downloaded'" (click)="quitAndInstall()">
+      <mat-icon>restart_alt</mat-icon>Apply update and restart
     </button>
   </span>
 
   <mat-progress-bar
-    [ngClass]="{ show: showProgressBar }"
+    [ngClass]="{ show: downloaderState.status === 'downloading' }"
     mode="determinate"
-    [value]="downloadProgress"
+    [value]="downloaderState.downloadProgress"
   ></mat-progress-bar>
 </div>

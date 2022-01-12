@@ -6,13 +6,14 @@
     rgba(26, 26, 26, 0.2497373949579832) 56%,
     rgba(0, 0, 0, 0) 84%
   );
-  backdrop-filter: blur(7px);
+  backdrop-filter: blur(2px);
   .top-container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
-  h3 {
-    margin-left: 0.5rem;
+  p {
+    margin: 0 0 0 0.5rem;
     color: var(--contrast);
   }
   mat-progress-bar {
@@ -21,6 +22,9 @@
       visibility: visible;
     }
   }
+  mat-icon {
+    transform: scale(0.8);
+  }
 }
 
 :host ::ng-deep {
@@ -28,7 +32,9 @@
     color: var(--contrast);
     opacity: 0.8;
   }
-  .mat-button:hover {
-    background-color: var(--buttonColor);
+  .mat-button-wrapper {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
   }
 }
