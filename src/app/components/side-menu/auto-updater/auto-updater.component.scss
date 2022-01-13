@@ -1,12 +1,6 @@
 .container {
-  background: rgb(26, 26, 26);
-  background: linear-gradient(
-    0deg,
-    rgba(26, 26, 26, 0.927608543417367) 0%,
-    rgba(26, 26, 26, 0.2497373949579832) 56%,
-    rgba(0, 0, 0, 0) 84%
-  );
-  backdrop-filter: blur(2px);
+  background: #1010108a;
+  backdrop-filter: blur(3px);
   .top-container {
     display: flex;
     justify-content: space-between;

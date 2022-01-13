@@ -6,3 +6,18 @@
   width: 100%;
   background: var(--backgroundSecondary);
 }
+
+.no-viewer-available {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > span {
+    font-size: 1.2rem;
+    color: var(--contrast);
+    > span {
+      font-size: 1.2rem;
+      color: var(--buttonColor);
+    }
+  }
+}

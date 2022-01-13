@@ -34,7 +34,6 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
 
   async initfileContent(): Promise<void> {
     this.fileContent = this.tab.fileContent
-    console.log(this.fileContent)
   }
 
   private initThemeListener(): void {

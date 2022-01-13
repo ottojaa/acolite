@@ -6,6 +6,7 @@
   "dependencies": {
     "@angular/material": "^12.1.2",
     "@electron/remote": "1.2.0",
+    "chokidar": "^3.5.2",
     "date-fns": "2.27.0",
     "electron-log": "^4.4.4",
     "electron-updater": "4.6.1",

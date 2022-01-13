@@ -260,8 +260,11 @@ export class AppComponent extends AbstractComponent implements OnInit {
 
     this.state.state$.next({ ...initialState, ...response, initialized: true })
 
-    if (!this.state.getStatePartValue('baseDir')) {
+    const baseDir = this.state.getStatePartValue('baseDir')
+    if (!baseDir) {
       this.router.navigate(['base-dir'])
+    } else {
+      this.electronService.initFileWatcher({ filePath: baseDir })
     }
   }
 
@@ -269,6 +272,7 @@ export class AppComponent extends AbstractComponent implements OnInit {
     const baseDir = this.state.getStatePartValue('baseDir')
     if (baseDir) {
       this.electronService.readDirectoryRequest({ state: this.state.value })
+      this.electronService.initFileWatcher({ filePath: baseDir })
     }
   }
 }

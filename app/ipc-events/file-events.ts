@@ -3,13 +3,7 @@ import { promises as fsp } from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { Document } from 'flexsearch'
-import {
-  addToIndex,
-  getUpdatedRecentlyModified,
-  removeIndexes,
-  updateIndex,
-  updateIndexesRecursive,
-} from './store-events'
+import { getUpdatedRecentlyModified, removeIndexes } from './store-events'
 import {
   getBaseName,
   getDirName,
@@ -80,7 +74,6 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
     }
 
     updateTabData(tabs, filePath, content)
-    updateIndex(filePath, index)
     const updatedRecentlyModified = getUpdatedRecentlyModified(recentlyModified, filePath) || recentlyModified
 
     event.sender.send(FileActionResponses.UpdateSuccess, { tabs, recentlyModified: updatedRecentlyModified })
@@ -125,7 +118,6 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
     })
 
     const rootDir = first(updatedRootDirectory)
-    addToIndex(filePath, index)
 
     event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
 
@@ -153,7 +145,6 @@ export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, in
     })
 
     const rootDir = first(updatedRootDirectory)
-    addToIndex(filePath, index)
 
     event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
   })
@@ -185,7 +176,6 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
     const rootDir = first(updatedRootDirectory)
 
     updateTabData(tabs, filePath, null, newPath)
-    updateIndexesRecursive([newPath], index)
 
     event.sender.send(FileActionResponses.RenameSuccess, { rootDirectory: rootDir, tabs })
   })
@@ -231,10 +221,6 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Documen
           return getUpdatedFilePathsRecursive(treeEl, newParentPath, oldPath)
         })
 
-      await updateIndexesRecursive(
-        elementsToAdd.map((el) => el.data.filePath),
-        index
-      )
       moveRecursive(elementsToAdd, elementsToDelete, [rootDirectory], { baseDir: rootDirectory.data.filePath })
       event.sender.send(FileActionResponses.MoveSuccess, { rootDirectory, tabs })
     })
@@ -338,7 +324,6 @@ export const copyFiles = (event: IpcMainEvent, payload: CopyFiles, index: Docume
               failedToCopy.push(currentPath)
               reject(err)
             }
-            addToIndex(newPath, index)
             resolve()
           })
         }
@@ -369,7 +354,6 @@ export const copyDirectory = async (src: string, dest: string, index: Document<D
 
       const copyFileFunc = async () => {
         await fsp.copyFile(srcPath, destPath)
-        addToIndex(destPath, index)
       }
 
       entry.isDirectory() ? await copyDirectory(srcPath, destPath, index) : await copyFileFunc()

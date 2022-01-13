@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
@@ -44,9 +44,11 @@ import {
   UpdateActionPayload,
   ReadFileContent,
   AutoUpdateEvent,
+  CreateThumbnail,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
+import { startFileWatcher } from './file-watcher/file-watcher'
 
 // Initialize remote module
 require('@electron/remote/main').initialize()
@@ -144,6 +146,7 @@ const FileActionChannels = [
 const StoreActionChannels = [
   StoreActions.GetStore,
   StoreActions.InitApp,
+  StoreActions.InitFileWatcher,
   StoreActions.UpdateStore,
   StoreActions.GetBookmarkedFiles,
   StoreActions.GetRecentlyModified,
@@ -184,6 +187,10 @@ const StoreActionReducer = (action: StoreActions) => {
       }
       case StoreActions.UpdateStore: {
         updateStore(event, payload, configPath)
+        break
+      }
+      case StoreActions.InitFileWatcher: {
+        startFileWatcher(payload.filePath, index)
         break
       }
 
@@ -302,6 +309,10 @@ const IPCHandlerReducer = () => {
     const defaultPath = getDirName(action.filePath)
     const result = await getDirectoryPath(win, defaultPath)
     return result
+  })
+  ipcMain.handle(HandlerAction.CreateThumbnail, async (_event, action: CreateThumbnail) => {
+    const result = await nativeImage.createThumbnailFromPath(action.filePath, { width: 200, height: 120 })
+    return result.toDataURL()
   })
 }
 

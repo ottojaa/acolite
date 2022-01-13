@@ -163,6 +163,10 @@ export class ElectronService {
     this.send(StoreActions.GetBookmarkedFiles, payload)
   }
 
+  initFileWatcher(payload: { filePath: string }): void {
+    this.send(StoreActions.InitFileWatcher, payload)
+  }
+
   showContextMenu(): void {
     this.ipcRenderer.send(ContextMenuActions.ShowEditorContextMenu)
   }

@@ -16,6 +16,7 @@ export type UpdateActionPayload =
   | GetStore
   | UpdateStore
   | InitApp
+  | InitFileWatcher
   | SearchQuery
   | OpenFileLocation
   | GetRecentlyModified
@@ -102,6 +103,11 @@ export interface ChooseDirectory {
   filePath: string
 }
 
+export interface CreateThumbnail {
+  type: HandlerAction.CreateThumbnail
+  filePath: string
+}
+
 export interface OpenFileLocation {
   type: FileActions.OpenFileLocation
   filePath: string
@@ -134,6 +140,11 @@ export interface GetStore {
 
 export interface InitApp {
   type: StoreActions.InitApp
+}
+
+export interface InitFileWatcher {
+  type: StoreActions.InitFileWatcher
+  filePath: string
 }
 
 export interface UpdateStore {
@@ -191,6 +202,7 @@ export enum FileActions {
 
 export enum StoreActions {
   InitApp = 'init-app',
+  InitFileWatcher = 'init-file-watcher',
   GetStore = 'read-store',
   UpdateStore = 'update-store',
   GetRecentlyModified = 'get-recently-modified',
@@ -208,6 +220,7 @@ export enum SearchActions {
 export enum HandlerAction {
   GetFileData = 'get-file-data',
   ChooseDirectory = 'choose-directory',
+  CreateThumbnail = 'create-thumbnail',
 }
 
 export enum FileActionResponses {

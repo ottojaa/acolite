@@ -20,7 +20,11 @@
       <app-image-editor [tab]="tabData"></app-image-editor>
     </div>
 
-    <div *ngSwitchDefault>No viewer for this type of file: {{ tabData.extension }}</div>
+    <div *ngSwitchDefault class="no-viewer-available">
+      <span
+        >No viewer available for files of type <span>{{ tabData.extension }}</span></span
+      >
+    </div>
   </ng-container>
 </div>
 

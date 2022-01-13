@@ -54,11 +54,9 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
         }
         const selectedWorkspaceData = validatedConfig.workspaces.find((workspace) => workspace.baseDir === baseDir)
         const rootDirectory = getRootDirectory(baseDir)
-
-        await addFilesToIndexSynchronous(rootDirectory.children, index)
-
         const dashboardConfig = getDashboardConfig(index, selectedWorkspaceData.bookmarks)
         const state = { ...selectedWorkspaceData, rootDirectory, ...dashboardConfig }
+
         return state
       }
       const workspaceData = await getWorkspaceData()
@@ -221,28 +219,6 @@ export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemP
   const item = getFileDataSync(updatedItemPath)
   const filtered = recentlyModified.filter((el) => el.filePath !== updatedItemPath)
   return [item, ...filtered]
-}
-
-export const addFilesToIndex = (treeStruct: TreeElement[], index: Document<Doc, true>) => {
-  const files = flattenTreeStructure(treeStruct)
-
-  files.forEach((file) => {
-    if (file.data.type === 'file') {
-      addToIndex(file.data.filePath, index)
-    }
-  })
-}
-
-export const addFilesToIndexSynchronous = (treeStruct: TreeElement[], index: Document<Doc, true>): Promise<string> => {
-  return new Promise(async (resolve, _reject) => {
-    const files = flattenTreeStructure(treeStruct)
-    for (const file of files) {
-      if (file.data.type === 'file') {
-        await addToIndex(file.data.filePath, index)
-      }
-    }
-    resolve('success')
-  })
 }
 
 export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
