@@ -1,4 +1,4 @@
-<div style="height: 100%" *ngIf="tabData$ | async as tabData">
+<div style="height: 100%" *ngIf="tabData$ | async as tabData; else loader" @componentLoaded>
   <ng-container [ngSwitch]="tabData.editorConfig.editorType">
     <div *ngSwitchCase="'txt'" class="editor">
       <app-text-editor [tab]="tabData"></app-text-editor>
@@ -23,3 +23,7 @@
     <div *ngSwitchDefault>No viewer for this type of file: {{ tabData.extension }}</div>
   </ng-container>
 </div>
+
+<ng-template #loader>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>
