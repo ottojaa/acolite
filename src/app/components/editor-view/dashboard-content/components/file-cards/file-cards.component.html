@@ -5,7 +5,7 @@
       <h4>No content</h4>
     </span>
   </ng-container>
-  <div *ngFor="let file of files">
+  <div *ngFor="let file of files; trackBy: trackByPath">
     <app-file-card [file]="file" [showBookmark]="showBookmark"></app-file-card>
   </div>
 </div>

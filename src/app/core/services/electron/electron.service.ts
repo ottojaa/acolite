@@ -155,14 +155,6 @@ export class ElectronService {
     this.send(StoreActions.InitApp, {})
   }
 
-  getRecentlyModified(): void {
-    this.send(StoreActions.GetRecentlyModified, {})
-  }
-
-  getBookmarkedFiles(payload: OmitActionType<GetBookmarkedFiles>) {
-    this.send(StoreActions.GetBookmarkedFiles, payload)
-  }
-
   initFileWatcher(payload: { filePath: string }): void {
     this.send(StoreActions.InitFileWatcher, payload)
   }
@@ -196,5 +188,17 @@ export class ElectronService {
 
   async getDirectoryPath(payload: { filePath: string }): Promise<string> {
     return this.handle(HandlerAction.ChooseDirectory, payload)
+  }
+
+  async getThumbnail(payload: { filePath: string; baseDir: string }): Promise<string> {
+    return this.handle(HandlerAction.GetThumbnail, payload)
+  }
+
+  async getRecentlyModified(): Promise<Doc[]> {
+    return this.handle(HandlerAction.GetRecentlyModified)
+  }
+
+  async getBookmarkedFiles(payload: { bookmarks: string[] }): Promise<Doc[]> {
+    return this.handle(HandlerAction.GetBookmarkedFiles, payload)
   }
 }

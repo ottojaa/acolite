@@ -84,5 +84,29 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
 export class AppModule {
   constructor(iconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
     iconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl('./assets/mdi.svg'))
+    iconRegistry.addSvgIcon(
+      'css',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/css.svg')
+    )
+    iconRegistry.addSvgIcon(
+      'scss',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/scss.svg')
+    )
+    iconRegistry.addSvgIcon(
+      'image',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/image.svg')
+    )
+    iconRegistry.addSvgIcon(
+      'html',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/html.svg')
+    )
+    iconRegistry.addSvgIcon(
+      'default-document',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/document.svg')
+    )
+    iconRegistry.addSvgIcon(
+      'typescript',
+      domSanitizer.bypassSecurityTrustResourceUrl('./assets/icons/file-extension-icons/typescript.svg')
+    )
   }
 }

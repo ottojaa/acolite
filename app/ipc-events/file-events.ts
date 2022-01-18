@@ -3,7 +3,7 @@ import { promises as fsp } from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { Document } from 'flexsearch'
-import { getUpdatedRecentlyModified, removeIndexes } from './store-events'
+import { getUpdatedRecentlyModified, removeIndex } from './store-events'
 import {
   getBaseName,
   getDirName,
@@ -37,8 +37,9 @@ import {
   CopyFiles,
   CreateImageFile,
 } from '../shared/actions'
-import { Doc, State, TreeElement } from '../shared/interfaces'
+import { Doc, TreeElement } from '../shared/interfaces'
 import { first, cloneDeep } from 'lodash'
+import { deleteThumbnail } from '../thumbnail-helpers/thumbnail-helpers'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action
@@ -65,7 +66,7 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
 
 export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
   const { filePath, content, state } = action
-  const { tabs, recentlyModified } = state
+  const { tabs } = state
 
   fs.writeFile(filePath, content, (err) => {
     if (err) {
@@ -74,9 +75,8 @@ export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent
     }
 
     updateTabData(tabs, filePath, content)
-    const updatedRecentlyModified = getUpdatedRecentlyModified(recentlyModified, filePath) || recentlyModified
 
-    event.sender.send(FileActionResponses.UpdateSuccess, { tabs, recentlyModified: updatedRecentlyModified })
+    event.sender.send(FileActionResponses.UpdateSuccess, { tabs })
   })
 }
 
@@ -181,9 +181,9 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
   })
 }
 
-export const moveFiles = (event: IpcMainEvent, action: MoveFiles, index: Document<Doc, true>) => {
+export const moveFiles = (event: IpcMainEvent, action: MoveFiles) => {
   const { target, elementsToMove, state } = action
-  const { rootDirectory, tabs, bookmarks } = state
+  const { rootDirectory, tabs } = state
   const newParentPath = target.data.filePath
   const sortedElements = elementsToMove.sort((a, _b) => (a.type === 'file' ? 1 : -1))
   const failedToMove = []
@@ -266,21 +266,22 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
   const promises: Promise<void>[] = paths.map(
     (filePath) =>
       new Promise((resolve, reject) => {
-        fs.rm(filePath, { recursive: true, force: true }, (err) => {
+        const { ino } = fs.statSync(filePath)
+        fs.rm(filePath, { recursive: true, force: true }, async (err) => {
           if (err) {
             failedToDelete.push(filePath)
             reject()
           }
-
+          await removeIndex(ino, index)
+          await deleteThumbnail(filePath, ino)
           markTabAsDeleted(filePath)
+
           resolve()
         })
       })
   )
   Promise.all(promises).then(
     async () => {
-      await removeIndexes(inodes, index)
-
       const filesToDelete = paths
         .filter((el) => !failedToDelete.includes(el))
         .map((filePath) => getDeletedFileEntityMock(filePath))
@@ -363,11 +364,4 @@ export const copyDirectory = async (src: string, dest: string, index: Document<D
 
 export const openFileLocation = (_event: IpcMainEvent, action: OpenFileLocation) => {
   shell.showItemInFolder(action.filePath)
-}
-
-const stateUpdate = (state: State, type: 'copy') => {
-  switch (type) {
-    case 'copy': {
-    }
-  }
 }

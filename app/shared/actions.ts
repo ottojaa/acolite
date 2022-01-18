@@ -108,6 +108,12 @@ export interface CreateThumbnail {
   filePath: string
 }
 
+export interface GetThumbnail {
+  type: HandlerAction.GetThumbnail
+  filePath: string
+  baseDir: string
+}
+
 export interface OpenFileLocation {
   type: FileActions.OpenFileLocation
   filePath: string
@@ -219,8 +225,12 @@ export enum SearchActions {
 
 export enum HandlerAction {
   GetFileData = 'get-file-data',
+  GetRecentlyModified = 'get-recently-modified',
+  GetBookmarkedFiles = 'get-bookmarked-files',
   ChooseDirectory = 'choose-directory',
   CreateThumbnail = 'create-thumbnail',
+  GetThumbnail = 'get-thumbnail',
+  DeleteThumbnail = 'delete-thumbnail',
 }
 
 export enum FileActionResponses {
@@ -242,6 +252,8 @@ export enum FileActionResponses {
 }
 
 export enum StoreResponses {
+  Indexing = 'indexing',
+  IndexingReady = 'indexing-ready',
   ReadStoreSuccess = 'read-store-success',
   ReadStoreFailure = 'read-store-failure',
   CreateStoreSuccess = 'create-store-success',

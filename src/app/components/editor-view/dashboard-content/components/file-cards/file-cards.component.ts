@@ -40,4 +40,8 @@ import { Doc } from '../../../../../../../app/shared/interfaces'
 export class FileCardsComponent {
   @Input() files: Doc[]
   @Input() showBookmark = false
+
+  trackByPath(_index: number, tab: Doc): string {
+    return tab.filePath
+  }
 }

@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-utils'
-import { getBaseName, getDirName, getPathSeparator } from './file-utils'
+import { getBaseName, getDirName, getJoinedPath, getPathSeparator } from './file-utils'
 import { FileEntity, MenuItemTypes, SelectedTab, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
 import { ValidatorFn, AbstractControl } from '@angular/forms'
@@ -55,6 +55,7 @@ export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
     fs
       .readdirSync(fileEntity.filePath)
       .map((name) => join(fileEntity.filePath, name))
+      .filter((name) => !name.includes('_thumbnails'))
       .filter(isDirectory)
       .map(getFileEntityFromPath)
 
@@ -167,26 +168,39 @@ export const getSelectedTabEntityFromIndex = (state: State, index: number): Sele
 }
 
 export const expandNodeRecursive = (root: TreeElement, path: string) => {
-  const expandParentRecursive = (parentNode: TreeElement) => {
-    if (parentNode) {
-      parentNode.expanded = true
-    }
+  const rootPath = root.data.filePath
+  const nodeParent = getDirName(path)
+  const diff = nodeParent.replace(rootPath, '')
 
-    if (parentNode?.parent) {
-      expandParentRecursive(parentNode.parent)
+  const getPathsToExpand = () => {
+    const paths = diff.split(getPathSeparator())
+    let lastPath = rootPath
+
+    const resultPaths = paths.map((nodePath) => {
+      lastPath = getJoinedPath([lastPath, nodePath])
+      return lastPath
+    })
+    return resultPaths.filter((el) => el !== rootPath)
+  }
+
+  const pathsToExpand = getPathsToExpand()
+
+  const expandRecursive = (node: TreeElement) => {
+    node.expanded = true
+    if (node.children) {
+      node.children.forEach((childNode) => {
+        expandRecursive(childNode)
+      })
     }
   }
-  const findParentNodeRecursive = (currentNode: TreeElement, path: string) => {
-    for (const node of currentNode?.children) {
-      if (node.data.filePath === path) {
-        expandParentRecursive(node.parent)
-        return
-      } else if (node.children) {
-        findParentNodeRecursive(node, path)
+
+  if (pathsToExpand.length) {
+    root.children.forEach((child) => {
+      if (pathsToExpand.includes(child.data.filePath)) {
+        expandRecursive(child)
       }
-    }
+    })
   }
-  findParentNodeRecursive(root, path)
 }
 
 export const getActiveIndent = (rootPath: string, path: string) => {

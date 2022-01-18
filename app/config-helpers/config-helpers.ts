@@ -17,7 +17,8 @@ export const changeSelectedWorkspace = (newWorkspacePath: string, configPath: st
       (configData) => {
         const { workspaces } = configData
         const newWorkspaceIndex = workspaces.findIndex((workspace) => workspace.baseDir === newWorkspacePath)
-        const updatedWorkspaces = newWorkspaceIndex > -1 ? workspaces : [...workspaces, { baseDir: newWorkspacePath }]
+        const updatedWorkspaces =
+          newWorkspaceIndex > -1 ? workspaces : [...workspaces, { baseDir: newWorkspacePath, tabs: [] }]
         const data = { selectedWorkspace: newWorkspacePath, workspaces: updatedWorkspaces }
 
         writeConfigData(configPath, data).then(

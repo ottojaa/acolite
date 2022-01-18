@@ -40,21 +40,25 @@ import {
   ChooseDirectory,
   SearchActions,
   StoreActions,
-  StoreResponses,
   UpdateActionPayload,
   ReadFileContent,
   AutoUpdateEvent,
   CreateThumbnail,
+  GetThumbnail,
+  GetBookmarkedFiles,
+  GetRecentlyModified,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
-import { startFileWatcher } from './file-watcher/file-watcher'
+import { FileWatcher } from './file-watcher/file-watcher'
+import { getThumbnail } from './thumbnail-helpers/thumbnail-helpers'
 
 // Initialize remote module
 require('@electron/remote/main').initialize()
 
 let win: BrowserWindow = null
 const configFileName = 'acolite.config.json'
+process.traceProcessWarnings = true
 const dirPath = app.getPath('userData')
 const defaultDocumentPath = getJoinedPath([app.getPath('documents'), 'Acolite'])
 const configPath = getJoinedPath([dirPath, configFileName])
@@ -62,6 +66,7 @@ const args = process.argv.slice(1),
   serve = args.some((val) => val === '--serve')
 
 let index: Document<Doc, true>
+let fileWatcher = new FileWatcher()
 
 function createWindow(): BrowserWindow {
   const electronScreen = screen
@@ -149,7 +154,6 @@ const StoreActionChannels = [
   StoreActions.InitFileWatcher,
   StoreActions.UpdateStore,
   StoreActions.GetBookmarkedFiles,
-  StoreActions.GetRecentlyModified,
 ]
 
 const ContextMenuChannels = [ContextMenuActions.ShowEditorContextMenu]
@@ -190,23 +194,22 @@ const StoreActionReducer = (action: StoreActions) => {
         break
       }
       case StoreActions.InitFileWatcher: {
-        startFileWatcher(payload.filePath, index)
-        break
-      }
-
-      case StoreActions.GetBookmarkedFiles: {
-        const { bookmarks } = payload
-        const bookmarkedFiles = getBookmarkedFiles(index, bookmarks)
-        event.sender.send(StoreResponses.GetBookmarkedFilesSuccess, { bookmarkedFiles })
-        break
-      }
-      case StoreActions.GetRecentlyModified: {
-        const recentlyModified = getRecentlyModifiedFiles(index)
-        event.sender.send(StoreResponses.GetRecentlyModifiedSuccess, { recentlyModified })
+        initFileWatcher(payload.filePath)
         break
       }
     }
   })
+}
+
+/**
+ * Chokidar event listeners remain after restart even when destroying the class instance.
+ * First remove all existing listeners if present, then destroy the instance and then create a new one
+ */
+const initFileWatcher = (filePath: string) => {
+  fileWatcher.removeAllExistingListeners()
+  fileWatcher = null
+  fileWatcher = new FileWatcher()
+  fileWatcher.startWatcher(filePath, win, index)
 }
 
 const AutoUpdateListener = () => {
@@ -237,6 +240,7 @@ const FolderActionReducer = (action: FolderActions) => {
         break
       }
       case FolderActions.ReadDir: {
+        index = null
         index = getEmptyIndex()
         readAndSendMenuItemsFromBaseDirectory(event, payload, index)
         break
@@ -265,7 +269,7 @@ const FileActionReducer = (action: FileActions) => {
         break
       }
       case FileActions.MoveFiles: {
-        moveFiles(event, payload, index)
+        moveFiles(event, payload)
         break
       }
       case FileActions.Update: {
@@ -302,8 +306,8 @@ const ContextMenuReducer = (action: ContextMenuActions) => {
 const IPCHandlerReducer = () => {
   ipcMain.handle(HandlerAction.GetFileData, async (_event, action: ReadFileContent) => {
     const { filePath, encoding } = action
-    const result = await getFileContent(filePath, encoding)
-    return result
+    const content = await getFileContent(filePath, encoding)
+    return content
   })
   ipcMain.handle(HandlerAction.ChooseDirectory, async (_event, action: ChooseDirectory) => {
     const defaultPath = getDirName(action.filePath)
@@ -311,8 +315,21 @@ const IPCHandlerReducer = () => {
     return result
   })
   ipcMain.handle(HandlerAction.CreateThumbnail, async (_event, action: CreateThumbnail) => {
-    const result = await nativeImage.createThumbnailFromPath(action.filePath, { width: 200, height: 120 })
-    return result.toDataURL()
+    const thumbnail = await nativeImage.createThumbnailFromPath(action.filePath, { width: 200, height: 120 })
+    return thumbnail.toDataURL()
+  })
+  ipcMain.handle(HandlerAction.GetThumbnail, async (_event, action: GetThumbnail) => {
+    const { filePath, baseDir } = action
+    const thumbnail = await getThumbnail(baseDir, filePath)
+    return thumbnail
+  })
+  ipcMain.handle(HandlerAction.GetRecentlyModified, (_event, _action: GetRecentlyModified) => {
+    const recentlyModified = getRecentlyModifiedFiles(index)
+    return recentlyModified
+  })
+  ipcMain.handle(HandlerAction.GetBookmarkedFiles, (_event, action: GetBookmarkedFiles) => {
+    const bookmarkedFiles = getBookmarkedFiles(index, action.bookmarks)
+    return bookmarkedFiles
   })
 }
 
@@ -327,10 +344,11 @@ try {
 
   index = getEmptyIndex()
 
-  // Quit when all windows are closed.
+  process.on('unhandledRejection', (reason, p) => {
+    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)
+  })
+
   app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       app.quit()
     }
@@ -340,14 +358,10 @@ try {
   })
 
   app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (win === null) {
       createWindow()
     }
   })
 } catch (e) {
   console.log(e)
-  // Catch Error
-  // throw e;
 }

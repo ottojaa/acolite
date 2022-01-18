@@ -26,7 +26,7 @@
           dragging: isDragging
         }"
       >
-        <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
+        <ng-container *ngFor="let e of [].constructor(node.data?.indents); let i = index">
           <div
             class="indent"
             [ngClass]="{
@@ -50,7 +50,7 @@
         (click)="expand($event, node)"
         [ngClass]="{ dragging: isDragging }"
       >
-        <ng-container *ngFor="let e of [].constructor(node.data.indents); let i = index">
+        <ng-container *ngFor="let e of [].constructor(node.data?.indents); let i = index">
           <div
             class="indent"
             [ngClass]="{

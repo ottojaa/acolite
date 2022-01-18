@@ -27,8 +27,6 @@ export type StateUpdate<T> = {
 interface TriggerMap {
   expandNodeParents: string[]
   updateStore: string[]
-  bookmarks: string[]
-  recentlyModified: string[]
 }
 
 @Injectable({
@@ -36,6 +34,8 @@ interface TriggerMap {
 })
 export class StateService extends AbstractComponent {
   initialState: State = {
+    indexing: false,
+    indexingReady: false,
     initialized: false,
     baseDir: '',
     selectedTab: {
@@ -51,8 +51,6 @@ export class StateService extends AbstractComponent {
     rootDirectory: {},
     searchPreferences: [],
     bookmarks: [],
-    bookmarkedFiles: [],
-    recentlyModified: [],
   }
 
   get value(): State {
@@ -172,8 +170,6 @@ export class StateService extends AbstractComponent {
 
     const triggerMap: TriggerMap = {
       expandNodeParents: ['selectedTab'],
-      bookmarks: ['bookmarks'],
-      recentlyModified: ['rootDirectory'],
       updateStore: allowedConfigKeys,
     }
 
@@ -184,12 +180,6 @@ export class StateService extends AbstractComponent {
     }
     if (shouldTrigger('updateStore')) {
       this.electronService.updateStore({ state })
-    }
-    if (shouldTrigger('recentlyModified')) {
-      this.electronService.getRecentlyModified()
-    }
-    if (shouldTrigger('bookmarks')) {
-      this.electronService.getBookmarkedFiles({ bookmarks })
     }
   }
 }

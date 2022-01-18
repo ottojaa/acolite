@@ -80,13 +80,13 @@ export class AppComponent extends AbstractComponent implements OnInit {
       FileActionResponses.UpdateFailure,
       FileActionResponses.CopySuccess,
       FileActionResponses.CopyFailure,
+      StoreResponses.Indexing,
+      StoreResponses.IndexingReady,
       StoreResponses.ReadStoreSuccess,
       StoreResponses.ReadStoreFailure,
       StoreResponses.InitAppSuccess,
       StoreResponses.InitAppFailure,
       StoreResponses.UpdateStoreFailure,
-      StoreResponses.GetBookmarkedFilesSuccess,
-      StoreResponses.GetRecentlyModifiedSuccess,
       SearchResponses.QuerySuccess,
     ]
 
@@ -123,6 +123,7 @@ export class AppComponent extends AbstractComponent implements OnInit {
         }
         case FolderActionResponses.ChooseDirectorySuccess: {
           const currentState = this.state.state$.getValue()
+          console.log(response)
           this.state.state$.next({ ...currentState, ...response })
           this.readDir()
           break
@@ -184,11 +185,8 @@ export class AppComponent extends AbstractComponent implements OnInit {
           break
         }
         case FileActionResponses.UpdateSuccess: {
-          const { recentlyModified, tabs } = response
-          const payload: StateUpdate<State>[] = [
-            { key: 'recentlyModified', payload: recentlyModified },
-            { key: 'tabs', payload: tabs },
-          ]
+          const { tabs } = response
+          const payload: StateUpdate<State>[] = [{ key: 'tabs', payload: tabs }]
           this.state.updateState$.next(payload)
           break
         }
@@ -211,12 +209,13 @@ export class AppComponent extends AbstractComponent implements OnInit {
           this.state.updateState$.next([{ key: 'searchResults', payload: response.searchResults }])
           break
         }
-        case StoreResponses.GetBookmarkedFilesSuccess: {
-          this.state.updateState$.next([{ key: 'bookmarkedFiles', payload: response.bookmarkedFiles }])
+        case StoreResponses.IndexingReady: {
+          this.state.updateState$.next([{ key: 'indexingReady', payload: true }])
           break
         }
-        case StoreResponses.GetRecentlyModifiedSuccess: {
-          this.state.updateState$.next([{ key: 'recentlyModified', payload: response.recentlyModified }])
+        case StoreResponses.Indexing: {
+          console.log(response)
+          this.state.updateState$.next([{ key: 'indexing', payload: response.indexing }])
           break
         }
         default: {

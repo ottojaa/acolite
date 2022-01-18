@@ -9,7 +9,7 @@
     <span *ngFor="let folder of displayTexts.folders">
       <div class="file-container">
         <mat-icon class="icon material-icons-outlined">folder</mat-icon>
-        <p class="display-text">{{ folder }}</p>
+        <p class="display-text">{{ folder.name }}</p>
       </div>
     </span>
     <span *ngFor="let file of displayTexts.files">

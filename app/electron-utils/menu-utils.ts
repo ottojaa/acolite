@@ -29,7 +29,6 @@ const createMenuItemsRecursive = (
       key: data.filePath,
       leaf: false,
       parent,
-      expanded: true,
       children: children.map((child) => createMenuItemsRecursive(baseDir, child, element)),
       data,
     }

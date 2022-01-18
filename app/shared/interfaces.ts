@@ -44,6 +44,8 @@ export type TreeElement = TreeNode<FileEntity>
 export interface State {
   baseDir: string
   initialized: boolean
+  indexing: boolean
+  indexingReady: boolean
   selectedTab: SelectedTab
   editorTheme: 'dark' | 'light'
   appTheme: string
@@ -53,8 +55,6 @@ export interface State {
   tabs: Doc[]
   rootDirectory: TreeElement
   bookmarks: string[]
-  bookmarkedFiles: Doc[]
-  recentlyModified: Doc[]
 }
 
 export enum MenuItemTypes {

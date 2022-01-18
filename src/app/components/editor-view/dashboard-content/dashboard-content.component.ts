@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
-import { Observable, of } from 'rxjs'
-import { delay } from 'rxjs/operators'
+import { Component, Input } from '@angular/core'
 import { Doc } from '../../../../../app/shared/interfaces'
 
 @Component({

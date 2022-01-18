@@ -18,7 +18,7 @@ export class IconComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.extension) {
-      this.iconName = 'file-document'
+      this.iconName = 'default-document'
       return
     }
     this.setIconAttributes(this.extension)
@@ -31,7 +31,7 @@ export class IconComponent implements OnInit {
     const icon = fileExtensionIcons.find((extensionIcon) => extensionIcon.acceptedExtensions.includes(extString))
 
     if (!icon) {
-      this.iconName = 'file-document'
+      this.iconName = 'default-document'
     } else {
       this.iconName = icon.name
       this.iconColor = icon.color

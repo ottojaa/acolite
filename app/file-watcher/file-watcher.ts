@@ -1,42 +1,70 @@
-import { watch } from 'chokidar'
+import { FSWatcher, watch } from 'chokidar'
 import { addToIndex, updateIndex } from '../ipc-events/store-events'
 import { Document } from 'flexsearch'
 import { Doc } from '../shared/interfaces'
+import { writeThumbnailImage } from '../thumbnail-helpers/thumbnail-helpers'
+import { Scheduler } from '../action-scheduler/scheduler'
+import { BrowserWindow } from 'electron'
+import { StoreResponses } from '../shared/actions'
+import { Subject } from 'rxjs/internal/Subject'
+import { skipUntil, takeUntil } from 'rxjs/operators'
 
-export const startFileWatcher = (path: string, index: Document<Doc, true>) => {
-  const watcher = watch(path, {
-    ignored: /[\/\\]\./,
-    persistent: true,
-  })
+export class FileWatcher {
+  window: BrowserWindow
+  index: Document<Doc, true>
+  watcher: FSWatcher
 
-  const onWatcherReady = () => {
-    console.info('File watcher ready, watching path ', path)
+  ignoredFolders = ['node_modules', '_thumbnails', '.DS_Store']
+  baseDir: string
+  indexingReadySub$ = new Subject()
+  indexQueue = new Scheduler()
+
+  startWatcher(baseDir: string, window: BrowserWindow, index: Document<Doc, true>): void {
+    this.baseDir = baseDir
+    this.window = window
+    this.index = index
+
+    this.watcher = watch(this.baseDir, {
+      ignored: (path: string) => this.ignoredFolders.some((folder) => path.includes(folder)),
+    })
+
+    this.initScheduler()
+    this.initWatcherEvents()
   }
 
-  // Declare the listeners of the watcher
-  watcher
-    .on('add', (path: string) => {
-      console.log('File', path, 'has been added')
-      addToIndex(path, index)
-    })
-    .on('addDir', (path) => {
-      console.log('Directory', path, 'has been added')
-    })
-    .on('change', (path: string) => {
-      console.log('File', path, 'has been changed')
-      updateIndex(path, index)
-    })
-    .on('unlink', (path: string) => {
-      console.log('File', path, 'has been removed')
-    })
-    .on('unlinkDir', (path: string) => {
-      console.log('Directory', path, 'has been removed')
-    })
-    .on('error', (error: Error) => {
-      console.log('Error happened', error)
-    })
-    .on('ready', onWatcherReady)
-    .on('raw', (event: string, path: string, details) => {
-      console.log('Raw event info:', event, path, details)
-    })
+  initScheduler(): void {
+    let initialResponseSent = false
+    const indexingReady$ = this.indexingReadySub$.asObservable()
+
+    this.indexQueue
+      .isScheduling()
+      .pipe(skipUntil(indexingReady$))
+      .subscribe((indexing) => {
+        if (!initialResponseSent) {
+          this.window.webContents.send(StoreResponses.IndexingReady)
+          initialResponseSent = true
+        } else {
+          this.window.webContents.send(StoreResponses.Indexing, { indexing })
+        }
+      })
+  }
+
+  initWatcherEvents(): void {
+    this.watcher
+      .on('add', (path: string) => {
+        this.indexQueue.addToQueue(addToIndex(path, this.index))
+        writeThumbnailImage(this.baseDir, path, 'create')
+      })
+      .on('change', (path: string) => {
+        this.indexQueue.addToQueue(updateIndex(path, this.index))
+        writeThumbnailImage(this.baseDir, path, 'update')
+      })
+      .on('ready', () => this.indexingReadySub$.next(true))
+  }
+
+  removeAllExistingListeners(): void {
+    try {
+      this.watcher.close()
+    } catch {}
+  }
 }

@@ -1,13 +1,42 @@
 <div class="card-container">
   <div class="card-header">
-    <h3 class="contrast-text">{{ file.fileName }}</h3>
+    <span>
+      <app-icon [extension]="file.extension" [scale]="0.8"></app-icon>
+      <h3 class="contrast-text">{{ file.fileName }}</h3>
+    </span>
 
     <!-- <mat-icon>more_vert</mat-icon> -->
   </div>
 
   <p-card (click)="openInNewTab(file)">
-    <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
+    <div *ngIf="thumbnail$ | async as thumbnail; else loader" @componentLoaded>
+      <ng-container *ngIf="thumbnail !== 'default'; else default">
+        <img [src]="thumbnail" [ngClass]="{ nativeImage: imageTypesArr.includes(file.extension) }" />
+      </ng-container>
+
+      <ng-template #default>
+        <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
+      </ng-template>
+    </div>
+
+    <ng-template #loader>
+      <p-skeleton width="100%" height="100%"></p-skeleton>
+    </ng-template>
+    <!-- <ng-container *ngIf="thumbnailLoading$ | async; else showContent">
+      <ng-container *ngIf="image; else default">
+        <img [src]="image" />
+      </ng-container>
+
+      <ng-template #default>
+        <app-icon [extension]="file.extension" [scale]="2.5"></app-icon>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #showContent>
+      <p-skeleton width="100%" height="100%"></p-skeleton>
+    </ng-template> -->
   </p-card>
+
   <p class="last-modified-text">Last updated {{ file.modifiedAt | formatDistance }} ago</p>
   <div class="chips-container padding">
     <mat-chip-list aria-label="File tags">

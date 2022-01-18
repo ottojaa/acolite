@@ -17,8 +17,8 @@ import {
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, TreeElement, Doc } from '../shared/interfaces'
 import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
-import { defaultSpliceLength, indexFileSizeLimit, indexFileTypes } from '../shared/constants'
-import { isPlainObject, cloneDeep, uniqBy, isEqual } from 'lodash'
+import { defaultSpliceLength } from '../shared/constants'
+import { isPlainObject, cloneDeep, uniqBy, isEqual, reject } from 'lodash'
 
 export const initAppState = async (event: IpcMainEvent, configPath: string, index: Document<Doc, true>) => {
   try {
@@ -207,7 +207,6 @@ export const getBookmarkedFiles = (
   return storeItems
     .filter((item) => bookmarks?.includes(item.filePath))
     .sort((a, b) => (a.modifiedAt < b.modifiedAt ? 1 : -1))
-    .slice(0, 50)
 }
 
 export const getRecentlyModifiedFiles = (index: Document<Doc, true> & { store?: Record<string, Doc> }) => {
@@ -221,18 +220,30 @@ export const getUpdatedRecentlyModified = (recentlyModified: Doc[], updatedItemP
   return [item, ...filtered]
 }
 
-export const updateIndex = async (newPath: string, index: Document<Doc, true>) => {
-  const indexFile = await getFileDataToIndex(newPath)
-  const { ino } = indexFile
-
-  await index.updateAsync(ino, indexFile)
+export const updateIndex = (filePath: string, index: Document<Doc, true>) => {
+  return new Promise<void>((resolve) => {
+    getFileDataToIndex(filePath)
+      .then((indexFile) => {
+        const { ino } = indexFile
+        index.updateAsync(ino, indexFile, () => resolve())
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
-export const addToIndex = async (filePath: string, index: Document<Doc, true>) => {
-  let indexFile = await getFileDataToIndex(filePath)
-  const { ino } = indexFile
-
-  await index.addAsync(ino, indexFile)
+export const addToIndex = async (filePath: string, index: Document<any, true>) => {
+  return new Promise<void>((resolve) => {
+    getFileDataToIndex(filePath)
+      .then((indexFile) => {
+        const { ino } = indexFile
+        index.addAsync(ino, indexFile, () => resolve())
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
 export const updateIndexesRecursive = async (filePaths: string[], index: Document<Doc, true>) => {
@@ -256,16 +267,15 @@ export const updateIndexesRecursive = async (filePaths: string[], index: Documen
   await Promise.all(filePaths.map(async (path) => await updateIndexes(path)))
 }
 
-export const removeIndexes = async (inodes: number[], index: Document<Doc, true>) => {
-  for (let node of inodes) {
-    await index.removeAsync(node)
-  }
+export const removeIndex = async (inode: number, index: Document<Doc, true>) => {
+  await index.removeAsync(inode)
 }
 
 export const getEmptyIndex = (): Document<Doc, true> => {
   return new Document({
-    tokenize: 'full',
+    tokenize: 'forward',
     resolution: 1,
+    context: false,
     optimize: true,
     document: {
       id: 'id',
