@@ -12,15 +12,10 @@ export interface Config {
 
 export const folderStructureToMenuItems = (
   baseDir: string,
-  folderStruct: (TreeElement | FileEntity)[],
-  rootTreeNode: TreeElement
-): TreeNode<FileEntity>[] => folderStruct.map((child) => createMenuItemsRecursive(baseDir, child, rootTreeNode))
+  folderStruct: (TreeElement | FileEntity)[]
+): TreeNode<FileEntity>[] => folderStruct.map((child) => createMenuItemsRecursive(baseDir, child))
 
-const createMenuItemsRecursive = (
-  baseDir: string,
-  element: TreeElement | FileEntity,
-  parent: TreeElement
-): TreeNode => {
+const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
   if (isFolder(element) && element.data.type === 'folder') {
     const { data, children } = element
     const treeNode: TreeElement = {
@@ -28,8 +23,7 @@ const createMenuItemsRecursive = (
       type: MenuItemTypes.Folder,
       key: data.filePath,
       leaf: false,
-      parent,
-      children: children.map((child) => createMenuItemsRecursive(baseDir, child, element)),
+      children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
       data,
     }
     treeNode.data.indents = calculateIndents(treeNode, baseDir)
@@ -38,7 +32,6 @@ const createMenuItemsRecursive = (
   } else if (isFile(element)) {
     const treeNode = getTreeNodeFromFileEntity(element)
     treeNode.data.indents = calculateIndents(treeNode, baseDir)
-    treeNode.parent = parent
 
     return treeNode
   }
@@ -96,7 +89,6 @@ const updateItemByStrategy = (
     case 'create': {
       const isFolder = updatedItem.type === 'folder'
       const treeNode = getTreeNodeFromFileEntity(updatedItem, 'new-file')
-      treeNode.parent = item
 
       // PrimeNG tree sorts folders to the top
       item.children = isFolder ? [treeNode, ...item.children] : [...item.children, treeNode]
@@ -133,10 +125,7 @@ export const moveRecursive = (
   config?: Config
 ): void => {
   for (let menuItem of menuItems) {
-    const toBeAdded = elementsToAdd
-      .filter((el) => el.data.parentPath === menuItem.data.filePath)
-      .map((el) => ({ ...el, parent: menuItem }))
-
+    const toBeAdded = elementsToAdd.filter((el) => el.data.parentPath === menuItem.data.filePath)
     const toBeDeleted = elementsToDelete
       .filter((el) => el.data.parentPath === menuItem.data.filePath)
       .map((x) => x.data.filePath)

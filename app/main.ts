@@ -265,7 +265,7 @@ const FileActionReducer = (action: FileActions) => {
         break
       }
       case FileActions.DeleteFiles: {
-        deleteFiles(event, payload, index)
+        deleteFiles(event, payload, fileWatcher)
         break
       }
       case FileActions.MoveFiles: {
@@ -314,14 +314,16 @@ const IPCHandlerReducer = () => {
     const result = await getDirectoryPath(win, defaultPath)
     return result
   })
-  ipcMain.handle(HandlerAction.CreateThumbnail, async (_event, action: CreateThumbnail) => {
-    const thumbnail = await nativeImage.createThumbnailFromPath(action.filePath, { width: 200, height: 120 })
-    return thumbnail.toDataURL()
-  })
+
   ipcMain.handle(HandlerAction.GetThumbnail, async (_event, action: GetThumbnail) => {
     const { filePath, baseDir } = action
-    const thumbnail = await getThumbnail(baseDir, filePath)
-    return thumbnail
+
+    try {
+      const thumbnail = await getThumbnail(baseDir, filePath)
+      return thumbnail
+    } catch (err) {
+      return 'default'
+    }
   })
   ipcMain.handle(HandlerAction.GetRecentlyModified, (_event, _action: GetRecentlyModified) => {
     const recentlyModified = getRecentlyModifiedFiles(index)

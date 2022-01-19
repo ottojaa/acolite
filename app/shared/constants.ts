@@ -53,7 +53,7 @@ export const binaryTypes = ['pdf', 'jpg', 'jpeg', 'png', 'ico', 'bmp', 'webp']
 export const imageTypes = ['png', 'jpeg', 'jpg', 'ico', 'bmp', 'webp', 'ai', 'eps']
 export const indexFileSizeLimit = 100000
 
-export const defaultSpliceLength = 50
+export const defaultSpliceLength = 100
 
 export const allowedConfigKeys: string[] = [
   'baseDir',

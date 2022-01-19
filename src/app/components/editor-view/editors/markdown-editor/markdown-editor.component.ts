@@ -62,7 +62,6 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
     return {
       highlightTokens: true,
       shortcutsEnabled: 'all',
-      lineNumbers: true,
     }
   }
 

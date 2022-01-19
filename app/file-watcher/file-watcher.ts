@@ -1,12 +1,15 @@
 import { FSWatcher, watch } from 'chokidar'
-import { addToIndex, updateIndex } from '../ipc-events/store-events'
+import { addToIndex, removeIndex, updateIndex } from '../ipc-events/store-events'
 import { Document } from 'flexsearch'
 import { Doc } from '../shared/interfaces'
-import { writeThumbnailImage } from '../thumbnail-helpers/thumbnail-helpers'
+import { deleteThumbnail, writeThumbnailImage } from '../thumbnail-helpers/thumbnail-helpers'
 import { Scheduler } from '../action-scheduler/scheduler'
 import { BrowserWindow } from 'electron'
 import { StoreResponses } from '../shared/actions'
 
+/**
+ * This class handles chokidar events, creating and deleting file thumbnails, and updating file indexes
+ */
 export class FileWatcher {
   window: BrowserWindow
   index: Document<Doc, true>
@@ -46,13 +49,23 @@ export class FileWatcher {
     this.watcher
       .on('add', (path: string) => {
         this.indexQueue.addToQueue(addToIndex(path, this.index))
-        writeThumbnailImage(this.baseDir, path, 'create')
+        writeThumbnailImage(this.baseDir, path, 'create').catch((_err) => null)
       })
       .on('change', (path: string) => {
         this.indexQueue.addToQueue(updateIndex(path, this.index))
-        writeThumbnailImage(this.baseDir, path, 'update')
+        writeThumbnailImage(this.baseDir, path, 'update').catch((_err) => null)
       })
       .on('ready', () => this.initScheduler())
+  }
+
+  /**
+   * Chokidar's unlink event does not contain the inode number of the deleted file, because the file does not exist anymore. We use inodes as thumbnail file names, hence we need to call onDeleteFile
+   * separately from the event that deletes the file, passing the ino as parameter
+   * @param ino inode number of the file
+   */
+  onDeleteFile(ino: number): void {
+    this.indexQueue.addToQueue(removeIndex(ino, this.index))
+    deleteThumbnail(this.baseDir, ino).catch((_err) => null)
   }
 
   removeAllExistingListeners(): void {

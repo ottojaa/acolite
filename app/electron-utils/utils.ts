@@ -42,9 +42,9 @@ export const getDeletedFileEntityMock = (filePath: string): FileEntity => {
   }
 }
 
-export const getMenuItemsFromBaseDirectory = (baseDir: string, rootTreeNode: TreeElement) => {
+export const getMenuItemsFromBaseDirectory = (baseDir: string) => {
   const treeStructure = getTreeStructureFromBaseDirectory(baseDir)
-  return folderStructureToMenuItems(baseDir, treeStructure, rootTreeNode)
+  return folderStructureToMenuItems(baseDir, treeStructure)
 }
 
 export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
@@ -148,7 +148,7 @@ export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: 
 export const getRootDirectory = (baseDir: string): TreeElement => {
   const rootEntity = getFileEntityFromPath(baseDir)
   const rootTreeNode = getTreeNodeFromFileEntity(rootEntity)
-  const menuItems = getMenuItemsFromBaseDirectory(baseDir, rootTreeNode)
+  const menuItems = getMenuItemsFromBaseDirectory(baseDir)
 
   return { ...rootTreeNode, children: menuItems }
 }

@@ -40,6 +40,7 @@ import {
 import { Doc, TreeElement } from '../shared/interfaces'
 import { first, cloneDeep } from 'lodash'
 import { deleteThumbnail } from '../thumbnail-helpers/thumbnail-helpers'
+import { FileWatcher } from '../file-watcher/file-watcher'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   const { filePath, state } = action
@@ -230,27 +231,10 @@ export const moveFiles = (event: IpcMainEvent, action: MoveFiles) => {
     })
 }
 
-export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Document<Doc, true>) => {
+export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, fileWatcher: FileWatcher) => {
   const { directoryPaths, filePaths, state } = action
-  const { baseDir, rootDirectory, tabs, bookmarks } = state
+  const { baseDir, rootDirectory, tabs } = state
   const paths = [...directoryPaths, ...filePaths]
-
-  // Gather all inode-values prior to deleting, so we can remove the files' indexes if the deletions were succesful.
-  // If forceDelete = true, it means that the containing parent folder was deleted and hence children should also.
-  const getInodesRecursive = (el: TreeElement, inodes: number[] = [], forceDelete: boolean = false) => {
-    if (paths.includes(el.data.filePath) || forceDelete) {
-      inodes.push(el.data.ino)
-    }
-
-    if (el.children?.length) {
-      const shouldDeleteChildren = forceDelete || paths.includes(el.data.filePath)
-
-      for (let child of el.children) {
-        getInodesRecursive(child, inodes, shouldDeleteChildren)
-      }
-    }
-    return inodes
-  }
 
   const markTabAsDeleted = (filePath: string) => {
     const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
@@ -258,8 +242,6 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
       tabs[tabIdx].deleted = true
     }
   }
-
-  const inodes = getInodesRecursive(rootDirectory)
 
   let failedToDelete = []
 
@@ -272,8 +254,8 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
             failedToDelete.push(filePath)
             reject()
           }
-          await removeIndex(ino, index)
-          await deleteThumbnail(baseDir, ino)
+
+          fileWatcher.onDeleteFile(ino)
           markTabAsDeleted(filePath)
 
           resolve()

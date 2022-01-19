@@ -22,7 +22,6 @@ export const writeThumbnailImage = (baseDir: string, filePath: string, operation
         fs.writeFile(thumbnailPath, thumbnailUrl, () => resolve())
       })
       .catch((err) => {
-        console.error(`Unable to create thumbnail for file ${filePath}`, err)
         reject(err)
       })
   })
