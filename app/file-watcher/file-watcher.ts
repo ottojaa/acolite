@@ -6,8 +6,6 @@ import { writeThumbnailImage } from '../thumbnail-helpers/thumbnail-helpers'
 import { Scheduler } from '../action-scheduler/scheduler'
 import { BrowserWindow } from 'electron'
 import { StoreResponses } from '../shared/actions'
-import { Subject } from 'rxjs/internal/Subject'
-import { skipUntil, takeUntil } from 'rxjs/operators'
 
 export class FileWatcher {
   window: BrowserWindow
@@ -16,8 +14,8 @@ export class FileWatcher {
 
   ignoredFolders = ['node_modules', '_thumbnails', '.DS_Store']
   baseDir: string
-  indexingReadySub$ = new Subject()
   indexQueue = new Scheduler()
+  isScheduling$ = this.indexQueue.isScheduling()
 
   startWatcher(baseDir: string, window: BrowserWindow, index: Document<Doc, true>): void {
     this.baseDir = baseDir
@@ -28,25 +26,20 @@ export class FileWatcher {
       ignored: (path: string) => this.ignoredFolders.some((folder) => path.includes(folder)),
     })
 
-    this.initScheduler()
     this.initWatcherEvents()
   }
 
   initScheduler(): void {
     let initialResponseSent = false
-    const indexingReady$ = this.indexingReadySub$.asObservable()
 
-    this.indexQueue
-      .isScheduling()
-      .pipe(skipUntil(indexingReady$))
-      .subscribe((indexing) => {
-        if (!initialResponseSent) {
-          this.window.webContents.send(StoreResponses.IndexingReady)
-          initialResponseSent = true
-        } else {
-          this.window.webContents.send(StoreResponses.Indexing, { indexing })
-        }
-      })
+    this.isScheduling$.subscribe((indexing) => {
+      if (!initialResponseSent) {
+        this.window.webContents.send(StoreResponses.IndexingReady)
+        initialResponseSent = true
+      } else {
+        this.window.webContents.send(StoreResponses.Indexing, { indexing })
+      }
+    })
   }
 
   initWatcherEvents(): void {
@@ -59,7 +52,7 @@ export class FileWatcher {
         this.indexQueue.addToQueue(updateIndex(path, this.index))
         writeThumbnailImage(this.baseDir, path, 'update')
       })
-      .on('ready', () => this.indexingReadySub$.next(true))
+      .on('ready', () => this.initScheduler())
   }
 
   removeAllExistingListeners(): void {

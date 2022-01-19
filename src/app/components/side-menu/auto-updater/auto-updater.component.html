@@ -1,6 +1,9 @@
 <div class="container" *ngIf="downloaderState.showLoader">
   <span class="top-container">
-    <p *ngIf="downloaderState.status !== 'downloaded'">{{ downloaderState.statusText }}</p>
+    <p *ngIf="downloaderState.status !== 'downloaded'">
+      <span> {{ downloaderState.statusText }}</span>
+      <span *ngIf="downloaderState.progressTotal as progress">{{ progress }}</span>
+    </p>
 
     <button mat-button *ngIf="downloaderState.status === 'available'" (click)="downloadUpdate()">
       Download <mat-icon>download</mat-icon>

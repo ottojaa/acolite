@@ -8,6 +8,7 @@ interface DownloaderState {
   status: 'available' | 'checking' | 'downloading' | 'not-available' | 'downloaded' | undefined
   showLoader: boolean
   downloadProgress: number | undefined
+  progressTotal: string | undefined
 }
 
 @Component({
@@ -20,7 +21,8 @@ export class AutoUpdaterComponent implements OnInit {
     statusText: '',
     status: undefined,
     showLoader: false,
-    downloadProgress: undefined,
+    downloadProgress: 30,
+    progressTotal: undefined,
   }
 
   constructor(public electronService: ElectronService, public cdRef: ChangeDetectorRef) {
@@ -46,7 +48,7 @@ export class AutoUpdaterComponent implements OnInit {
   }
 
   eventReducer(action: AutoUpdateEvent): void {
-    this.electronService.on(action, (_event, response?: ProgressInfo) => {
+    this.electronService.on(action, (_event, response?: { percent: number; progressTotal: string }) => {
       if (action === AutoUpdateEvent.UpdateNotAvailable) {
         this.updateDownloaderState({ showLoader: false })
         return
@@ -68,6 +70,7 @@ export class AutoUpdaterComponent implements OnInit {
             statusText: 'Downloading update',
             status: 'downloading',
             downloadProgress: response.percent,
+            progressTotal: response.progressTotal,
           })
           break
         }
@@ -93,5 +96,10 @@ export class AutoUpdaterComponent implements OnInit {
 
   downloadUpdate(): void {
     this.electronService.downloadUpdate()
+    this.updateDownloaderState({
+      statusText: 'Downloading update',
+      status: 'downloading',
+      downloadProgress: 0,
+    })
   }
 }

@@ -9,6 +9,7 @@ autoUpdater.autoDownload = false
 export function checkForUpdates(window: BrowserWindow): void {
   try {
     autoUpdater.checkForUpdatesAndNotify()
+    autoUpdater.removeAllListeners()
 
     startAutoUpdaterEventListeners(window)
   } catch (err) {

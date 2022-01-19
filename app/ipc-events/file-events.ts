@@ -273,7 +273,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, index: Doc
             reject()
           }
           await removeIndex(ino, index)
-          await deleteThumbnail(filePath, ino)
+          await deleteThumbnail(baseDir, ino)
           markTabAsDeleted(filePath)
 
           resolve()

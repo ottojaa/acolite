@@ -14,11 +14,9 @@ import { Doc } from '../../../../../../app/shared/interfaces'
   templateUrl: './file-card.component.html',
   styleUrls: ['./file-card.component.scss'],
   animations: [
-    trigger('componentLoaded', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-in', keyframes([style({ opacity: 0 }), style({ opacity: 1 })])),
-      ]),
+    trigger('fadeInOut', [
+      transition(':enter', [style({ opacity: 0 }), animate(300, style({ opacity: 1 }))]),
+      transition(':leave', [animate(300, style({ opacity: 0 }))]),
     ]),
   ],
 })

@@ -7,11 +7,23 @@ import { MatIconModule } from '@angular/material/icon'
 import { IconModule } from '../../icon/icon.module'
 import { FormatDistanceModule } from 'app/components/pipes/format-distance.module'
 import { SkeletonModule } from 'primeng/skeleton'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { NgLetModule } from 'app/components/directives/ng-let.module'
 
 @NgModule({
   declarations: [FileCardComponent],
   exports: [FileCardComponent],
-  imports: [CommonModule, CardModule, MatChipsModule, MatIconModule, IconModule, FormatDistanceModule, SkeletonModule],
+  imports: [
+    CommonModule,
+    CardModule,
+    MatChipsModule,
+    MatIconModule,
+    IconModule,
+    FormatDistanceModule,
+    SkeletonModule,
+    MatProgressSpinnerModule,
+    NgLetModule,
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FileCardModule {}

@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu'
 import { SearchBuilderDialogModule } from '../../dialogs/search-builder-dialog/search-builder-dialog.module'
 import { IconModule } from 'app/components/common/icon/icon.module'
 import { FormatDistanceModule } from 'app/components/pipes/format-distance.module'
-import { KeyboardNavigationModule } from 'app/components/directives/keyboard-events/keyboard-navigation.module'
+import { KeyboardNavigationModule } from 'app/components/directives/keyboard-navigation.module'
 
 @NgModule({
   declarations: [AutocompleteComponent],

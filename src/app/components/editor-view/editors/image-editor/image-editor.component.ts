@@ -14,10 +14,7 @@ import { Dimensions } from './interfaces'
   styleUrls: ['./image-editor.component.scss'],
   animations: [
     trigger('componentLoaded', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('.3s ease-in', keyframes([style({ opacity: 0 }), style({ opacity: 1 })])),
-      ]),
+      transition(':enter', [style({ opacity: 0 }), animate('300ms', style({ opacity: 1 }))]),
     ]),
   ],
 })
