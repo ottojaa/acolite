@@ -45,29 +45,6 @@ export class TabService {
     }
   }
 
-  revertDelete(tab: Doc): void {
-    const { fileContent, filePath, extension } = tab
-    const { tabs, selectedTab } = this.state.value
-    const tabIdx = tabs.findIndex((fileTab) => fileTab.filePath === filePath)
-    if (tabIdx > -1) {
-      tabs[tabIdx].deleted = false
-      this.update(selectedTab, tabs)
-
-      const payload = {
-        filePath,
-        content: fileContent,
-        openFileAfterCreation: false,
-        state: this.state.value,
-      }
-
-      if (binaryTypes.includes(extension)) {
-        this.electronService.createNewImageRequest({ ...payload, encoding: 'binary' })
-      } else {
-        this.electronService.createNewFileRequest(payload)
-      }
-    }
-  }
-
   closeAllTabs(): void {
     this.update({ filePath: '', index: 0, forceDashboard: false }, [])
   }

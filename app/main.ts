@@ -21,7 +21,6 @@ import {
   readAndSendTabData,
   openFileLocation,
   copyFiles,
-  createImageFile,
 } from './ipc-events/file-events'
 import {
   getBookmarkedFiles,
@@ -43,7 +42,6 @@ import {
   UpdateActionPayload,
   ReadFileContent,
   AutoUpdateEvent,
-  CreateThumbnail,
   GetThumbnail,
   GetBookmarkedFiles,
   GetRecentlyModified,
@@ -138,7 +136,6 @@ const FolderActionChannels = [
 
 const FileActionChannels = [
   FileActions.Create,
-  FileActions.CreateImage,
   FileActions.Rename,
   FileActions.DeleteFiles,
   FileActions.MoveFiles,
@@ -253,11 +250,7 @@ const FileActionReducer = (action: FileActions) => {
   ipcMain.on(action, (event: IpcMainEvent, payload: UpdateActionPayload) => {
     switch (payload.type) {
       case FileActions.Create: {
-        createFile(event, payload, index)
-        break
-      }
-      case FileActions.CreateImage: {
-        createImageFile(event, payload, index)
+        createFile(event, payload)
         break
       }
       case FileActions.Rename: {
@@ -332,6 +325,9 @@ const IPCHandlerReducer = () => {
   ipcMain.handle(HandlerAction.GetBookmarkedFiles, (_event, action: GetBookmarkedFiles) => {
     const bookmarkedFiles = getBookmarkedFiles(index, action.bookmarks)
     return bookmarkedFiles
+  })
+  ipcMain.handle(HandlerAction.GetAppVersion, (_event) => {
+    return app.getVersion()
   })
 }
 

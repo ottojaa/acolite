@@ -2,7 +2,9 @@
   <span class="top-container">
     <p *ngIf="downloaderState.status !== 'downloaded'">
       <span> {{ downloaderState.statusText }}</span>
-      <span *ngIf="downloaderState.progressTotal as progress">{{ progress }}</span>
+      <span *ngIf="downloaderState.progress as progress"
+        >{{ progress.transferred | formatSize }} / {{ progress.total | formatSize }}</span
+      >
     </p>
 
     <button mat-button *ngIf="downloaderState.status === 'available'" (click)="downloadUpdate()">

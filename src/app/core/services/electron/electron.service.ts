@@ -27,8 +27,6 @@ import {
   HandlerAction,
   ContextMenuActions,
   CopyFiles,
-  GetBookmarkedFiles,
-  CreateImageFile,
   AutoUpdateEvent,
 } from '../../../../../app/shared/actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
@@ -106,10 +104,6 @@ export class ElectronService {
 
   createNewFileRequest(payload: OmitActionType<CreateFile>): void {
     this.send(FileActions.Create, payload)
-  }
-
-  createNewImageRequest(payload: OmitActionType<CreateImageFile>): void {
-    this.send(FileActions.CreateImage, payload)
   }
 
   renameFileRequest(payload: OmitActionType<RenameFile>): void {

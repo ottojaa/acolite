@@ -107,6 +107,7 @@ export class FileCreationComponent {
     this.electronService.createNewFileRequest({
       filePath,
       openFileAfterCreation: this.openFileAfterCreation,
+      encoding: 'utf-8',
       state: this.state.value,
     })
     this.dialogRef.close()

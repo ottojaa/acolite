@@ -13,10 +13,11 @@
     "flatted": "^3.2.2",
     "flexsearch": "^0.7.21",
     "lodash": "4.17.21",
-    "rxjs": "~6.6.0",
     "primeflex": "^3.0.1",
     "primeicons": "4.1.0",
-    "primeng": "*"
+    "primeng": "*",
+    "rxjs": "~6.6.0",
+    "trash": "^7.2.0"
   },
   "devDependencies": {
     "@types/flexsearch": "^0.7.2",

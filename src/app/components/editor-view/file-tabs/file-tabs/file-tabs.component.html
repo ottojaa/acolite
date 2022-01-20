@@ -24,7 +24,8 @@
           <ng-container *ngIf="tab.deleted; else showEditor">
             <div class="deleted">
               <h2 class="deleted-text">
-                This file appears to be deleted!<!--  If this was a mistake, press
+                This file appears to be deleted, but you can still find it in your recycle bin.
+                <!--  If this was a mistake, press
                 <span aria-label="bring-deleted-file-back" class="bring-back" (click)="revertDelete(tab)">here</span>
                 to bring it back -->
               </h2>

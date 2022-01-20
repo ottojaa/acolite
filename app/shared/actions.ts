@@ -6,7 +6,6 @@ export type UpdateActionPayload =
   | ChooseDir
   | SetDefaultDir
   | CreateFile
-  | CreateImageFile
   | RenameFile
   | DeleteFiles
   | CopyFiles
@@ -29,17 +28,10 @@ export interface CreateFile {
   filePath: string
   openFileAfterCreation: boolean
   content?: string
+  encoding?: Encoding
   state: State
 }
 
-export interface CreateImageFile {
-  type: FileActions.CreateImage
-  filePath: string
-  content: string
-  state: State
-  encoding?: 'binary' | 'base64'
-  isPDF?: boolean
-}
 export interface ReadDirectory {
   type: FolderActions.ReadDir
   state: State
@@ -225,6 +217,7 @@ export enum SearchActions {
 
 export enum HandlerAction {
   GetFileData = 'get-file-data',
+  GetAppVersion = 'get-app-version',
   GetRecentlyModified = 'get-recently-modified',
   GetBookmarkedFiles = 'get-bookmarked-files',
   ChooseDirectory = 'choose-directory',

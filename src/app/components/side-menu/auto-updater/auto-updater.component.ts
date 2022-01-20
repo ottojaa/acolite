@@ -8,7 +8,10 @@ interface DownloaderState {
   status: 'available' | 'checking' | 'downloading' | 'not-available' | 'downloaded' | undefined
   showLoader: boolean
   downloadProgress: number | undefined
-  progressTotal: string | undefined
+  progress?: {
+    transferred: number
+    total: number
+  }
 }
 
 @Component({
@@ -22,7 +25,6 @@ export class AutoUpdaterComponent implements OnInit {
     status: undefined,
     showLoader: false,
     downloadProgress: 30,
-    progressTotal: undefined,
   }
 
   constructor(public electronService: ElectronService, public cdRef: ChangeDetectorRef) {
@@ -48,41 +50,44 @@ export class AutoUpdaterComponent implements OnInit {
   }
 
   eventReducer(action: AutoUpdateEvent): void {
-    this.electronService.on(action, (_event, response?: { percent: number; progressTotal: string }) => {
-      if (action === AutoUpdateEvent.UpdateNotAvailable) {
-        this.updateDownloaderState({ showLoader: false })
-        return
-      } else {
-        this.updateDownloaderState({ showLoader: true })
-      }
+    this.electronService.on(
+      action,
+      (_event, response?: { percent: number; progress: { transferred: number; total: number } }) => {
+        if (action === AutoUpdateEvent.UpdateNotAvailable) {
+          this.updateDownloaderState({ showLoader: false })
+          return
+        } else {
+          this.updateDownloaderState({ showLoader: true })
+        }
 
-      switch (action) {
-        case AutoUpdateEvent.UpdateAvailable: {
-          this.updateDownloaderState({ statusText: 'Update available', status: 'available' })
-          break
-        }
-        case AutoUpdateEvent.CheckingForUpdates: {
-          this.updateDownloaderState({ statusText: 'Checking for updates...', status: 'checking' })
-          break
-        }
-        case AutoUpdateEvent.DownloadProgress: {
-          this.updateDownloaderState({
-            statusText: 'Downloading update',
-            status: 'downloading',
-            downloadProgress: response.percent,
-            progressTotal: response.progressTotal,
-          })
-          break
-        }
-        case AutoUpdateEvent.UpdateDownloaded: {
-          this.updateDownloaderState({
-            statusText: 'Update downloaded',
-            status: 'downloaded',
-          })
-          break
+        switch (action) {
+          case AutoUpdateEvent.UpdateAvailable: {
+            this.updateDownloaderState({ statusText: 'Update available', status: 'available' })
+            break
+          }
+          case AutoUpdateEvent.CheckingForUpdates: {
+            this.updateDownloaderState({ statusText: 'Checking for updates...', status: 'checking' })
+            break
+          }
+          case AutoUpdateEvent.DownloadProgress: {
+            this.updateDownloaderState({
+              statusText: 'Downloading update',
+              status: 'downloading',
+              downloadProgress: response.percent,
+              progress: response.progress,
+            })
+            break
+          }
+          case AutoUpdateEvent.UpdateDownloaded: {
+            this.updateDownloaderState({
+              statusText: 'Update downloaded',
+              status: 'downloaded',
+            })
+            break
+          }
         }
       }
-    })
+    )
   }
 
   updateDownloaderState(state: Partial<DownloaderState>): void {

@@ -1,6 +1,6 @@
 .container {
-  background: #1010108a;
-  backdrop-filter: blur(3px);
+  background: #1010104f;
+  backdrop-filter: blur(2px);
   .top-container {
     display: flex;
     justify-content: space-between;
@@ -29,6 +29,7 @@
 
 :host ::ng-deep {
   .mat-button {
+    margin-right: 5px;
     color: var(--contrast);
     opacity: 0.8;
   }

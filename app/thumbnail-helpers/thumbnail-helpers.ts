@@ -31,7 +31,7 @@ export const deleteThumbnail = (baseDir: string, inode: number) => {
   return new Promise<void>(async (resolve, reject) => {
     const thumbnailBaseDir = getJoinedPath([baseDir, '_thumbnails'])
     const filePath = getJoinedPath([thumbnailBaseDir, inode.toString()])
-    fs.rm(filePath, (err) => {
+    fs.unlink(filePath, (err) => {
       if (err) {
         reject()
       }

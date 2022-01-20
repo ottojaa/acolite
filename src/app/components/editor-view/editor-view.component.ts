@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { AbstractComponent } from 'app/abstract/abstract-component'
 import { ElectronService } from 'app/core/services'
-import { flatMap } from 'lodash'
-import { BehaviorSubject, combineLatest, forkJoin, from, merge, Observable, of, Subject } from 'rxjs'
-import { filter, map, mergeMap, share, skipUntil, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs'
+import { filter, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators'
 import { Doc } from '../../../../app/shared/interfaces'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
@@ -20,13 +19,6 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   indexingReady$: Observable<boolean>
   bookmarked$: Observable<Doc[]>
   basePath$: Observable<string>
-  bannerOpen = true
-  viewInit$: Observable<boolean>
-
-  markedForUpdate = {
-    recentlyModified: false,
-    bookmarked: false,
-  }
 
   private recentlyModifiedSub$ = new BehaviorSubject<Doc[]>([])
   private bookmarkedSub$ = new BehaviorSubject<Doc[]>([])
@@ -43,32 +35,8 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
     this.bookmarked$ = this.getBookmarked()
     this.forceDashboard$ = this.state.getStatePart('selectedTab').pipe(map((selectedTab) => selectedTab.forceDashboard))
 
-    this.waitForIndexingReadyUntilInitContent()
     this.initBookmarksListener()
     this.initRecentlyModifiedListener()
-  }
-
-  /**
-   * Wait for the main process to send event indicating that all files are indexed and then initialise bookmarks and recently modified
-   */
-  waitForIndexingReadyUntilInitContent(): void {
-    this.indexingReady$
-      .pipe(
-        filter((indexingReady) => indexingReady),
-        take(1),
-        switchMap(async () => {
-          const bookmarks = this.state.getStatePartValue('bookmarks')
-          const recentlyModified$ = await this.fetchRecentlyModified()
-          const bookmarked$ = await this.fetchBookmarked(bookmarks)
-
-          return forkJoin([recentlyModified$, bookmarked$])
-        }),
-        mergeMap((data) => data)
-      )
-      .subscribe(([recentlyModified, bookmarked]) => {
-        this.recentlyModifiedSub$.next(recentlyModified)
-        this.bookmarkedSub$.next(bookmarked)
-      })
   }
 
   initBookmarksListener(): void {

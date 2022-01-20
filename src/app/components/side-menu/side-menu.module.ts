@@ -8,6 +8,7 @@ import { FileTreeModule } from './tree/tree.module'
 import { AutoUpdaterComponent } from './auto-updater/auto-updater.component'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
+import { FormatFileSizePipeModule } from '../pipes/format-file-size.module'
 
 @NgModule({
   declarations: [SideMenuComponent, AutoUpdaterComponent],
@@ -17,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon'
     CommonModule,
     RoundedIconButtonModule,
     MatProgressBarModule,
+    FormatFileSizePipeModule,
     FileTreeModule,
     MatButtonModule,
     MatIconModule,

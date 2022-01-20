@@ -5,6 +5,7 @@ import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { ImageTransform, OutputFormat } from 'ngx-image-cropper'
 import { getDirName, getJoinedPath } from '../../../../../../app/electron-utils/file-utils'
+import { CreateFile } from '../../../../../../app/shared/actions'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { Dimensions } from './interfaces'
 
@@ -107,12 +108,14 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
 
   onClickSave(filename: string): void {
     const newFilePath = getJoinedPath([this.outputPath, filename])
-    const payload = {
+    const payload: Omit<CreateFile, 'type'> = {
       filePath: newFilePath,
+      openFileAfterCreation: false,
       content: this.croppedImage,
+      encoding: 'base64',
       state: this.state.value,
     }
 
-    this.electronService.createNewImageRequest(payload)
+    this.electronService.createNewFileRequest(payload)
   }
 }

@@ -44,7 +44,7 @@ const startAutoUpdaterEventListeners = (window: BrowserWindow) => {
 
   autoUpdater.on(AutoUpdateEvent.DownloadProgress, (progressInfo: ProgressInfo) => {
     const { percent, transferred, total } = progressInfo
-    const progressObj = { percent: Math.round(percent), progressTotal: `${transferred}/${total}` }
+    const progressObj = { percent: Math.round(percent), progress: { transferred, total } }
     logger.info(`progressInfo.percent: ${percent}`)
 
     sendContentsToWindow(AutoUpdateEvent.DownloadProgress, progressObj)

@@ -3,7 +3,7 @@ import { promises as fsp } from 'fs'
 import { shell } from 'electron'
 import { IpcMainEvent } from 'electron'
 import { Document } from 'flexsearch'
-import { getUpdatedRecentlyModified, removeIndex } from './store-events'
+import * as trash from 'trash'
 import {
   getBaseName,
   getDirName,
@@ -35,7 +35,6 @@ import {
   FileActionResponses,
   FileActions,
   CopyFiles,
-  CreateImageFile,
 } from '../shared/actions'
 import { Doc } from '../shared/interfaces'
 import { first, cloneDeep } from 'lodash'
@@ -102,12 +101,12 @@ const updateTabData = (tabs: Doc[], oldTabPath: string, newContent?: string, new
   }
 }
 
-export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
-  const { filePath, openFileAfterCreation, content, state } = action
+export const createFile = (event: IpcMainEvent, action: CreateFile) => {
+  const { filePath, openFileAfterCreation, content, state, encoding } = action
   const { rootDirectory, baseDir } = state
-  const fileContent = content || ''
+  const fileContent = (content || '').replace(/^data:([A-Za-z-+/]+);base64,/, '')
 
-  fs.writeFile(filePath, fileContent, (err) => {
+  fs.writeFile(filePath, fileContent, encoding, (err) => {
     if (err) {
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
@@ -124,29 +123,6 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
     if (openFileAfterCreation) {
       readAndSendTabData(event, { state, filePath, type: FileActions.ReadFile })
     }
-  })
-}
-
-export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, index: Document<Doc, true>) => {
-  const { filePath, content, state, encoding } = action
-  const { rootDirectory, baseDir } = state
-  const imageEncoding = encoding === 'binary' ? 'binary' : 'base64'
-  const buffer = content.replace(/^data:([A-Za-z-+/]+);base64,/, '')
-
-  fs.writeFile(filePath, buffer, imageEncoding, (err) => {
-    if (err) {
-      console.error(err)
-      event.sender.send(FileActionResponses.CreateFailure, err)
-      return
-    }
-    const file = getTreeElementFromPath(baseDir, filePath, false)
-    const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
-      baseDir: rootDirectory.data.filePath,
-    })
-
-    const rootDir = first(updatedRootDirectory)
-
-    event.sender.send(FileActionResponses.CreateSuccess, { rootDirectory: rootDir })
   })
 }
 
@@ -246,20 +222,22 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, fileWatche
   const promises: Promise<void>[] = paths.map(
     (filePath) =>
       new Promise((resolve, reject) => {
-        const { ino, isDirectory } = fs.statSync(filePath)
-        fs.rm(filePath, { recursive: true, force: true }, async (err) => {
-          if (err) {
+        const stats = fs.statSync(filePath)
+        const isDir = stats.isDirectory()
+
+        trash(filePath)
+          .then(() => {
+            if (!isDir) {
+              fileWatcher.onDeleteFile(stats.ino)
+              markTabAsDeleted(filePath)
+
+              resolve()
+            }
+          })
+          .catch(() => {
             failedToDelete.push(filePath)
             reject()
-          }
-
-          if (!isDirectory) {
-            fileWatcher.onDeleteFile(ino)
-            markTabAsDeleted(filePath)
-          }
-
-          resolve()
-        })
+          })
       })
   )
   Promise.all(promises).then(
