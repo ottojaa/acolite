@@ -1,15 +1,9 @@
 import { TreeNode } from 'primeng/api'
 
 export interface FileEntity {
-  type: 'folder' | 'file'
-  icon?: string
   indents?: number
-  ino: number
   filePath: string
   parentPath: string
-  size: number
-  createdAt: Date
-  modifiedAt: Date
   fileExtension?: string
 }
 

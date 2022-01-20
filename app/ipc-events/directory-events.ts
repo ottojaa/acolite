@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import { promises as fsp } from 'fs'
 import { Document } from 'flexsearch'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
-import { getFileEntityFromPath, getRootDirectory } from '../electron-utils/utils'
+import { getTreeElementFromPath, getRootDirectory } from '../electron-utils/utils'
 import { getUpdatedMenuItemsRecursive } from '../electron-utils/menu-utils'
 import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../shared/actions'
 import { Doc } from '../shared/interfaces'
@@ -18,7 +18,7 @@ export const createNewDirectory = (event: IpcMainEvent, payload: CreateNewDirect
   fsp
     .mkdir(directoryPath, { recursive: true })
     .then(() => {
-      const newDir = getFileEntityFromPath(directoryPath)
+      const newDir = getTreeElementFromPath(baseDir, directoryPath, true)
       const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [newDir], 'create', {
         baseDir: rootDirectory.data.filePath,
       })

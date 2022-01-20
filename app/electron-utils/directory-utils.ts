@@ -3,8 +3,8 @@ import { TreeElement, FilePathContainer } from '../shared/interfaces'
 import { getDirName, getPathSeparator } from './file-utils'
 
 export const getPathsToBeModified = (selectedFiles: TreeElement[], target?: TreeElement): FilePathContainer => {
-  const folders = selectedFiles.filter((el) => el.data.type === 'folder')
-  const files = selectedFiles.filter((el) => el.data.type === 'file')
+  const folders = selectedFiles.filter((el) => el.type === 'folder')
+  const files = selectedFiles.filter((el) => el.type === 'file')
   const dirPaths = folders.map((folder) => folder.data.filePath)
   const filteredDirPaths = filterDirPathsWithNoParentSelected(dirPaths, target)
   const filteredFilePaths = filePathsWithNoParentDirectorySelected(dirPaths, files, target)

@@ -54,7 +54,7 @@ export class TreeComponent extends AbstractComponent {
     const modifierKeyPressed = shiftKey || metaKey
 
     if (!modifierKeyPressed) {
-      if (node.data.type === 'file') {
+      if (node.type === 'file') {
         this.tabService.openNewTab(node.data.filePath)
       }
     }
@@ -122,7 +122,7 @@ export class TreeComponent extends AbstractComponent {
   onDrop(event: { dragNode: TreeElement; dropNode: TreeElement }): void {
     const { dragNode, dropNode } = event
 
-    if (dropNode.data.type !== 'folder') {
+    if (dropNode.type !== 'folder') {
       return
     }
     const isNodeInSelectedFiles = this.selectedFiles.find((file) => file.data.filePath === dragNode.data.filePath)
@@ -264,7 +264,7 @@ export class TreeComponent extends AbstractComponent {
    * Menuitems declared here instead of a separate class / component as otherwise we need to pass a component reference to it
    */
   getMenuItems(baseItem: TreeElement): MenuItem[] {
-    const isFolder = (node: TreeElement) => node.data.type === 'folder'
+    const isFolder = (node: TreeElement) => node.type === 'folder'
     let baseItems = [
       {
         label: 'Rename',
@@ -321,6 +321,6 @@ export class TreeComponent extends AbstractComponent {
   }
 
   isFolderSelected(selectedFiles: TreeNode<FileEntity>[]): boolean {
-    return selectedFiles?.length === 1 && selectedFiles[0].data.type === 'folder'
+    return selectedFiles?.length === 1 && selectedFiles[0].type === 'folder'
   }
 }

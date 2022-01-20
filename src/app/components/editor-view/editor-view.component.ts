@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core'
 import { AbstractComponent } from 'app/abstract/abstract-component'
 import { ElectronService } from 'app/core/services'
 import { flatMap } from 'lodash'
-import { BehaviorSubject, combineLatest, forkJoin, from, Observable, of, Subject } from 'rxjs'
-import { filter, map, mergeMap, skipUntil, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { BehaviorSubject, combineLatest, forkJoin, from, merge, Observable, of, Subject } from 'rxjs'
+import { filter, map, mergeMap, share, skipUntil, switchMap, take, takeUntil, tap } from 'rxjs/operators'
 import { Doc } from '../../../../app/shared/interfaces'
 import { StateService } from '../../services/state.service'
 import { TabService } from '../../services/tab.service'
@@ -72,11 +72,10 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   initBookmarksListener(): void {
-    this.state
-      .getStatePart('bookmarks')
+    combineLatest([this.state.getStatePart('bookmarks'), this.indexingReady$])
       .pipe(
         takeUntil(this.destroy$),
-        switchMap((bookmarks) => this.fetchBookmarked(bookmarks)),
+        switchMap(([bookmarks]) => this.fetchBookmarked(bookmarks)),
         mergeMap((data) => data)
       )
       .subscribe((bookmarked) => {
@@ -85,12 +84,10 @@ export class EditorViewComponent extends AbstractComponent implements OnInit {
   }
 
   initRecentlyModifiedListener(): void {
-    this.state
-      .getStatePart('indexing')
+    combineLatest([this.state.getStatePart('indexing'), this.indexingReady$])
       .pipe(
         takeUntil(this.destroy$),
-        skipUntil(this.indexingReady$),
-        filter((isIndexing) => !isIndexing),
+        filter(([isIndexing]) => !isIndexing),
         switchMap(() => this.fetchRecentlyModified()),
         mergeMap((data) => data)
       )

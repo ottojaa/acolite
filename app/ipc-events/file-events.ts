@@ -19,10 +19,10 @@ import {
   replaceTreeNodeRecursive,
 } from '../electron-utils/menu-utils'
 import {
-  getDeletedFileEntityMock,
-  getFileEntityFromPath,
+  getDeletedFileMock,
+  getTreeElementFromPath,
   getSelectedTabEntityFromIndex,
-  getTreeElementsFromFilePath,
+  getTreeStructureFromBaseDirectory,
 } from '../electron-utils/utils'
 import {
   ReadFile,
@@ -37,9 +37,8 @@ import {
   CopyFiles,
   CreateImageFile,
 } from '../shared/actions'
-import { Doc, TreeElement } from '../shared/interfaces'
+import { Doc } from '../shared/interfaces'
 import { first, cloneDeep } from 'lodash'
-import { deleteThumbnail } from '../thumbnail-helpers/thumbnail-helpers'
 import { FileWatcher } from '../file-watcher/file-watcher'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
@@ -105,7 +104,7 @@ const updateTabData = (tabs: Doc[], oldTabPath: string, newContent?: string, new
 
 export const createFile = (event: IpcMainEvent, action: CreateFile, index: Document<Doc, true>) => {
   const { filePath, openFileAfterCreation, content, state } = action
-  const { rootDirectory } = state
+  const { rootDirectory, baseDir } = state
   const fileContent = content || ''
 
   fs.writeFile(filePath, fileContent, (err) => {
@@ -113,7 +112,7 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
     }
-    const file = getFileEntityFromPath(filePath)
+    const file = getTreeElementFromPath(baseDir, filePath, false)
     const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
       baseDir: rootDirectory.data.filePath,
     })
@@ -130,7 +129,7 @@ export const createFile = (event: IpcMainEvent, action: CreateFile, index: Docum
 
 export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, index: Document<Doc, true>) => {
   const { filePath, content, state, encoding } = action
-  const { rootDirectory } = state
+  const { rootDirectory, baseDir } = state
   const imageEncoding = encoding === 'binary' ? 'binary' : 'base64'
   const buffer = content.replace(/^data:([A-Za-z-+/]+);base64,/, '')
 
@@ -140,7 +139,7 @@ export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, in
       event.sender.send(FileActionResponses.CreateFailure, err)
       return
     }
-    const file = getFileEntityFromPath(filePath)
+    const file = getTreeElementFromPath(baseDir, filePath, false)
     const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'create', {
       baseDir: rootDirectory.data.filePath,
     })
@@ -151,9 +150,9 @@ export const createImageFile = (event: IpcMainEvent, action: CreateImageFile, in
   })
 }
 
-export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Document<Doc, true>) => {
+export const renameFile = (event: IpcMainEvent, action: RenameFile) => {
   const { filePath, newName, state } = action
-  const { rootDirectory, tabs } = state
+  const { rootDirectory, tabs, baseDir } = state
   const parentDirectory = getDirName(filePath)
   const extension = getExtension(filePath)
   const newPath = getJoinedPath([parentDirectory, newName]) + extension
@@ -164,9 +163,8 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile, index: Docum
       event.sender.send(FileActionResponses.RenameFailure)
       return
     }
-    const file = getFileEntityFromPath(newPath)
-    const fileInfo = fs.statSync(newPath)
-    const isFolder = fileInfo.isDirectory()
+    const isFolder = fs.statSync(newPath).isDirectory()
+    const file = getTreeElementFromPath(baseDir, newPath, isFolder)
 
     const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], [file], 'rename', {
       oldPath,
@@ -248,15 +246,17 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, fileWatche
   const promises: Promise<void>[] = paths.map(
     (filePath) =>
       new Promise((resolve, reject) => {
-        const { ino } = fs.statSync(filePath)
+        const { ino, isDirectory } = fs.statSync(filePath)
         fs.rm(filePath, { recursive: true, force: true }, async (err) => {
           if (err) {
             failedToDelete.push(filePath)
             reject()
           }
 
-          fileWatcher.onDeleteFile(ino)
-          markTabAsDeleted(filePath)
+          if (!isDirectory) {
+            fileWatcher.onDeleteFile(ino)
+            markTabAsDeleted(filePath)
+          }
 
           resolve()
         })
@@ -266,7 +266,7 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, fileWatche
     async () => {
       const filesToDelete = paths
         .filter((el) => !failedToDelete.includes(el))
-        .map((filePath) => getDeletedFileEntityMock(filePath))
+        .map((filePath) => getDeletedFileMock(filePath))
 
       const updatedRootDirectory = getUpdatedMenuItemsRecursive([rootDirectory], filesToDelete, 'delete', { baseDir })
       const rootDir = first(updatedRootDirectory)
@@ -315,7 +315,7 @@ export const copyFiles = (event: IpcMainEvent, payload: CopyFiles, index: Docume
 
   Promise.all(promises).then(
     () => {
-      const updatedTargetNodeChildren = getTreeElementsFromFilePath(target.data.filePath)
+      const updatedTargetNodeChildren = getTreeStructureFromBaseDirectory(target.data.filePath)
       const node = { ...target, children: updatedTargetNodeChildren }
       const updatedRootDir = first(replaceTreeNodeRecursive([rootDirectory], node, baseDir))
 

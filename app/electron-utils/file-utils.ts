@@ -85,6 +85,10 @@ export const getFileContent = (filePath: string, encoding: Encoding) => {
 
 export const getFileDataSync = (filePath: string): Doc => {
   try {
+    if (!fs.existsSync(filePath)) {
+      return null
+    }
+
     const extension = getExtensionSplit(filePath)
     const fileStats = fs.statSync(filePath)
     const editorConfig = getEditorConfig(extension)

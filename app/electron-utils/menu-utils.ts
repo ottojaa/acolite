@@ -10,44 +10,16 @@ export interface Config {
   baseDir?: string
 }
 
-export const folderStructureToMenuItems = (
-  baseDir: string,
-  folderStruct: (TreeElement | FileEntity)[]
-): TreeNode<FileEntity>[] => folderStruct.map((child) => createMenuItemsRecursive(baseDir, child))
-
-const createMenuItemsRecursive = (baseDir: string, element: TreeElement | FileEntity): TreeNode => {
-  if (isFolder(element) && element.data.type === 'folder') {
-    const { data, children } = element
-    const treeNode: TreeElement = {
-      label: getBaseName(data.filePath),
-      type: MenuItemTypes.Folder,
-      key: data.filePath,
-      leaf: false,
-      children: children.map((child) => createMenuItemsRecursive(baseDir, child)),
-      data,
-    }
-    treeNode.data.indents = calculateIndents(treeNode, baseDir)
-
-    return treeNode
-  } else if (isFile(element)) {
-    const treeNode = getTreeNodeFromFileEntity(element)
-    treeNode.data.indents = calculateIndents(treeNode, baseDir)
-
-    return treeNode
-  }
-  throw new Error('createMenuItemsRecursive failed, invalid element')
-}
-
 export const getUpdatedMenuItemsRecursive = (
   menuItems: TreeElement[],
-  updatedItems: FileEntity[],
+  updatedItems: TreeElement[],
   strategy: UpdateStrategy,
   config?: Config
 ): TreeElement[] => {
   for (let updatedItem of updatedItems) {
     for (let item of menuItems) {
       // Find the updated item's parent, and update it
-      if (item.data.filePath === updatedItem.parentPath) {
+      if (item.data.filePath === updatedItem.data.parentPath) {
         updateItemByStrategy(item, updatedItem, strategy, config)
       }
       if (item.children) {
@@ -81,17 +53,16 @@ export const replaceTreeNodeRecursive = (treeElements: TreeElement[], nodeToRepl
 
 const updateItemByStrategy = (
   item: TreeElement,
-  updatedItem: FileEntity,
+  updatedItem: TreeElement,
   strategy: UpdateStrategy,
   config?: Config
 ) => {
   switch (strategy) {
     case 'create': {
       const isFolder = updatedItem.type === 'folder'
-      const treeNode = getTreeNodeFromFileEntity(updatedItem, 'new-file')
 
       // PrimeNG tree sorts folders to the top
-      item.children = isFolder ? [treeNode, ...item.children] : [...item.children, treeNode]
+      item.children = isFolder ? [updatedItem, ...item.children] : [...item.children, updatedItem]
       item.expanded = true
       addIndents(item.children, config.baseDir)
 
@@ -102,7 +73,7 @@ const updateItemByStrategy = (
       break
     }
     case 'delete': {
-      item.children = item.children.filter((el) => !el.data.filePath.includes(updatedItem.filePath))
+      item.children = item.children.filter((el) => !el.data.filePath.includes(updatedItem.data.filePath))
       break
     }
     default: {
@@ -132,7 +103,7 @@ export const moveRecursive = (
 
     if (toBeAdded.length || toBeDeleted.length) {
       if (toBeAdded.length) {
-        menuItem.children = [...menuItem.children, ...toBeAdded].sort((a, _b) => (a.data.type === 'folder' ? -1 : 1))
+        menuItem.children = [...menuItem.children, ...toBeAdded].sort((a, _b) => (a.type === 'folder' ? -1 : 1))
         menuItem.expanded = true
         addIndents(menuItem.children, config.baseDir)
       }
@@ -145,8 +116,8 @@ export const moveRecursive = (
     }
   }
 }
-export const calculateIndents = (el: TreeElement, baseDir: string) => {
-  const pathDiff = el.data.filePath.replace(baseDir, '')
+export const calculateIndents = (filePath: string, baseDir: string) => {
+  const pathDiff = filePath.replace(baseDir, '')
   const separators = pathDiff.split(getPathSeparator())
 
   return separators.length - 2 // Do not show indent for rootDir, nor the first menuItems
@@ -157,7 +128,7 @@ export const calculateIndents = (el: TreeElement, baseDir: string) => {
  */
 export const addIndents = (items: TreeElement[], baseDir: string): void => {
   items.forEach((item) => {
-    item.data.indents = calculateIndents(item, baseDir)
+    item.data.indents = calculateIndents(item.data.filePath, baseDir)
     if (item.children?.length) {
       addIndents(item.children, baseDir)
     }
@@ -200,40 +171,6 @@ export const removeExistingStyleClasses = (menuItems: TreeElement[]) => {
   }, 500)
 }
 
-export const getTreeNodeFromFileEntity = (
-  data: FileEntity,
-  styleClass?: string,
-  children?: TreeElement[]
-): TreeNode<FileEntity> => {
-  if (data.type === 'folder') {
-    return {
-      data,
-      label: getBaseName(data.filePath),
-      leaf: false,
-      key: data.filePath,
-      type: MenuItemTypes.Folder,
-      children: children?.length ? children : [],
-      ...(styleClass && { styleClass }),
-    }
-  } else {
-    return {
-      label: getBaseName(data.filePath),
-      type: MenuItemTypes.File,
-      key: data.filePath,
-      data,
-      ...(styleClass && { styleClass }),
-    }
-  }
-}
-
 export const addFileToBaseDir = (menuItems: TreeNode<FileEntity>[], newItem: FileEntity) => {
   return [...menuItems, newItem]
-}
-
-const isFolder = (el: TreeElement | FileEntity): el is TreeElement => {
-  return 'data' in el
-}
-
-const isFile = (el: TreeElement | FileEntity): el is FileEntity => {
-  return !('data' in el)
 }

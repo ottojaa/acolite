@@ -1,81 +1,74 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { folderStructureToMenuItems, getTreeNodeFromFileEntity } from './menu-utils'
+import { calculateIndents } from './menu-utils'
 import { getBaseName, getDirName, getJoinedPath, getPathSeparator } from './file-utils'
 import { FileEntity, MenuItemTypes, SelectedTab, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
 import { ValidatorFn, AbstractControl } from '@angular/forms'
 
-export const getFileEntityFromPath = (filePath: string): FileEntity => {
-  const fileInfo = fs.statSync(filePath)
-  const isFolder = fileInfo.isDirectory()
+export const getTreeElementFromPath = (baseDir: string, filePath: string, isFolder: boolean): TreeElement => {
   const getExtension = (filename: string) => {
     const ext = path.extname(filename || '').split('.')
     return ext[ext.length - 1]
   }
+  const type = isFolder ? MenuItemTypes.Folder : MenuItemTypes.File
   const fileExtension = isFolder ? null : getExtension(filePath)
+  const label = getBaseName(filePath)
+  const parentPath = getDirName(filePath)
+  const indents = calculateIndents(filePath, baseDir)
 
   return {
-    filePath,
-    ino: fileInfo.ino,
-    parentPath: getDirName(filePath),
-    type: isFolder ? 'folder' : 'file',
-    size: fileInfo.size,
-    createdAt: fileInfo.birthtime,
-    modifiedAt: fileInfo.mtime,
-    ...(!isFolder && { fileExtension }),
+    type,
+    label,
+    key: filePath,
+    leaf: !isFolder,
+    data: {
+      filePath,
+      parentPath,
+      indents,
+      ...(!isFolder && { fileExtension }),
+    },
   }
 }
 
 /**
  * Since the file entity does not exist after deletion, we need to mock it
  */
-export const getDeletedFileEntityMock = (filePath: string): FileEntity => {
+export const getDeletedFileMock = (filePath: string): TreeElement => {
   return {
-    filePath,
-    ino: 0,
-    parentPath: getDirName(filePath),
-    type: 'file',
-    size: 0,
-    createdAt: new Date(),
-    modifiedAt: new Date(),
+    data: {
+      filePath,
+      parentPath: getDirName(filePath),
+    },
   }
-}
-
-export const getMenuItemsFromBaseDirectory = (baseDir: string) => {
-  const treeStructure = getTreeStructureFromBaseDirectory(baseDir)
-  return folderStructureToMenuItems(baseDir, treeStructure)
 }
 
 export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
   const directoryPath = baseDir
 
-  const isDirectory = (path: string) => fs.statSync(path).isDirectory()
-  const getDirectories = (fileEntity: FileEntity) =>
+  const getDirectories = (fileEntity: TreeElement) =>
     fs
-      .readdirSync(fileEntity.filePath)
-      .map((name) => join(fileEntity.filePath, name))
+      .readdirSync(fileEntity.data.filePath, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => join(fileEntity.data.filePath, dirent.name))
       .filter((name) => !name.includes('_thumbnails'))
-      .filter(isDirectory)
-      .map(getFileEntityFromPath)
+      .map((dirPath) => getTreeElementFromPath(baseDir, dirPath, true))
 
-  const isFile = (path: string) => fs.statSync(path).isFile()
-  const getFiles = (fileEntity: FileEntity) =>
+  const getFiles = (fileEntity: TreeElement) =>
     fs
-      .readdirSync(fileEntity.filePath)
-      .map((name) => join(fileEntity.filePath, name))
-      .filter(isFile)
+      .readdirSync(fileEntity.data.filePath, { withFileTypes: true })
+      .filter((dirent) => !dirent.isDirectory())
+      .map((dirent) => join(fileEntity.data.filePath, dirent.name))
       .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
-      .map(getFileEntityFromPath)
+      .map((filePath) => getTreeElementFromPath(baseDir, filePath, false))
 
-  const getFilesRecursively = (file: FileEntity): TreeElement[] => {
+  const getFilesRecursively = (file: TreeElement): TreeElement[] => {
     let dirs = getDirectories(file)
-    let files: (TreeElement | FileEntity)[] = dirs.map((dir) => {
+    let files: TreeElement[] = dirs.map((dir) => {
       return {
-        data: dir,
+        ...dir,
         children: getFilesRecursively(dir).reduce(
-          (directoryDescendants: (TreeElement | FileEntity)[], descendant: TreeElement | FileEntity) =>
-            directoryDescendants.concat(descendant),
+          (directoryDescendants: TreeElement[], descendant: TreeElement) => directoryDescendants.concat(descendant),
           []
         ),
       }
@@ -83,52 +76,7 @@ export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
     return files.concat(getFiles(file))
   }
 
-  const rootFolder = getFileEntityFromPath(directoryPath)
-  return getFilesRecursively(rootFolder)
-}
-
-export const getTreeElementsFromFilePath = (baseDir: string) => {
-  const directoryPath = baseDir
-
-  const isDirectory = (path: string) => fs.statSync(path).isDirectory()
-  const getDirectories = (fileEntity: FileEntity) =>
-    fs
-      .readdirSync(fileEntity.filePath)
-      .map((name) => join(fileEntity.filePath, name))
-      .filter(isDirectory)
-      .map(getFileEntityFromPath)
-
-  const isFile = (path: string) => fs.statSync(path).isFile()
-  const getFiles = (fileEntity: FileEntity) =>
-    fs
-      .readdirSync(fileEntity.filePath)
-      .map((name) => join(fileEntity.filePath, name))
-      .filter(isFile)
-      .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
-      .map(getFileEntityFromPath)
-      .map((file) => getTreeNodeFromFileEntity(file))
-
-  const getFilesRecursively = (file: FileEntity): TreeElement[] => {
-    let dirs = getDirectories(file)
-    let files: (TreeElement | FileEntity)[] = dirs.map((dir) => {
-      return {
-        data: dir,
-        label: getBaseName(dir.filePath),
-        expanded: true,
-        leaf: false,
-        key: dir.filePath,
-        type: MenuItemTypes.Folder,
-        children: getFilesRecursively(dir).reduce(
-          (directoryDescendants: (TreeElement | FileEntity)[], descendant: TreeElement | FileEntity) =>
-            directoryDescendants.concat(descendant),
-          []
-        ),
-      }
-    })
-    return files.concat(getFiles(file))
-  }
-
-  const rootFolder = getFileEntityFromPath(directoryPath)
+  const rootFolder = getTreeElementFromPath(baseDir, directoryPath, true)
   return getFilesRecursively(rootFolder)
 }
 
@@ -146,11 +94,10 @@ export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: 
 }
 
 export const getRootDirectory = (baseDir: string): TreeElement => {
-  const rootEntity = getFileEntityFromPath(baseDir)
-  const rootTreeNode = getTreeNodeFromFileEntity(rootEntity)
-  const menuItems = getMenuItemsFromBaseDirectory(baseDir)
+  const rootTreeElement = getTreeElementFromPath(baseDir, baseDir, true)
+  const menuItems = getTreeStructureFromBaseDirectory(baseDir)
 
-  return { ...rootTreeNode, children: menuItems }
+  return { ...rootTreeElement, children: menuItems }
 }
 
 export const getSelectedTabEntityFromIndex = (state: State, index: number): SelectedTab => {

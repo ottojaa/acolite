@@ -1,4 +1,4 @@
-import { combineLatest, Observable, Subject } from 'rxjs'
+import { combineLatest, Observable, ReplaySubject, Subject } from 'rxjs'
 import { concatMap, debounceTime, distinctUntilChanged, map, startWith, tap } from 'rxjs/operators'
 
 /**
@@ -7,9 +7,14 @@ import { concatMap, debounceTime, distinctUntilChanged, map, startWith, tap } fr
 export class Scheduler {
   queue$ = new Subject()
   results$: Observable<any>
+  isScheduling$ = new ReplaySubject<boolean>(1)
 
   constructor() {
     this.results$ = this.queue$.pipe(concatMap((action: Promise<any>) => action))
+    this.isScheduling().subscribe((scheduling) => {
+      console.log(scheduling)
+      this.isScheduling$.next(scheduling)
+    })
   }
 
   addToQueue(action: Promise<any>): void {

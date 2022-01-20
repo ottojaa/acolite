@@ -261,7 +261,7 @@ const FileActionReducer = (action: FileActions) => {
         break
       }
       case FileActions.Rename: {
-        renameFile(event, payload, index)
+        renameFile(event, payload)
         break
       }
       case FileActions.DeleteFiles: {

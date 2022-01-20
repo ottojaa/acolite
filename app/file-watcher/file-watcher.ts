@@ -18,7 +18,6 @@ export class FileWatcher {
   ignoredFolders = ['node_modules', '_thumbnails', '.DS_Store']
   baseDir: string
   indexQueue = new Scheduler()
-  isScheduling$ = this.indexQueue.isScheduling()
 
   startWatcher(baseDir: string, window: BrowserWindow, index: Document<Doc, true>): void {
     this.baseDir = baseDir
@@ -33,11 +32,12 @@ export class FileWatcher {
   }
 
   initScheduler(): void {
+    this.window.webContents.send(StoreResponses.IndexingReady, { indexingReady: false })
     let initialResponseSent = false
 
-    this.isScheduling$.subscribe((indexing) => {
+    this.indexQueue.isScheduling$.subscribe((indexing) => {
       if (!initialResponseSent) {
-        this.window.webContents.send(StoreResponses.IndexingReady)
+        this.window.webContents.send(StoreResponses.IndexingReady, { indexingReady: true })
         initialResponseSent = true
       } else {
         this.window.webContents.send(StoreResponses.Indexing, { indexing })

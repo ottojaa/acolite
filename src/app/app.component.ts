@@ -210,11 +210,10 @@ export class AppComponent extends AbstractComponent implements OnInit {
           break
         }
         case StoreResponses.IndexingReady: {
-          this.state.updateState$.next([{ key: 'indexingReady', payload: true }])
+          this.state.updateState$.next([{ key: 'indexingReady', payload: response.indexingReady }])
           break
         }
         case StoreResponses.Indexing: {
-          console.log(response)
           this.state.updateState$.next([{ key: 'indexing', payload: response.indexing }])
           break
         }
