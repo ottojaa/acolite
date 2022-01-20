@@ -11,10 +11,7 @@ export class Scheduler {
 
   constructor() {
     this.results$ = this.queue$.pipe(concatMap((action: Promise<any>) => action))
-    this.isScheduling().subscribe((scheduling) => {
-      console.log(scheduling)
-      this.isScheduling$.next(scheduling)
-    })
+    this.isScheduling().subscribe((scheduling) => this.isScheduling$.next(scheduling))
   }
 
   addToQueue(action: Promise<any>): void {

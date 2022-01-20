@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { calculateIndents } from './menu-utils'
 import { getBaseName, getDirName, getJoinedPath, getPathSeparator } from './file-utils'
-import { FileEntity, MenuItemTypes, SelectedTab, State, TreeElement } from '../shared/interfaces'
+import { MenuItemTypes, SelectedTab, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
 import { ValidatorFn, AbstractControl } from '@angular/forms'
 
@@ -28,6 +28,7 @@ export const getTreeElementFromPath = (baseDir: string, filePath: string, isFold
       indents,
       ...(!isFolder && { fileExtension }),
     },
+    ...(isFolder && { children: [] }),
   }
 }
 

@@ -58,7 +58,7 @@
             }"
           ></div>
         </ng-container>
-        <mat-icon [ngClass]="{ empty: !node.children.length }">
+        <mat-icon [ngClass]="{ empty: !node.children?.length }">
           {{ node.expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}</mat-icon
         >
 
