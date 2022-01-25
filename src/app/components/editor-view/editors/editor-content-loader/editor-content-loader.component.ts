@@ -1,8 +1,11 @@
 import { trigger, transition, style, animate, keyframes } from '@angular/animations'
 import { ChangeDetectorRef, Component, Input, NgZone, OnInit } from '@angular/core'
+import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 import { ElectronService } from 'app/core/services'
+import { StateService } from 'app/services/state.service'
+import { ThemeService } from 'app/services/theme.service'
 import { from, Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { filter, map, switchMap, take, tap } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
@@ -22,8 +25,16 @@ export class EditorContentLoaderComponent implements OnInit {
   @Input() tab: Doc
 
   tabData$: Observable<Doc>
+  monacoLoaded$: Observable<boolean>
 
-  constructor(public electronService: ElectronService, public zone: NgZone, public cdRef: ChangeDetectorRef) {}
+  constructor(
+    public electronService: ElectronService,
+    public zone: NgZone,
+    public cdRef: ChangeDetectorRef,
+    public monacoLoaderService: MonacoEditorLoaderService,
+    public state: StateService,
+    public themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
     this.tabData$ = this.getTabData(this.tab)

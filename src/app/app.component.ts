@@ -8,10 +8,12 @@ import { StateService, StateUpdate } from './services/state.service'
 import { Router } from '@angular/router'
 import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/shared/actions'
 import { State } from '../../app/shared/interfaces'
-import { takeUntil } from 'rxjs/operators'
+import { filter, skip, skipUntil, switchMap, take, takeUntil, tap } from 'rxjs/operators'
 import { AbstractComponent } from './abstract/abstract-component'
+import { addTabAndSetAsSelectedTab } from './components/helpers/tab-helpers'
+import { combineLatest, forkJoin, Observable } from 'rxjs'
+import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 
-type IPCEvent = Electron.IpcMessageEvent
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
 @Component({
   selector: 'app-root',
@@ -21,6 +23,8 @@ type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses 
 export class AppComponent extends AbstractComponent implements OnInit {
   initialized = false
 
+  themeListReady$: Observable<boolean>
+
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
@@ -28,22 +32,56 @@ export class AppComponent extends AbstractComponent implements OnInit {
     public state: StateService,
     public router: Router,
     public dialogService: AppDialogService,
+    public monacoLoaderService: MonacoEditorLoaderService,
     public zone: NgZone
   ) {
     super()
     this.electronService.initApp()
     this.translate.setDefaultLang('en')
+
+    this.themeListReady$ = this.themeService.isThemeListReady()
+    this.initMonacoEditorThemes()
+    this.initMonacoEditor()
+    this.initMonacoThemeChangeListener()
+
     console.log('APP_CONFIG', APP_CONFIG)
 
-    if (electronService.isElectron) {
-      console.log(process.env)
-      console.log('Run in electron')
-      console.log('Electron ipcRenderer', this.electronService.ipcRenderer)
-      console.log('NodeJS childProcess', this.electronService.childProcess)
-    } else {
-      console.log('Run in browser')
-    }
     this.initIPCMainListeners()
+  }
+
+  initMonacoEditor(): void {
+    this.monacoLoaderService.isMonacoLoaded$
+      .pipe(
+        filter((isLoaded) => isLoaded),
+        take(1),
+        switchMap(() => {
+          this.themeService.monacoReady$.next(true)
+          return this.themeListReady$.pipe(take(1))
+        })
+      )
+      .subscribe(() => {
+        this.themeService.setMonacoTheme(this.state.getStatePartValue('monacoEditorTheme'))
+        this.state.updateState$.next([{ key: 'monacoReady', payload: true }])
+      })
+  }
+
+  initMonacoEditorThemes(): void {
+    this.themeService
+      .fetchThemeList()
+      .pipe(take(1))
+      .subscribe((themes) => {
+        this.themeService.themeList$.next(themes)
+        this.themeService.themeListReady$.next(true)
+      })
+  }
+
+  initMonacoThemeChangeListener(): void {
+    this.state
+      .getStatePart('monacoEditorTheme')
+      .pipe(skipUntil(this.themeListReady$), takeUntil(this.destroy$))
+      .subscribe((theme) => {
+        this.themeService.setMonacoTheme(theme)
+      })
   }
 
   ngOnInit(): void {
@@ -94,7 +132,7 @@ export class AppComponent extends AbstractComponent implements OnInit {
   }
 
   startListener(action: IPCResponse): void {
-    this.electronService.on(action, (_ipcEvent: IPCEvent, arg: any) => {
+    this.electronService.on(action, (arg: any) => {
       this.ipcEventReducer(action, arg)
     })
   }
@@ -192,12 +230,7 @@ export class AppComponent extends AbstractComponent implements OnInit {
         }
 
         case FileActionResponses.ReadSuccess: {
-          const { tabs, selectedTab } = response
-          const payload: StateUpdate<State>[] = [
-            { key: 'tabs', payload: tabs },
-            { key: 'selectedTab', payload: selectedTab },
-          ]
-
+          const payload = addTabAndSetAsSelectedTab(this.state.state$.value, response.tabData)
           this.state.updateState$.next(payload)
           break
         }
@@ -229,7 +262,7 @@ export class AppComponent extends AbstractComponent implements OnInit {
     const initialState = this.state.initialState
 
     const mapIsoString = () => {
-      if (response.searchPreferences?.length) {
+      if (response?.searchPreferences?.length) {
         const convertIsoStringToDate = (range: { start?: string; end?: string }) => {
           const { start, end } = range
           const payload = {

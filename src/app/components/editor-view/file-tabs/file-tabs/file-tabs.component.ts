@@ -8,8 +8,8 @@ import { StateService } from '../../../../services/state.service'
 import { TabService } from '../../../../services/tab.service'
 import { MatTabChangeEvent } from '@angular/material/tabs'
 import { Doc, SelectedTab } from '../../../../../../app/shared/interfaces'
-import { getSelectedTabEntityFromIndex } from '../../../../../../app/electron-utils/utils'
 import { allowedMarkdownEditorExtensions, allowedTextEditorExtensions } from '../../../../../../app/shared/constants'
+import { getSelectedTabEntityFromIndex } from 'app/components/helpers/tab-helpers'
 
 @Component({
   selector: 'app-file-tabs',

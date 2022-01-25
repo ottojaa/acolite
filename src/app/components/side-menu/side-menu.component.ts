@@ -2,8 +2,6 @@ import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import { filter, map, takeUntil, tap } from 'rxjs/operators'
-import { getBaseName } from '../../../../app/electron-utils/file-utils'
-import { removeExistingStyleClasses } from '../../../../app/electron-utils/menu-utils'
 import { TreeElement, ActiveIndent } from '../../../../app/shared/interfaces'
 import { AbstractComponent } from '../../abstract/abstract-component'
 import { ElectronService } from '../../core/services'
@@ -40,14 +38,11 @@ export class SideMenuComponent extends AbstractComponent implements OnInit {
       filter((dir) => !!dir),
       tap((rootDir) => {
         if (rootDir && rootDir.data) {
-          this.workspaceName = getBaseName(rootDir.data.filePath)
+          this.workspaceName = window.path.getBaseName(rootDir.data.filePath)
         }
       }),
       map((rootDir) => rootDir.children),
-      tap((menuItems) => {
-        if (menuItems && menuItems.length) {
-          removeExistingStyleClasses(menuItems)
-        }
+      tap(() => {
         this.menuLoading = false
         this.cdRef.detectChanges()
       })

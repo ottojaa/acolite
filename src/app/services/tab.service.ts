@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
-import { getSelectedTabEntityFromIndex } from '../../../app/electron-utils/utils'
-import { binaryTypes } from '../../../app/shared/constants'
+import { getSelectedTabEntityFromIndex } from 'app/components/helpers/tab-helpers'
 import { Doc, SelectedTab, State } from '../../../app/shared/interfaces'
 import { ElectronService } from '../core/services'
 import { AppDialogService } from './dialog.service'

@@ -22,10 +22,11 @@ export interface WorkspaceConfig {
   tabs?: Doc[]
   sideMenuWidth?: number
   selectedTab?: SelectedTab
-  editorTheme?: 'dark' | 'light'
+  markdownEditorTheme?: 'dark' | 'light'
   appTheme?: string
   searchPreferences?: SearchPreference[]
   bookmarks?: string[]
+  monacoEditorTheme?: string
 }
 
 export interface AppConfig {
@@ -40,9 +41,11 @@ export interface State {
   initialized: boolean
   indexing: boolean
   indexingReady: boolean
+  monacoReady: boolean
   selectedTab: SelectedTab
-  editorTheme: 'dark' | 'light'
+  markdownEditorTheme: 'dark' | 'light'
   appTheme: string
+  monacoEditorTheme: string
   sideMenuWidth: number
   searchPreferences: SearchPreference[]
   searchResults: SearchResult[]

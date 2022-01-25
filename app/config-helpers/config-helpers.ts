@@ -143,7 +143,7 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       case 'selectedTab': {
         return validateSelectedTab(workspaceConfig)
       }
-      case 'editorTheme': {
+      case 'markdownEditorTheme': {
         return validateEditorTheme(workspaceConfig)
       }
       case 'searchPreferences': {
@@ -154,6 +154,9 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       }
       case 'appTheme': {
         return validateAppTheme(workspaceConfig)
+      }
+      case 'monacoEditorTheme': {
+        return validateMonacoEditorTheme(workspaceConfig)
       }
       default: {
         break
@@ -191,10 +194,10 @@ const validateSideMenuWidth = (config: WorkspaceConfig) => {
 }
 
 const validateEditorTheme = (config: WorkspaceConfig) => {
-  const { editorTheme } = config
-  const isValid = editorTheme === 'dark' || editorTheme === 'light'
+  const { markdownEditorTheme } = config
+  const isValid = markdownEditorTheme === 'dark' || markdownEditorTheme === 'light'
 
-  return isValid ? editorTheme : 'dark'
+  return isValid ? markdownEditorTheme : 'dark'
 }
 
 const validateAppTheme = (config: WorkspaceConfig) => {
@@ -215,6 +218,10 @@ const validateSearchPreferences = (config: WorkspaceConfig) => {
   const validValues = ['fileName', 'fileContent', 'filePath', 'createdAt', 'modifiedAt']
   const isValid = searchPreferences.every((preference) => preference.value && validValues.includes(preference.value))
   return isValid ? searchPreferences : []
+}
+
+const validateMonacoEditorTheme = (config: WorkspaceConfig) => {
+  return typeof config.monacoEditorTheme === 'string' ? config.monacoEditorTheme : 'vs-dark'
 }
 
 const validateBookmarks = (config: WorkspaceConfig) => {

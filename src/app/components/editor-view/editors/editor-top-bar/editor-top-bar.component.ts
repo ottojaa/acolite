@@ -2,7 +2,9 @@ import { Component, Input, OnInit } from '@angular/core'
 import { AbstractComponent } from 'app/abstract/abstract-component'
 import { StateService } from 'app/services/state.service'
 import { TabService } from 'app/services/tab.service'
-import { takeUntil } from 'rxjs/operators'
+import { MonacoTheme, ThemeList, ThemeService } from 'app/services/theme.service'
+import { Observable } from 'rxjs'
+import { takeUntil, tap } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
@@ -12,22 +14,29 @@ import { Doc } from '../../../../../../app/shared/interfaces'
 })
 export class EditorTopBarComponent extends AbstractComponent implements OnInit {
   @Input() tab: Doc
+  @Input() showToggleSwitch: boolean = false
+  @Input() showMonacoThemeList: boolean = false
 
   isChecked: boolean
   isBookmarked: boolean
 
-  constructor(private state: StateService, private tabService: TabService) {
+  monacoThemes$: Observable<ThemeList>
+  selectedMonacoTheme$: Observable<string>
+
+  constructor(private state: StateService, private tabService: TabService, private themeService: ThemeService) {
     super()
   }
 
   ngOnInit(): void {
     this.initThemeListener()
     this.initBookmarkListener()
+    this.monacoThemes$ = this.themeService.getThemeList()
+    this.selectedMonacoTheme$ = this.state.getStatePart('monacoEditorTheme')
   }
 
   initThemeListener(): void {
     this.state
-      .getStatePart('editorTheme')
+      .getStatePart('markdownEditorTheme')
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => (this.isChecked = data === 'light'))
   }
@@ -43,7 +52,7 @@ export class EditorTopBarComponent extends AbstractComponent implements OnInit {
 
   onChangeTheme(): void {
     const theme = this.isChecked ? 'light' : 'dark'
-    this.state.updateState$.next([{ key: 'editorTheme', payload: theme }])
+    this.state.updateState$.next([{ key: 'markdownEditorTheme', payload: theme }])
   }
 
   toggleBookmark(tab: Doc): void {

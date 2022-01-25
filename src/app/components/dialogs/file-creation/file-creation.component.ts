@@ -6,8 +6,6 @@ import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { MatSelect } from '@angular/material/select'
 import { extensionValidationPattern, nameValidationPattern } from '../../../../../app/shared/constants'
-import { getBaseName, getJoinedPath } from '../../../../../app/electron-utils/file-utils'
-import { TreeElement } from '../../../../../app/shared/interfaces'
 
 @Component({
   selector: 'app-file-creation',
@@ -54,7 +52,7 @@ export class FileCreationComponent {
   }
 
   get parent(): string {
-    return getBaseName(this.data.filePath)
+    return window.path.getBaseName(this.data.filePath)
   }
 
   get formValid(): boolean {
@@ -102,7 +100,7 @@ export class FileCreationComponent {
       return
     }
 
-    const filePath = getJoinedPath([this.data.filePath, this.result])
+    const filePath = window.path.getJoinedPath([this.data.filePath, this.result])
 
     this.electronService.createNewFileRequest({
       filePath,

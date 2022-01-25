@@ -1,11 +1,4 @@
 import { Injectable } from '@angular/core'
-
-// If you import a module but never use any of the imported values other than as TypeScript types,
-// the resulting javascript file will look as if you never imported the module at all.
-import { ipcRenderer, webFrame } from 'electron'
-import * as remote from '@electron/remote'
-import * as childProcess from 'child_process'
-import * as fs from 'fs'
 import {
   ActionType,
   ReadDirectory,
@@ -38,48 +31,28 @@ type OmitActionType<T> = Omit<T, 'type'>
   providedIn: 'root',
 })
 export class ElectronService {
-  ipcRenderer: typeof ipcRenderer
-  webFrame: typeof webFrame
-  remote: typeof remote
-  childProcess: typeof childProcess
-  fs: typeof fs
-
-  get isElectron(): boolean {
-    return !!(window && window.process && window.process.type)
-  }
-
-  constructor() {
-    // Conditional imports
-    if (this.isElectron) {
-      this.ipcRenderer = window.require('electron').ipcRenderer
-      this.webFrame = window.require('electron').webFrame
-      this.childProcess = window.require('child_process')
-      this.fs = window.require('fs')
-      this.remote = window.require('@electron/remote')
-    }
-  }
+  constructor() {}
 
   public on(channel: string, listener: any): void {
-    if (!this.ipcRenderer) {
+    if (!window.ipc) {
       return
     }
 
-    this.ipcRenderer.on(channel, listener)
+    window.ipc.on(channel, listener)
   }
 
   public send<T>(channel: ActionType, payload?: T): void {
-    if (!this.ipcRenderer) {
+    if (!window.ipc) {
       return
     }
-    const action = this.addActionType(channel, payload)
-    this.ipcRenderer.send(channel, action)
+    window.ipc.send(channel, payload ? this.addActionType(channel, payload) : null)
   }
 
   public async handle<T>(channel: HandlerAction, payload?: T): Promise<any> {
-    if (!this.ipcRenderer) {
+    if (!window.ipc) {
       return
     }
-    return this.ipcRenderer.invoke(channel, payload)
+    return window.ipc.invoke(channel, payload)
   }
 
   // Folder actions
@@ -154,26 +127,19 @@ export class ElectronService {
   }
 
   showContextMenu(): void {
-    this.ipcRenderer.send(ContextMenuActions.ShowEditorContextMenu)
-  }
-
-  addActionType<T extends OmitActionType<UpdateActionPayload>>(
-    channel: ActionType,
-    payload: T
-  ): T & { type: ActionType } {
-    return { ...payload, type: channel }
+    this.send(ContextMenuActions.ShowEditorContextMenu)
   }
 
   startAutoUpdater(): void {
-    this.ipcRenderer.send(AutoUpdateEvent.StartAutoUpdater)
+    this.send(AutoUpdateEvent.StartAutoUpdater)
   }
 
   downloadUpdate(): void {
-    this.ipcRenderer.send(AutoUpdateEvent.DownloadUpdate)
+    this.send(AutoUpdateEvent.DownloadUpdate)
   }
 
   quitAndInstall(): void {
-    this.ipcRenderer.send(AutoUpdateEvent.QuitAndInstall)
+    this.send(AutoUpdateEvent.QuitAndInstall)
   }
 
   async getFileData(payload: { filePath: string; encoding: Encoding }): Promise<string> {
@@ -194,5 +160,12 @@ export class ElectronService {
 
   async getBookmarkedFiles(payload: { bookmarks: string[] }): Promise<Doc[]> {
     return this.handle(HandlerAction.GetBookmarkedFiles, payload)
+  }
+
+  private addActionType<T extends OmitActionType<UpdateActionPayload>>(
+    channel: ActionType,
+    payload: T
+  ): T & { type: ActionType } {
+    return { ...payload, type: channel }
   }
 }

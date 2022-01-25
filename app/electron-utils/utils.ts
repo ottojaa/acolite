@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { calculateIndents } from './menu-utils'
-import { getBaseName, getDirName, getJoinedPath, getPathSeparator } from './file-utils'
+import { getBaseName, getDirName, getPathSeparator } from './file-utils'
 import { MenuItemTypes, SelectedTab, State, TreeElement } from '../shared/interfaces'
 import { join } from 'path'
 import { ValidatorFn, AbstractControl } from '@angular/forms'
@@ -99,69 +99,6 @@ export const getRootDirectory = (baseDir: string): TreeElement => {
   const menuItems = getTreeStructureFromBaseDirectory(baseDir)
 
   return { ...rootTreeElement, children: menuItems }
-}
-
-export const getSelectedTabEntityFromIndex = (state: State, index: number): SelectedTab => {
-  const { tabs, baseDir } = state
-  const selectedTab = tabs[index]
-  if (selectedTab) {
-    const filePath = tabs[index].filePath
-    const activeIndent = getActiveIndent(baseDir, selectedTab.filePath)
-
-    return { filePath, index, activeIndent, forceDashboard: false }
-  } else {
-    console.error(`No tab at index ${index}`)
-    return null
-  }
-}
-
-export const expandNodeRecursive = (root: TreeElement, path: string) => {
-  const rootPath = root.data.filePath
-  const nodeParent = getDirName(path)
-  const diff = nodeParent.replace(rootPath, '')
-
-  const getPathsToExpand = () => {
-    const paths = diff.split(getPathSeparator())
-    let lastPath = rootPath
-
-    const resultPaths = paths.map((nodePath) => {
-      lastPath = getJoinedPath([lastPath, nodePath])
-      return lastPath
-    })
-    return resultPaths.filter((el) => el !== rootPath)
-  }
-
-  const pathsToExpand = getPathsToExpand()
-
-  const expandRecursive = (node: TreeElement) => {
-    node.expanded = true
-    if (node.children) {
-      node.children.forEach((childNode) => {
-        expandRecursive(childNode)
-      })
-    }
-  }
-
-  if (pathsToExpand.length) {
-    root.children.forEach((child) => {
-      if (pathsToExpand.includes(child.data.filePath)) {
-        expandRecursive(child)
-      }
-    })
-  }
-}
-
-export const getActiveIndent = (rootPath: string, path: string) => {
-  if (!rootPath || !path) {
-    return undefined
-  }
-  const pathDiff = path.replace(rootPath, '')
-  const pathDepth = pathDiff.split(getPathSeparator()).length - 2
-  const parentPath = getDirName(path)
-  if (parentPath) {
-    return { activeParent: parentPath, activeNode: path, indent: pathDepth }
-  }
-  return null
 }
 
 export const isBannedValue = (bannedValues: string[]): ValidatorFn => {

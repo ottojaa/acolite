@@ -4,8 +4,6 @@ import { MatSliderChange } from '@angular/material/slider'
 import { ElectronService } from 'app/core/services'
 import { format } from 'date-fns'
 import { ImageTransform } from 'ngx-image-cropper'
-import { getBaseName } from '../../../../../../../app/electron-utils/file-utils'
-import { nameValidationPattern } from '../../../../../../../app/shared/constants'
 import { Dimensions } from '../interfaces'
 
 @Component({
@@ -59,7 +57,7 @@ export class EditorControlsComponent implements OnInit {
   constructor(public electronService: ElectronService) {}
 
   ngOnInit(): void {
-    const baseName = getBaseName(this.filePath).split('.')[0]
+    const baseName = window.path.getBaseName(this.filePath).split('.')[0]
     this.fileName.setValue(baseName + `_cropped_${format(new Date(), 'HH-mm-ss')}`)
   }
 

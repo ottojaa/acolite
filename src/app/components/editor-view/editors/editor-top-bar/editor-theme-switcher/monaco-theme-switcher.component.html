@@ -1,0 +1,8 @@
+<mat-form-field>
+  <mat-label>Theme</mat-label>
+  <mat-select [(ngModel)]="selectedTheme">
+    <mat-option *ngFor="let option of options" (click)="setTheme(option.name)" [value]="option.name">
+      {{ option.displayName }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

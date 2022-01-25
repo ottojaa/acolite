@@ -5,7 +5,6 @@ import { ConfirmDialogComponent } from 'app/components/dialogs/confirm-dialog/co
 import { TagEditorComponent } from 'app/components/top-bar/tag-editor/tag-editor.component'
 import { Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
-import { getBaseName } from '../../../app/electron-utils/file-utils'
 import { ConfirmDialogConfig, FilePathContainer, TreeElement } from '../../../app/shared/interfaces'
 import { BaseDirectoryDialogComponent } from '../components/dialogs/base-directory-dialog/base-directory-dialog.component'
 import { ChangeDirectoryDialogComponent } from '../components/dialogs/change-directory-dialog/change-directory-dialog.component'
@@ -156,6 +155,6 @@ export class AppDialogService {
       }
     }
 
-    return getBannedNodes(action).map((el) => getBaseName(el.data.filePath))
+    return getBannedNodes(action).map((el) => window.path.getBaseName(el.data.filePath))
   }
 }

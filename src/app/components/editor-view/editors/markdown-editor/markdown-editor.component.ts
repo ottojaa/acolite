@@ -3,10 +3,10 @@ import { MarkdownEditorComponent, Options, ToolbarItem, ToolbarItemName } from '
 import { MarkdownService } from 'ngx-markdown'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
-import hljs from 'highlight.js/lib/common'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ToolbarItemDef } from '@mdefy/ngx-markdown-editor/lib/types/toolbar'
+import hljs from 'highlight.js/lib/common'
 
 @Component({
   selector: 'app-markdown-editor',
@@ -142,9 +142,11 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
         return '<li>' + text + '</li>'
       }
     }
+
     this.markdownService.renderer.code = (code: string) => {
-      const highlighted = hljs.highlightAuto(code)
-      return `<pre><code>${highlighted.value}</code></pre>`
+      const highlighted = hljs.highlightAuto(code).value
+      console.log(highlighted)
+      return `<pre><code>${highlighted}</code></pre>`
     }
     // webContents.setWindowOpenHandler will not catch the event unless "_blank" is specified
     this.markdownService.renderer.link = (href: string, _title: string, text: string) =>

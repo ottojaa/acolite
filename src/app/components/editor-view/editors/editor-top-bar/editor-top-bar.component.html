@@ -1,10 +1,21 @@
-<span class="top-bar" [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
+<span class="top-bar"
   ><span class="last-saved">
     <h4 style="opacity: 0.7; margin-left: 10px">{{ tab.modifiedAt | date: 'd. MMMM hh:mm' }}</h4>
   </span>
 
   <div class="editor-settings">
-    <mat-slide-toggle id="theme-toggle" [(ngModel)]="isChecked" (ngModelChange)="onChangeTheme()"></mat-slide-toggle>
+    <mat-slide-toggle
+      *ngIf="showToggleSwitch"
+      id="theme-toggle"
+      [(ngModel)]="isChecked"
+      (ngModelChange)="onChangeTheme()"
+    ></mat-slide-toggle>
+
+    <app-monaco-theme-switcher
+      *ngIf="showMonacoThemeList"
+      [selectedTheme]="selectedMonacoTheme$ | async"
+      [options]="monacoThemes$ | async"
+    ></app-monaco-theme-switcher>
     <mat-icon (click)="toggleBookmark(tab)">{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
   </div>
 </span>

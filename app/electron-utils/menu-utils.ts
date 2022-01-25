@@ -1,5 +1,5 @@
 import { TreeNode } from 'primeng/api'
-import { TreeElement, FileEntity, MenuItemTypes } from '../shared/interfaces'
+import { TreeElement, FileEntity } from '../shared/interfaces'
 import { getBaseName, getPathSeparator } from './file-utils'
 
 export type UpdateStrategy = 'create' | 'rename' | 'delete' | 'copy'

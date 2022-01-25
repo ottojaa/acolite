@@ -9,9 +9,8 @@ import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { TabService } from '../../../services/tab.service'
 import { TreeElement, ActiveIndent, FileEntity, ConfirmDialogConfig } from '../../../../../app/shared/interfaces'
-import { getPathsToBeModified, pathContainerIsEmpty } from '../../../../../app/electron-utils/directory-utils'
-import { getBaseName } from '../../../../../app/electron-utils/file-utils'
 import { uniqBy, intersection } from 'lodash'
+import { getPathsToBeModified, pathContainerIsEmpty } from 'app/components/helpers/menu-helpers'
 
 @Component({
   selector: 'app-tree',
@@ -146,8 +145,8 @@ export class TreeComponent extends AbstractComponent {
       targetNode = this.state.getStatePartValue('rootDirectory')
     }
     const conflicts = intersection(
-      targetNode.children.map((child) => getBaseName(child.data.filePath)),
-      filePaths.map((path) => getBaseName(path))
+      targetNode.children.map((child) => window.path.getBaseName(child.data.filePath)),
+      filePaths.map((path) => window.path.getBaseName(path))
     )
 
     const copyRequest = () => {
@@ -159,7 +158,10 @@ export class TreeComponent extends AbstractComponent {
     }
 
     if (conflicts.length) {
-      const bannedNodes = targetNode.children.filter((child) => conflicts.includes(getBaseName(child.data.filePath)))
+      const bannedNodes = targetNode.children.filter((child) =>
+        conflicts.includes(window.path.getBaseName(child.data.filePath))
+      )
+
       this.ngZone.run(() => {
         const config: ConfirmDialogConfig = {
           title: 'The following file(s) already exist in the destination. Replace?',

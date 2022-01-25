@@ -35,7 +35,7 @@ export class AbstractEditor extends AbstractComponent {
   }
 
   themeListener(): Observable<string> {
-    return this.state.getStatePart('editorTheme').pipe(takeUntil(this.destroy$))
+    return this.state.getStatePart('markdownEditorTheme').pipe(takeUntil(this.destroy$))
   }
 
   showContextMenu(event: MouseEvent): void {

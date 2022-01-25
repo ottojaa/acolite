@@ -18,12 +18,7 @@ import {
   moveRecursive,
   replaceTreeNodeRecursive,
 } from '../electron-utils/menu-utils'
-import {
-  getDeletedFileMock,
-  getTreeElementFromPath,
-  getSelectedTabEntityFromIndex,
-  getTreeStructureFromBaseDirectory,
-} from '../electron-utils/utils'
+import { getDeletedFileMock, getTreeElementFromPath, getTreeStructureFromBaseDirectory } from '../electron-utils/utils'
 import {
   ReadFile,
   UpdateFileContent,
@@ -41,20 +36,11 @@ import { first, cloneDeep } from 'lodash'
 import { FileWatcher } from '../file-watcher/file-watcher'
 
 export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
-  const { filePath, state } = action
-  const { tabs } = state
+  const { filePath } = action
 
   getFileData(filePath).then(
     (tabData) => {
-      const tabIdx = tabs.findIndex((tab) => tab.filePath === filePath)
-      if (tabIdx === -1) {
-        tabs.push(tabData)
-      }
-
-      const selectedTabIndex = tabIdx === -1 ? tabs.length - 1 : tabIdx
-      const selectedTab = getSelectedTabEntityFromIndex(state, selectedTabIndex)
-
-      event.sender.send(FileActionResponses.ReadSuccess, { tabs, selectedTab })
+      event.sender.send(FileActionResponses.ReadSuccess, { tabData })
     },
     (err) => {
       console.error(err)
@@ -63,7 +49,7 @@ export const readAndSendTabData = (event: IpcMainEvent, action: ReadFile) => {
   )
 }
 
-export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent, index: Document<Doc, true>) => {
+export const updateFileContent = (event: IpcMainEvent, action: UpdateFileContent) => {
   const { filePath, content, state } = action
   const { tabs } = state
 

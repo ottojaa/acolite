@@ -46,6 +46,12 @@ export enum EntityTypes {
   Folder = 'folder',
 }
 
+export const defaultThemes = [
+  { name: 'vs', displayName: 'Vs' },
+  { name: 'vs-dark', displayName: 'Vs-dark' },
+  { name: 'hc-black', displayName: 'hc-black' },
+]
+
 export const indexFileTypes = ['txt', 'md', 'markdown', 'json', 'ts', 'js', 'css', 'scss', 'csv']
 
 // Types that should be encoded / decoded with encoding: 'binary'. Base64 seems to cause performance problems with async FS api readFile api
@@ -59,9 +65,10 @@ export const allowedConfigKeys: string[] = [
   'baseDir',
   'tabs',
   'sideMenuWidth',
-  'editorTheme',
+  'markdownEditorTheme',
   'selectedTab',
   'searchPreferences',
   'bookmarks',
   'appTheme',
+  'monacoEditorTheme',
 ]

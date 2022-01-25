@@ -36,6 +36,36 @@ import { ConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/', '.json')
 
+/**
+ * Contains typings for the functions exposed to the renderer process via contextBridge
+ */
+
+export interface IIpcAPI {
+  on: (channel: string, data: any) => void
+  send: (channel: string, data: any) => void
+  invoke: (channel: string, data: any) => void
+}
+
+export interface IHighlightAPI {
+  highlightAuto: (code: string) => string
+}
+
+export interface IPathAPI {
+  getBaseName: (filePath: string) => string
+  getExtension: (filePath: string) => string
+  getJoinedPath: (filePaths: string[]) => string
+  getDirName: (filePath: string) => string
+  getPathSeparator: () => string
+}
+
+declare global {
+  interface Window {
+    highlightJS: IHighlightAPI
+    path: IPathAPI
+    ipc: IIpcAPI
+  }
+}
+
 @NgModule({
   declarations: [AppComponent],
   imports: [

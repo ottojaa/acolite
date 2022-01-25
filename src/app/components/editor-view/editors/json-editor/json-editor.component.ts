@@ -63,14 +63,14 @@ export class JsonEditorComponent extends AbstractEditor implements OnInit {
     this.previewWidth = previewWidth as number
   }
 
-  updateJSONPreview(content: string): void {
+  async updateJSONPreview(content: string): Promise<void> {
     const formatted = this.formatJSON(content)
     this.isValidJson = !!formatted
 
     if (this.isValidJson) {
       this.formattedResult = { ...formatted }
-      const highlighted = hljs.highlightAuto(content)
-      this.highlightedContent = `<pre><code class="raw-json">${highlighted.value}</code></pre>`
+      const highlighted = hljs.highlightAuto(content).value
+      this.highlightedContent = `<pre><code class="raw-json">${highlighted}</code></pre>`
     }
   }
 

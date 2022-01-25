@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core'
 import { ThemeSwitcherComponent } from './theme-switcher.component'
-import { AppMaterialModule } from '../../../app-material.module'
+import { AppMaterialModule } from 'app/app-material.module'
 import { CommonModule } from '@angular/common'
 
 @NgModule({

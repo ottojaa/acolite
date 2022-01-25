@@ -1,0 +1,30 @@
+:host ::ng-deep {
+  .mat-select-value {
+    color: var(--contrast);
+  }
+  mat-label {
+    color: var(--contrast);
+  }
+  .mat-select-value {
+    color: var(--contrast);
+    opacity: 0.8;
+  }
+  .mat-select-arrow {
+    color: var(--contrast) !important;
+    opacity: 0.8;
+  }
+  .mat-form-field-underline,
+  .mat-form-field-ripple {
+    background-color: var(--buttonColor);
+  }
+  .mat-focused .mat-form-field-ripple {
+    background-color: var(--buttonColor) !important;
+  }
+  .mat-form-field-wrapper {
+    margin-bottom: -1.25em;
+  }
+}
+
+.option:hover {
+  background-color: var(--buttonColor);
+}

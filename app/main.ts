@@ -1,7 +1,8 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
+import hljs from 'highlight.js/lib/common'
 import { checkForUpdates, downloadUpdate, quitAndInstall } from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
@@ -45,6 +46,7 @@ import {
   GetThumbnail,
   GetBookmarkedFiles,
   GetRecentlyModified,
+  HighlightCodeAuto,
 } from './shared/actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -67,18 +69,16 @@ let index: Document<Doc, true>
 let fileWatcher = new FileWatcher()
 
 function createWindow(): BrowserWindow {
-  const electronScreen = screen
-
-  // Create the browser window.
   win = new BrowserWindow({
     x: 0,
     y: 0,
     show: false,
     icon: getJoinedPath([__dirname, 'acolite-logo-ellipse.png']),
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true, // Required by monaco-editor
       allowRunningInsecureContent: serve ? true : false,
-      contextIsolation: false, // false if you want to run e2e test with Spectron
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
     },
   })
   win.maximize()
@@ -266,7 +266,7 @@ const FileActionReducer = (action: FileActions) => {
         break
       }
       case FileActions.Update: {
-        updateFileContent(event, payload, index)
+        updateFileContent(event, payload)
         break
       }
       case FileActions.ReadFile: {
@@ -328,6 +328,9 @@ const IPCHandlerReducer = () => {
   })
   ipcMain.handle(HandlerAction.GetAppVersion, (_event) => {
     return app.getVersion()
+  })
+  ipcMain.handle(HandlerAction.HighlightCodeAuto, (_event, action: HighlightCodeAuto) => {
+    return hljs.highlightAuto(action.code).value
   })
 }
 

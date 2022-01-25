@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
+import { expandNodeRecursive } from 'app/components/helpers/menu-helpers'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { distinctUntilKeyChanged, map, mergeMap, take, takeUntil, tap } from 'rxjs/operators'
-import { expandNodeRecursive } from '../../../app/electron-utils/utils'
 import { allowedConfigKeys } from '../../../app/shared/constants'
 import { State } from '../../../app/shared/interfaces'
 import { AbstractComponent } from '../abstract/abstract-component'
@@ -27,6 +27,7 @@ export type StateUpdate<T> = {
 interface TriggerMap {
   expandNodeParents: string[]
   updateStore: string[]
+  setMonacoTheme: string[]
 }
 
 @Injectable({
@@ -36,6 +37,7 @@ export class StateService extends AbstractComponent {
   initialState: State = {
     indexing: false,
     indexingReady: false,
+    monacoReady: false,
     initialized: false,
     baseDir: '',
     selectedTab: {
@@ -43,7 +45,8 @@ export class StateService extends AbstractComponent {
       index: 0,
       forceDashboard: false,
     },
-    editorTheme: 'dark',
+    markdownEditorTheme: 'dark',
+    monacoEditorTheme: 'vs-dark',
     appTheme: 'Dark blue green',
     sideMenuWidth: 20,
     searchResults: [],
@@ -90,44 +93,6 @@ export class StateService extends AbstractComponent {
     )
   }
 
-  /**
-   *
-   * @param prop1 first level property of State
-   * @param prop2 second level property of State[prop1]
-   */
-  getStatePartDeep<P1 extends keyof State, P2 extends keyof State[P1]>(
-    prop1: P1,
-    prop2: P2
-  ): Observable<State[P1][P2]> {
-    return this.state$.asObservable().pipe(
-      map((state) => state[prop1]),
-      distinctUntilKeyChanged(prop2),
-      map((nestedState) => nestedState[prop2])
-    )
-  }
-
-  getStatePartValueDeep<P1 extends keyof State, P2 extends keyof State[P1]>(prop1: P1, prop2: P2): State[P1][P2] {
-    return this.value[prop1][prop2]
-  }
-
-  /**
-   * Updates nested properties without mutating the state object (unused for the time being + should probably reimplement without typecast)
-   */
-  /* updateStatePartDeep<P1 extends keyof State>(prop1: P1, update: StateUpdate<State[P1]>): Observable<UpdatePayload> {
-    return this.state$.pipe(
-      take(1),
-      map((state) => {
-        const newState = cloneDeep(state)
-        const { key, payload } = update
-
-        newState[prop1][key] = payload
-
-        console.log({ oldState: state, newState })
-        return { state: newState, updateStore: this.shouldTriggerStoreUpdate([key as string]) }
-      })
-    )
-  } */
-
   updateState(updateStateParts: StateUpdate<State>[]): Observable<UpdatePayload> {
     return this.state$.pipe(
       take(1),
@@ -166,11 +131,12 @@ export class StateService extends AbstractComponent {
    *
    */
   handleCallbacks(state: State, triggerKeys: (keyof State)[]): void {
-    const { selectedTab, rootDirectory, bookmarks } = state
+    const { selectedTab, rootDirectory, monacoEditorTheme } = state
 
     const triggerMap: TriggerMap = {
       expandNodeParents: ['selectedTab'],
       updateStore: allowedConfigKeys,
+      setMonacoTheme: ['monacoEditorTheme'],
     }
 
     const shouldTrigger = (action: keyof TriggerMap) => triggerKeys.some((key) => triggerMap[action].includes(key))

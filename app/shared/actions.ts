@@ -21,7 +21,13 @@ export type UpdateActionPayload =
   | GetRecentlyModified
   | GetBookmarkedFiles
 
-export type ActionType = FileActions | FolderActions | StoreActions | SearchActions
+export type ActionType =
+  | FileActions
+  | FolderActions
+  | StoreActions
+  | SearchActions
+  | AutoUpdateEvent
+  | ContextMenuActions
 
 export interface CreateFile {
   type: FileActions.Create
@@ -128,6 +134,10 @@ export interface GetBookmarkedFiles {
   type: StoreActions.GetBookmarkedFiles
   bookmarks: string[]
 }
+export interface HighlightCodeAuto {
+  type: HandlerAction.HighlightCodeAuto
+  code: string
+}
 export interface ChooseDir {
   type: FolderActions.ChooseDir
 }
@@ -220,6 +230,7 @@ export enum HandlerAction {
   GetAppVersion = 'get-app-version',
   GetRecentlyModified = 'get-recently-modified',
   GetBookmarkedFiles = 'get-bookmarked-files',
+  HighlightCodeAuto = 'highlight-code-auto',
   ChooseDirectory = 'choose-directory',
   CreateThumbnail = 'create-thumbnail',
   GetThumbnail = 'get-thumbnail',

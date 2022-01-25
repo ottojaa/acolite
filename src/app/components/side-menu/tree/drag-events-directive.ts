@@ -27,7 +27,7 @@ export class DragEventsDirective {
   @HostListener('drop', ['$event'])
   onDrop(event: DragEvent) {
     this.setHoverClass('remove')
-    const filePaths = Array.from(event.dataTransfer.files).map((file) => file.path)
+    const filePaths = Array.from(event.dataTransfer.files).map((fileEntity: any) => fileEntity.path)
 
     if (!filePaths.length) {
       return

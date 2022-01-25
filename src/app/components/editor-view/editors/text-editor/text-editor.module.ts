@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
+import { MonacoEditorModule, MONACO_PATH } from '@materia-ui/ngx-monaco-editor'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 
 @NgModule({
   declarations: [TextEditorComponent],
@@ -24,6 +26,14 @@ import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
     ContextMenuModule,
     MatSlideToggleModule,
     EditorTopBarModule,
+    MonacoEditorModule,
+    MatProgressSpinnerModule,
   ],
+  /* providers: [
+    {
+      provide: MONACO_PATH,
+      useValue: './assets/monaco-editor/min/vs',
+    },
+  ], */
 })
 export class TextEditorModule {}

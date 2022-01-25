@@ -19,7 +19,7 @@
       "@variables": ["./src/variables.scss"]
     }
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "release", ".git", "dist"],
   "angularCompilerOptions": {
     "strictTemplates": true,
     "fullTemplateTypeCheck": true,
