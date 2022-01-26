@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
-import hljs from 'highlight.js/lib/common'
 import { checkForUpdates, downloadUpdate, quitAndInstall } from './updater'
 import { IpcMainEvent, PopupOptions } from 'electron/main'
 import { Document } from 'flexsearch'
@@ -46,7 +45,6 @@ import {
   GetThumbnail,
   GetBookmarkedFiles,
   GetRecentlyModified,
-  HighlightCodeAuto,
 } from './shared/ipc-actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
@@ -328,9 +326,6 @@ const IPCHandlerReducer = () => {
   })
   ipcMain.handle(HandlerAction.GetAppVersion, (_event) => {
     return app.getVersion()
-  })
-  ipcMain.handle(HandlerAction.HighlightCodeAuto, (_event, action: HighlightCodeAuto) => {
-    return hljs.highlightAuto(action.code).value
   })
 }
 

@@ -5,7 +5,7 @@ import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { MatSelect } from '@angular/material/select'
-import { nameValidationPattern } from '../../../../../app/shared/constants'
+import { fileNameValidationPattern } from '../../../../../app/shared/constants'
 
 @Component({
   selector: 'app-file-creation',
@@ -16,7 +16,7 @@ export class FileCreationComponent {
   @ViewChild('typeSelect') typeSelect: MatSelect
 
   fileName = new FormControl('', {
-    validators: [Validators.required, Validators.pattern(nameValidationPattern)],
+    validators: [Validators.required, Validators.pattern(fileNameValidationPattern)],
   })
 
   openFileAfterCreation = true

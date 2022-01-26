@@ -215,9 +215,8 @@ export const deleteFiles = (event: IpcMainEvent, action: DeleteFiles, fileWatche
             if (!isDir) {
               fileWatcher.onDeleteFile(stats.ino)
               markTabAsDeleted(filePath)
-
-              resolve()
             }
+            resolve()
           })
           .catch(() => {
             failedToDelete.push(filePath)

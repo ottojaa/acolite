@@ -4,8 +4,8 @@ interface FileExtensionIcon {
   color?: string
 }
 
-export const nameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöåüÄÖÅÜß]+\\.[A-Za-z0-9]+$'
-export const extensionValidationPattern = '^[a-z]+$'
+export const folderNameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöüÄÖÜß ]+$'
+export const fileNameValidationPattern = '^[-A-Za-z0-9_-ñÑáéíóúÁÉÍÓÚäöåüÄÖÅÜß]+\\.[A-Za-z0-9]+$'
 
 export const allowedTextEditorExtensions = ['txt', 'text', 'html', 'yml', 'doc', 'docx']
 export const allowedMarkdownEditorExtensions = ['markdown', 'md']

@@ -1,7 +1,7 @@
 import { Component, Inject, NgZone } from '@angular/core'
 import { FormControl, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { nameValidationPattern } from '../../../../../app/shared/constants'
+import { fileNameValidationPattern } from '../../../../../app/shared/constants'
 import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
@@ -25,7 +25,7 @@ export class RenameFileDialogComponent {
   ) {
     this.fileName = new FormControl(window.path.getBaseName(data.filePath), [
       Validators.required,
-      Validators.pattern(nameValidationPattern),
+      Validators.pattern(fileNameValidationPattern),
     ])
   }
 
