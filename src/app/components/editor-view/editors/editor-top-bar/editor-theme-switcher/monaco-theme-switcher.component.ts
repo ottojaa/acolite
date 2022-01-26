@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core'
 import { StateService } from 'app/services/state.service'
-import { MonacoTheme } from 'app/services/theme.service'
+import { MonacoTheme, ThemeList } from 'app/services/theme.service'
 
 @Component({
   selector: 'app-monaco-theme-switcher',
@@ -9,7 +9,7 @@ import { MonacoTheme } from 'app/services/theme.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonacoThemeSwitcherComponent {
-  @Input() options: MonacoTheme[]
+  @Input() options: ThemeList
   @Input() selectedTheme: string
 
   constructor(public state: StateService) {}

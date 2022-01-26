@@ -1,15 +1,11 @@
 <div style="height: 100%" *ngIf="tabData$ | async as tabData; else loader" @componentLoaded>
   <ng-container [ngSwitch]="tabData.editorConfig.editorType">
     <div *ngSwitchCase="'txt'" class="editor">
-      <app-text-editor [tab]="tabData"></app-text-editor>
+      <app-monaco-editor [tab]="tabData"></app-monaco-editor>
     </div>
 
     <div *ngSwitchCase="'md'" class="editor">
       <app-markdown-editor [tab]="tabData"></app-markdown-editor>
-    </div>
-
-    <div *ngSwitchCase="'json'" class="editor">
-      <app-json-editor [tab]="tabData"></app-json-editor>
     </div>
 
     <div *ngSwitchCase="'pdf'" class="editor">

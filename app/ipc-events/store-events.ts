@@ -16,7 +16,7 @@ import {
 } from '../electron-utils/file-utils'
 import { getRootDirectory } from '../electron-utils/utils'
 import { AppConfig, SearchPreference, SearchResult, TreeElement, Doc } from '../shared/interfaces'
-import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/actions'
+import { SearchQuery, UpdateStore, StoreResponses, SearchResponses } from '../shared/ipc-actions'
 import { defaultSpliceLength } from '../shared/constants'
 import { isPlainObject, cloneDeep, uniqBy, isEqual, reject } from 'lodash'
 
@@ -30,9 +30,14 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
       event.sender.send(StoreResponses.InitAppSuccess, {})
     } else {
       const configBuffer = fs.readFileSync(configPath)
-      const config: AppConfig = JSON.parse(configBuffer.toString())
+      let config: AppConfig
 
-      // Invalid JSON, overwrite. unnecessary because JSON.parse would fail anyway -> move the validity check to a separate validation func?
+      try {
+        config = JSON.parse(configBuffer.toString())
+      } catch (err) {
+        console.error('parsing configuration file failed', err)
+      }
+
       if (!isPlainObject(config)) {
         fs.writeFileSync(configPath, getDefaultConfigJSON())
       }

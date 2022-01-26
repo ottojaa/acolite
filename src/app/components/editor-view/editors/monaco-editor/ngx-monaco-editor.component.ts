@@ -1,5 +1,5 @@
 import { trigger, transition, style, animate } from '@angular/animations'
-import { Component, Input, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
 import {
   MonacoEditorConstructionOptions,
   MonacoEditorLoaderService,
@@ -7,16 +7,16 @@ import {
 } from '@materia-ui/ngx-monaco-editor'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ThemeService } from 'app/services/theme.service'
-import { BehaviorSubject, combineLatest, forkJoin, Observable, Subject } from 'rxjs'
-import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { filter, take } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { ElectronService } from '../../../../core/services'
 import { StateService } from '../../../../services/state.service'
 
 @Component({
-  selector: 'app-text-editor',
-  templateUrl: './text-editor.component.html',
-  styleUrls: ['./text-editor.component.scss'],
+  selector: 'app-monaco-editor',
+  templateUrl: './ngx-monaco-editor.component.html',
+  styleUrls: ['./ngx-monaco-editor.component.scss'],
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(300, style({ opacity: 1 }))]),
@@ -24,7 +24,7 @@ import { StateService } from '../../../../services/state.service'
     ]),
   ],
 })
-export class TextEditorComponent extends AbstractEditor implements OnInit {
+export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
 
   fileContent: string
@@ -35,6 +35,8 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   editorOptions: MonacoEditorConstructionOptions = { autoDetectHighContrast: false, fixedOverflowWidgets: true }
   editorInstance$ = new BehaviorSubject<MonacoStandaloneCodeEditor>(null)
 
+  editorInit = false
+
   get filePath(): string {
     return this.tab.filePath
   }
@@ -43,12 +45,14 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
     public electronService: ElectronService,
     public state: StateService,
     public themeService: ThemeService,
-    public monacoLoaderService: MonacoEditorLoaderService
+    public monacoLoaderService: MonacoEditorLoaderService,
+    public cdRef: ChangeDetectorRef
   ) {
     super(electronService, state)
   }
 
   ngOnInit(): void {
+    this.fileContent = this.tab.fileContent
     this.monacoReady$ = this.state.getStatePart('monacoReady')
     this.themeListReady$ = this.themeService.isThemeListReady()
     this.initEditorListener()
@@ -59,6 +63,9 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   }
 
   onInputChange(): void {
+    if (!this.editorInit) {
+      return
+    }
     this.autoSave$.next({ filePath: this.filePath, content: this.fileContent })
   }
 
@@ -78,12 +85,13 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
     this.editor = editorInstance
 
     const createModel = () => {
-      return monaco.editor.createModel('', undefined, monaco.Uri.file(this.filePath))
+      return monaco.editor.createModel(this.tab.fileContent, undefined, monaco.Uri.file(this.filePath))
     }
 
     const model = createModel()
     this.editor.setModel(model)
-    this.fileContent = this.tab.fileContent
+
+    this.editorInit = true
   }
 
   updateEditorOptions(payload: MonacoEditorConstructionOptions): void {
@@ -91,6 +99,7 @@ export class TextEditorComponent extends AbstractEditor implements OnInit {
   }
 
   ngOnDestroy(): void {
+    super.ngOnDestroy()
     monaco.editor
       .getModels()
       .find((model) => model.uri.path === this.filePath)

@@ -145,7 +145,6 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
 
     this.markdownService.renderer.code = (code: string) => {
       const highlighted = hljs.highlightAuto(code).value
-      console.log(highlighted)
       return `<pre><code>${highlighted}</code></pre>`
     }
     // webContents.setWindowOpenHandler will not catch the event unless "_blank" is specified

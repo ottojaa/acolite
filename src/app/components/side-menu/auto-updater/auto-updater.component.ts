@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { ElectronService } from 'app/core/services'
-import { ProgressInfo } from 'electron-updater'
-import { AutoUpdateEvent } from '../../../../../app/shared/actions'
+import { AutoUpdateEvent } from '../../../../../app/shared/ipc-actions'
 
 interface DownloaderState {
   statusText: string

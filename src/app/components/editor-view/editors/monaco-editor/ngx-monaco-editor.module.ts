@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { TextEditorComponent } from './text-editor.component'
+import { NgxMonacoEditorComponent } from './ngx-monaco-editor.component'
 import { TextFieldModule } from '@angular/cdk/text-field'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatFormFieldModule } from '@angular/material/form-field'
@@ -9,12 +9,12 @@ import { MatInputModule } from '@angular/material/input'
 import { ContextMenuModule } from 'primeng/contextmenu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { EditorTopBarModule } from '../editor-top-bar/editor-top-bar.module'
-import { MonacoEditorModule, MONACO_PATH } from '@materia-ui/ngx-monaco-editor'
+import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 
 @NgModule({
-  declarations: [TextEditorComponent],
-  exports: [TextEditorComponent],
+  declarations: [NgxMonacoEditorComponent],
+  exports: [NgxMonacoEditorComponent],
   imports: [
     CommonModule,
     TextFieldModule,
@@ -29,11 +29,5 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
     MonacoEditorModule,
     MatProgressSpinnerModule,
   ],
-  /* providers: [
-    {
-      provide: MONACO_PATH,
-      useValue: './assets/monaco-editor/min/vs',
-    },
-  ], */
 })
-export class TextEditorModule {}
+export class MonacoEditorComponentModule {}

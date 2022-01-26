@@ -1,8 +1,8 @@
 import * as fs from 'fs'
-import { first, uniq } from 'lodash'
+import { first, isPlainObject, uniq } from 'lodash'
 import { getFileDataSync } from '../electron-utils/file-utils'
 import { allowedConfigKeys } from '../shared/constants'
-import { WorkspaceConfig, AppConfig } from '../shared/interfaces'
+import { WorkspaceConfig, AppConfig, Doc } from '../shared/interfaces'
 
 export const getDefaultConfigJSON = (workspacePath?: string): string => {
   if (!workspacePath) {
@@ -49,12 +49,13 @@ const getSelectedWorkspaceConfig = (config: AppConfig): WorkspaceConfig => {
 export const updateSelectedWorkspaceConfig = (updateData: WorkspaceConfig, configPath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     readConfigData(configPath).then((configData) => {
+      const validatedUpdateData = validateAndUpdateConfig(updateData)
       const { selectedWorkspace, workspaces } = configData
       const workspaceIndex = workspaces.findIndex((workspace) => workspace.baseDir === selectedWorkspace)
 
       if (workspaceIndex > -1) {
         const workspaceToUpdate = workspaces[workspaceIndex]
-        workspaces[workspaceIndex] = { ...workspaceToUpdate, ...updateData }
+        workspaces[workspaceIndex] = { ...workspaceToUpdate, ...validatedUpdateData }
       } else {
         reject(`Workspace config not found for path ${selectedWorkspace}`)
       }
@@ -84,6 +85,7 @@ const readConfigData = (configPath: string): Promise<AppConfig> => {
         resolve(parsedData)
       } catch (error) {
         console.error('readConfigData failed', error)
+        console.log('Invalid configData: ', configData)
         reject(error)
       }
     })

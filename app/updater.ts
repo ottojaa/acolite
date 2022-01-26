@@ -1,7 +1,7 @@
 import { App, BrowserWindow, IpcMain } from 'electron'
 import logger from 'electron-log'
 import { autoUpdater, ProgressInfo } from 'electron-updater'
-import { AutoUpdateEvent } from './shared/actions'
+import { AutoUpdateEvent } from './shared/ipc-actions'
 
 autoUpdater.logger = logger
 autoUpdater.autoDownload = false

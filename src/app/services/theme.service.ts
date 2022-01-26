@@ -81,7 +81,6 @@ export class ThemeService {
   }
 
   setMonacoTheme(theme: string): void {
-    console.log(theme)
     monaco.editor.setTheme(theme)
   }
 

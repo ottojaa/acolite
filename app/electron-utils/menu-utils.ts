@@ -1,6 +1,6 @@
 import { TreeNode } from 'primeng/api'
 import { TreeElement, FileEntity } from '../shared/interfaces'
-import { getBaseName, getPathSeparator } from './file-utils'
+import { getBaseName, getExtension, getPathSeparator } from './file-utils'
 
 export type UpdateStrategy = 'create' | 'rename' | 'delete' | 'copy'
 export interface Config {
@@ -144,6 +144,7 @@ export const getUpdatedFilePathsRecursive = (item: TreeElement, newPath: string,
 
   if (item.data.filePath === newPath) {
     item.label = getBaseName(newPath)
+    item.data.fileExtension = getExtension(newPath)
   }
 
   if (!item.children) {

@@ -30,7 +30,7 @@ import {
   FileActionResponses,
   FileActions,
   CopyFiles,
-} from '../shared/actions'
+} from '../shared/ipc-actions'
 import { Doc } from '../shared/interfaces'
 import { first, cloneDeep } from 'lodash'
 import { FileWatcher } from '../file-watcher/file-watcher'
@@ -116,8 +116,7 @@ export const renameFile = (event: IpcMainEvent, action: RenameFile) => {
   const { filePath, newName, state } = action
   const { rootDirectory, tabs, baseDir } = state
   const parentDirectory = getDirName(filePath)
-  const extension = getExtension(filePath)
-  const newPath = getJoinedPath([parentDirectory, newName]) + extension
+  const newPath = getJoinedPath([parentDirectory, newName])
   const oldPath = filePath
 
   fs.rename(filePath, newPath, (err) => {

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, screen, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as url from 'url'
@@ -47,7 +47,7 @@ import {
   GetBookmarkedFiles,
   GetRecentlyModified,
   HighlightCodeAuto,
-} from './shared/actions'
+} from './shared/ipc-actions'
 import { Doc } from './shared/interfaces'
 import { getEditorMenuItems } from './menu'
 import { FileWatcher } from './file-watcher/file-watcher'

@@ -5,7 +5,7 @@ import { ElectronService } from '../../../core/services'
 import { AppDialogService } from '../../../services/dialog.service'
 import { StateService } from '../../../services/state.service'
 import { MatSelect } from '@angular/material/select'
-import { extensionValidationPattern, nameValidationPattern } from '../../../../../app/shared/constants'
+import { nameValidationPattern } from '../../../../../app/shared/constants'
 
 @Component({
   selector: 'app-file-creation',
@@ -15,8 +15,10 @@ import { extensionValidationPattern, nameValidationPattern } from '../../../../.
 export class FileCreationComponent {
   @ViewChild('typeSelect') typeSelect: MatSelect
 
-  fileName = new FormControl('', [Validators.required, Validators.pattern(nameValidationPattern)])
-  extension = new FormControl('txt', [Validators.required, Validators.pattern(extensionValidationPattern)])
+  fileName = new FormControl('', {
+    validators: [Validators.required, Validators.pattern(nameValidationPattern)],
+  })
+
   openFileAfterCreation = true
   showExtensionInput = false
   options = [
@@ -42,15 +44,6 @@ export class FileCreationComponent {
     },
   ]
 
-  get result(): string {
-    const name = this.fileName.value
-    const extension = this.extension.value
-    if (!name || !extension) {
-      return
-    }
-    return name + '.' + extension
-  }
-
   get parent(): string {
     return window.path.getBaseName(this.data.filePath)
   }
@@ -73,34 +66,23 @@ export class FileCreationComponent {
     this.dialogRef.close()
   }
 
-  onClickShowExtensionInput(): void {
-    this.showExtensionInput = true
-    this.extension.setValue('')
-  }
-
   getErrorMessage(): string | undefined {
     if (this.fileName.hasError('required')) {
       return 'You must enter a file name'
     }
     if (this.fileName.hasError('pattern')) {
-      return 'File name can only contain letters and numbers'
-    }
-    if (this.extension.hasError('required')) {
-      return 'You must choose an extension'
-    }
-    if (this.extension.hasError('pattern')) {
-      return 'Extension can only consist of lower-case letters'
+      return 'File name can only contain letters and numbers, and has to have an extension specified'
     }
   }
 
   onCreateClick(): void {
-    const isBanned = this.data.bannedFileNames.some((name) => name === this.result)
+    const isBanned = this.data.bannedFileNames.some((name) => name === this.fileName.value)
     if (isBanned) {
-      this.dialogService.openToast(`${this.result} already exists in this location`, 'failure')
+      this.dialogService.openToast(`${this.fileName.value} already exists in this location`, 'failure')
       return
     }
 
-    const filePath = window.path.getJoinedPath([this.data.filePath, this.result])
+    const filePath = window.path.getJoinedPath([this.data.filePath, this.fileName.value])
 
     this.electronService.createNewFileRequest({
       filePath,

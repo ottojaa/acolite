@@ -12,9 +12,6 @@
   .mat-spinner circle {
     stroke: var(--buttonColor) !important;
   }
-  .monaco-editor {
-    padding-top: 1rem;
-  }
 }
 
 .editor-section {
@@ -23,9 +20,12 @@
   display: flex;
   flex-direction: column;
 }
+app-editor-top-bar {
+  height: 50px;
+}
 
 ngx-monaco-editor {
-  height: 100%;
+  height: calc(100% - 50px);
   width: 100%;
   opacity: 0;
   transition: opacity 300ms;

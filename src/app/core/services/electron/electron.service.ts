@@ -21,7 +21,7 @@ import {
   ContextMenuActions,
   CopyFiles,
   AutoUpdateEvent,
-} from '../../../../../app/shared/actions'
+} from '../../../../../app/shared/ipc-actions'
 import { allowedConfigKeys } from '../../../../../app/shared/constants'
 import { Doc, Encoding } from '../../../../../app/shared/interfaces'
 import { pick } from 'lodash'

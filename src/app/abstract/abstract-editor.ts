@@ -1,10 +1,10 @@
-import { Component, OnDestroy } from '@angular/core'
+import { Component } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { Observable, Subject } from 'rxjs'
-import { takeUntil, skip, debounceTime } from 'rxjs/operators'
-import { UpdateFileContent } from '../../../app/shared/actions'
-import { Encoding, SelectedTab, State } from '../../../app/shared/interfaces'
+import { takeUntil, debounceTime } from 'rxjs/operators'
+import { UpdateFileContent } from '../../../app/shared/ipc-actions'
+import { SelectedTab } from '../../../app/shared/interfaces'
 import { AbstractComponent } from './abstract-component'
 
 @Component({
@@ -41,5 +41,9 @@ export class AbstractEditor extends AbstractComponent {
   showContextMenu(event: MouseEvent): void {
     event.preventDefault()
     this.electronService.showContextMenu()
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy()
   }
 }

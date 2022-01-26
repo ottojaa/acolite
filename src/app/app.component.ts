@@ -6,12 +6,17 @@ import { AppDialogService } from './services/dialog.service'
 import { ThemeService } from './services/theme.service'
 import { StateService, StateUpdate } from './services/state.service'
 import { Router } from '@angular/router'
-import { FileActionResponses, FolderActionResponses, SearchResponses, StoreResponses } from '../../app/shared/actions'
+import {
+  FileActionResponses,
+  FolderActionResponses,
+  SearchResponses,
+  StoreResponses,
+} from '../../app/shared/ipc-actions'
 import { State } from '../../app/shared/interfaces'
-import { filter, skip, skipUntil, switchMap, take, takeUntil, tap } from 'rxjs/operators'
+import { filter, skipUntil, switchMap, take, takeUntil } from 'rxjs/operators'
 import { AbstractComponent } from './abstract/abstract-component'
 import { addTabAndSetAsSelectedTab } from './components/helpers/tab-helpers'
-import { combineLatest, forkJoin, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 
 type IPCResponse = FolderActionResponses | FileActionResponses | StoreResponses | SearchResponses
@@ -161,7 +166,6 @@ export class AppComponent extends AbstractComponent implements OnInit {
         }
         case FolderActionResponses.ChooseDirectorySuccess: {
           const currentState = this.state.state$.getValue()
-          console.log(response)
           this.state.state$.next({ ...currentState, ...response })
           this.readDir()
           break

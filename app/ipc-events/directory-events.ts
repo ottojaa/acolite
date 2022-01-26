@@ -6,7 +6,7 @@ import { Document } from 'flexsearch'
 import { changeSelectedWorkspace, getDefaultConfigJSON } from '../config-helpers/config-helpers'
 import { getTreeElementFromPath, getRootDirectory } from '../electron-utils/utils'
 import { getUpdatedMenuItemsRecursive } from '../electron-utils/menu-utils'
-import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../shared/actions'
+import { CreateNewDirectory, FolderActionResponses, ReadDirectory } from '../shared/ipc-actions'
 import { Doc } from '../shared/interfaces'
 import { first } from 'lodash'
 

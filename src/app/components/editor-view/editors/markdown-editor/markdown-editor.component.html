@@ -2,15 +2,13 @@
   <div class="elevation">
     <app-editor-top-bar [tab]="tab" [showToggleSwitch]="true"></app-editor-top-bar>
 
-    <div class="editor-border">
-      <ngx-markdown-editor
-        class="markdown-body"
-        id="ngx-markdown-editor-{{ tab.filePath }}"
-        [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
-        [options]="editorOptions"
-        (contentChange)="onEditorContentChange()"
-        (contextmenu)="showContextMenu($event)"
-      ></ngx-markdown-editor>
-    </div>
+    <ngx-markdown-editor
+      class="markdown-body"
+      id="ngx-markdown-editor-{{ tab.filePath }}"
+      [ngClass]="isChecked ? 'light-theme' : 'dark-theme'"
+      [options]="editorOptions"
+      (contentChange)="onEditorContentChange()"
+      (contextmenu)="showContextMenu($event)"
+    ></ngx-markdown-editor>
   </div>
 </div>

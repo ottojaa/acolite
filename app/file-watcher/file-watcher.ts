@@ -5,7 +5,7 @@ import { Doc } from '../shared/interfaces'
 import { deleteThumbnail, writeThumbnailImage } from '../thumbnail-helpers/thumbnail-helpers'
 import { Scheduler } from '../action-scheduler/scheduler'
 import { BrowserWindow } from 'electron'
-import { StoreResponses } from '../shared/actions'
+import { StoreResponses } from '../shared/ipc-actions'
 
 /**
  * This class handles chokidar events, creating and deleting file thumbnails, and updating file indexes

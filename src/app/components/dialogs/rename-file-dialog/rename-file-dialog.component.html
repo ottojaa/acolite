@@ -4,7 +4,6 @@
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label>
       <input matInput [formControl]="fileName" />
-      <span *ngIf="extension" style="opacity: 0.7" matSuffix>.{{ extension }}</span>
     </mat-form-field>
     <mat-error *ngIf="!fileName.pristine && fileName.invalid">{{ getErrorMessage() }}</mat-error>
   </div>

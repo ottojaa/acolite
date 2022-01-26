@@ -4,7 +4,7 @@ import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { ImageTransform, OutputFormat } from 'ngx-image-cropper'
-import { CreateFile } from '../../../../../../app/shared/actions'
+import { CreateFile } from '../../../../../../app/shared/ipc-actions'
 import { Doc } from '../../../../../../app/shared/interfaces'
 import { Dimensions } from './interfaces'
 
@@ -22,7 +22,7 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   @Input() tab: Doc
 
   fileName: string
-  croppedImage: any = ''
+  croppedImage: string = ''
   isChecked: boolean
   imagePath: string
   imageBase64: string

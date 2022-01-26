@@ -63,7 +63,7 @@ export class AppDialogService {
 
     const ref = this.dialog.open(FileCreationComponent, {
       data: { filePath, bannedFileNames },
-      minWidth: '400px',
+      minWidth: '600px',
       maxWidth: '600px',
       hasBackdrop: true,
       position: {},
@@ -78,7 +78,7 @@ export class AppDialogService {
     const ref = this.dialog.open(RenameFileDialogComponent, {
       data: { filePath, bannedFileNames },
       hasBackdrop: true,
-      minWidth: '400px',
+      minWidth: '600px',
       maxWidth: '600px',
     })
     return ref.afterClosed().pipe(take(1))

@@ -87,7 +87,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #1010108a;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.6505311597295168) 0%,
+      rgba(0, 0, 0, 0.4488504874606093) 22%,
+      rgba(0, 0, 0, 0) 100%
+    );
     backdrop-filter: blur(3px);
     transition: opacity 300ms;
     > div {

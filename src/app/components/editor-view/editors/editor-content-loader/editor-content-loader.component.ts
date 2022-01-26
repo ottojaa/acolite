@@ -5,7 +5,7 @@ import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { ThemeService } from 'app/services/theme.service'
 import { from, Observable } from 'rxjs'
-import { filter, map, switchMap, take, tap } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
 
 @Component({
@@ -46,6 +46,6 @@ export class EditorContentLoaderComponent implements OnInit {
         filePath: tab.filePath,
         encoding: tab.editorConfig.encoding,
       })
-    ).pipe(map((fileContent) => ({ ...tab, fileContent: fileContent })))
+    ).pipe(map((fileContent) => ({ ...tab, fileContent })))
   }
 }

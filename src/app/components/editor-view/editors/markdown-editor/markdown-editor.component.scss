@@ -59,8 +59,12 @@ $toolbar-bg-light: white;
   }
 }
 
+app-editor-top-bar {
+  height: 40px;
+}
+
 ngx-markdown-editor {
-  height: 100%;
+  height: calc(100% - 40px);
 }
 
 :host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {

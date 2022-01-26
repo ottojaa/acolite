@@ -11,6 +11,7 @@ src/**/*.js
 app/**/*.js
 app/ipc-events/*.js
 app/*.js/
+!app/preload.js
 !src/karma.conf.js
 *.js.map
 
