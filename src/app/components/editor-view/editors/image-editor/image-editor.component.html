@@ -1,3 +1,5 @@
+<app-editor-top-bar [tab]="tab" [lastModified]="lastModified"></app-editor-top-bar>
+
 <div class="image-cropper-container">
   <div class="view-container" [ngClass]="{ editMode: editMode }" *ngIf="tab.fileContent; else loader" @componentLoaded>
     <div class="image-container">

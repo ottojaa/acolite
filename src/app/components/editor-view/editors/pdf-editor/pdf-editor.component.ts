@@ -12,6 +12,7 @@ import { Doc } from '../../../../../../app/shared/interfaces'
 export class PdfEditorComponent extends AbstractEditor {
   @Input() set tab(tab: Doc) {
     this._tab = tab
+    this.lastModified = this.tab.modifiedAt
     this.initData()
   }
 

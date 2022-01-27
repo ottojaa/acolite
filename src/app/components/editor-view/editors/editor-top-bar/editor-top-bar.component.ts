@@ -14,6 +14,7 @@ import { Doc } from '../../../../../../app/shared/interfaces'
 })
 export class EditorTopBarComponent extends AbstractComponent implements OnInit {
   @Input() tab: Doc
+  @Input() lastModified: Date
   @Input() showToggleSwitch: boolean = false
   @Input() showMonacoThemeList: boolean = false
 

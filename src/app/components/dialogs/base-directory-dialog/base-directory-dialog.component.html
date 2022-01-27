@@ -3,12 +3,8 @@
   <h3>Choose a workspace directory</h3>
   <p>
     Workspace directory will be the folder where all of your files created in this application go. You can choose an
-    existing folder, create a new one, or let the application create one for you. Options are:
+    existing folder or create a new one.
   </p>
-  <ul>
-    <li>Set default directory: creates an empty folder in <span style="font-style: italic">documents/Acolite</span></li>
-    <li>Choose directory: select the desired destination, or create a new one.</li>
-  </ul>
 
   <span>
     <p>
@@ -21,13 +17,11 @@
 
   <h3>Change workspace on the go</h3>
   <p>
-    Changing your workspace is easy and you can do it anytime. All of your files will still be there, and all of the
-    workspaces will be backed up separately.
+    Changing your workspace is easy and you can do it anytime. All of your files and workspace specific settings will
+    still be there after switching.
   </p>
-  <p>Your workspace settings are automatically saved.</p>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onSetDefaultDirectory()">Set default directory</button>
   <button mat-button (click)="onChooseDirectory()" cdkFocusInitial>Choose directory</button>
 </mat-dialog-actions>

@@ -1,5 +1,5 @@
 import { trigger, transition, style, animate } from '@angular/animations'
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnInit, SimpleChange } from '@angular/core'
 import {
   MonacoEditorConstructionOptions,
   MonacoEditorLoaderService,
@@ -7,6 +7,7 @@ import {
 } from '@materia-ui/ngx-monaco-editor'
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ThemeService } from 'app/services/theme.service'
+import { get, isEqual } from 'lodash'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, take } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
@@ -35,8 +36,6 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
   editorOptions: MonacoEditorConstructionOptions = { autoDetectHighContrast: false, fixedOverflowWidgets: true }
   editorInstance$ = new BehaviorSubject<MonacoStandaloneCodeEditor>(null)
 
-  editorInit = false
-
   get filePath(): string {
     return this.tab.filePath
   }
@@ -53,6 +52,7 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
 
   ngOnInit(): void {
     this.fileContent = this.tab.fileContent
+    this.lastModified = this.tab.modifiedAt
     this.monacoReady$ = this.state.getStatePart('monacoReady')
     this.themeListReady$ = this.themeService.isThemeListReady()
     this.initEditorListener()
@@ -63,10 +63,11 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
   }
 
   onInputChange(): void {
-    if (!this.editorInit) {
+    if (this.fileContent === this.tab.fileContent) {
       return
     }
-    this.autoSave$.next({ filePath: this.filePath, content: this.fileContent })
+
+    this.autoSave$.next({ filePath: this.tab.filePath, content: this.fileContent })
   }
 
   initEditorListener(): void {
@@ -87,11 +88,9 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
     const createModel = () => {
       return monaco.editor.createModel(this.tab.fileContent, undefined, monaco.Uri.file(this.filePath))
     }
-
     const model = createModel()
-    this.editor.setModel(model)
 
-    this.editorInit = true
+    this.editor.setModel(model)
   }
 
   updateEditorOptions(payload: MonacoEditorConstructionOptions): void {
@@ -100,9 +99,15 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
 
   ngOnDestroy(): void {
     super.ngOnDestroy()
-    monaco.editor
-      .getModels()
-      .find((model) => model.uri.path === this.filePath)
-      .dispose()
+
+    const editorInstance = monaco?.editor
+    if (!editorInstance) {
+      return
+    }
+
+    const currentModel = editorInstance.getModels().find((model) => model.uri.path === this.filePath)
+    if (currentModel) {
+      currentModel.dispose()
+    }
   }
 }

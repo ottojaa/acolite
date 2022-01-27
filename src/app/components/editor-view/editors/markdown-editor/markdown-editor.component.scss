@@ -67,135 +67,146 @@ ngx-markdown-editor {
   height: calc(100% - 40px);
 }
 
-:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-  background-color: #cccccc;
-}
-
-:host ::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
-  background-color: white;
-}
-
-:host ::ng-deep .ngx-markdown-editor-toolbar {
-  background-color: var(--backgroundSecondary);
-  padding: 0 0.8rem 0.5rem;
-  box-shadow: $box-shadow-elevation;
-}
-
-:host ::ng-deep .CodeMirror {
-  background: var(--editorBg1);
-  border-radius: 0;
-}
-:host ::ng-deep .CodeMirror-scroll {
-  padding-bottom: 0 !important;
-}
-
-:host ::ng-deep .ngx-markdown-editor-wrapper > :first-child {
-  border: none !important;
-}
-
-:host ::ng-deep .CodeMirror-gutters {
-  background-color: var(--backgroundTertiary);
-  border: none;
-}
-
-:host ::ng-deep ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
-  border: none;
-}
-:host ::ng-deep .dark-theme {
-  .ngx-markdown-editor-statusbar {
-    color: white;
-    margin: 0;
-    padding: 0.5rem;
-    background-color: var(--backgroundTertiary);
+:host ::ng-deep {
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+    background-color: #cccccc;
   }
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+    background-color: white;
+  }
+  .ngx-markdown-editor-wrapper {
+    &:last-child {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    &:first-child {
+      border: none !important;
+    }
+    & > * {
+      border: none !important;
+    }
+  }
+  /* ngx-markdown-editor.default .ngx-markdown-editor-wrapper > * {
+    border: none
+  } */
   .ngx-markdown-editor-toolbar {
-    background-color: var(--mdStatusToolbarBg);
-    mat-icon {
-      color: white;
-      opacity: 0.9;
-    }
-  }
-  .cm-header {
-    color: #8c8cff;
-  }
-
-  .cm-variable-2 {
-    color: #4b9beb;
-  }
-  .cm-keyword {
-    color: #b227c5;
-  }
-  .cm-link {
-    color: #007fcc;
-  }
-  .mat-button-base,
-  .mat-form-field-label,
-  .mat-select-arrow,
-  .mat-select-value {
-    color: $markdown-color-dark;
-  }
-  .mat-form-field-underline {
-    background-color: $markdown-color-dark;
-  }
-  .ngx-markdown-editor-preview {
-    color: $markdown-color-dark;
-    background: var(--editorBg2);
-  }
-  .ngx-markdown-editor-preview > .preview-wrapper {
-    border-left: 1px solid #ffffff24;
-    &::-webkit-scrollbar-thumb {
-      visibility: visible;
-    }
-  }
-  .CodeMirror-scroll {
-    color: $markdown-color-dark;
+    background-color: var(--backgroundSecondary);
+    padding: 0 0.8rem 0.5rem;
+    border-bottom: $app-border;
+    box-shadow: $box-shadow-elevation;
   }
   .CodeMirror {
-    background: var(--backgroundTertiary);
-  }
-  .CodeMirror-cursor {
-    border-left: 1px solid $markdown-color-dark;
-  }
-}
-
-:host ::ng-deep .light-theme {
-  .ngx-markdown-editor-statusbar {
-    color: white;
-    margin: 0;
-    padding: 0.5rem;
-  }
-  .ngx-markdown-editor-toolbar {
-    background-color: $toolbar-bg-light;
-    mat-icon {
-      color: black;
-    }
-  }
-  .mat-button-base,
-  .mat-form-field-label,
-  .mat-select-arrow {
-    color: $markdown-color-light;
-  }
-  .mat-form-field-underline {
-    background-color: $markdown-color-light;
-  }
-  .ngx-markdown-editor-preview {
-    color: $markdown-color-light;
-    background: $markdown-bg-light;
-  }
-  .ngx-markdown-editor-preview > .preview-wrapper {
-    border-left: 1px solid #0000002b;
-  }
-  .ngx-markdown-editor-preview::-webkit-scrollbar-thumb {
-    visibility: visible;
+    background: var(--editorBg1);
+    border-radius: 0 !important;
   }
   .CodeMirror-scroll {
-    color: $markdown-color-light;
-    background: $markdown-bg-light;
+    padding-bottom: 0 !important;
   }
-  .Codemirror {
-    background: $markdown-bg-light;
+  .CodeMirror-gutters {
+    background-color: var(--backgroundTertiary);
+    border: none;
   }
-  .CodeMirror-cursor {
-    border-left: 1px solid $markdown-color-light;
+
+  // Dark theme
+
+  .dark-theme {
+    .ngx-markdown-editor-statusbar {
+      color: white;
+      margin: 0;
+      padding: 0.5rem;
+      background-color: var(--backgroundTertiary);
+    }
+    .ngx-markdown-editor-toolbar {
+      background-color: var(--mdStatusToolbarBg);
+      mat-icon {
+        color: white;
+        opacity: 0.9;
+      }
+    }
+    .cm-header {
+      color: #8c8cff;
+    }
+
+    .cm-variable-2 {
+      color: #4b9beb;
+    }
+    .cm-keyword {
+      color: #b227c5;
+    }
+    .cm-link {
+      color: #007fcc;
+    }
+    .mat-button-base,
+    .mat-form-field-label,
+    .mat-select-arrow,
+    .mat-select-value {
+      color: $markdown-color-dark;
+    }
+    .mat-form-field-underline {
+      background-color: $markdown-color-dark;
+    }
+    .ngx-markdown-editor-preview {
+      color: $markdown-color-dark;
+      background: var(--editorBg2);
+    }
+    .ngx-markdown-editor-preview > .preview-wrapper {
+      border-left: 1px solid #ffffff24;
+      &::-webkit-scrollbar-thumb {
+        visibility: visible;
+      }
+    }
+    .CodeMirror-scroll {
+      color: $markdown-color-dark;
+    }
+    .CodeMirror {
+      background: var(--backgroundTertiary);
+    }
+    .CodeMirror-cursor {
+      border-left: 1px solid $markdown-color-dark;
+    }
+  }
+
+  // Light theme
+
+  .light-theme {
+    .ngx-markdown-editor-statusbar {
+      color: white;
+      margin: 0;
+      padding: 0.5rem;
+    }
+    .ngx-markdown-editor-toolbar {
+      background-color: $toolbar-bg-light;
+      mat-icon {
+        color: black;
+      }
+    }
+    .mat-button-base,
+    .mat-form-field-label,
+    .mat-select-arrow {
+      color: $markdown-color-light;
+    }
+    .mat-form-field-underline {
+      background-color: $markdown-color-light;
+    }
+    .ngx-markdown-editor-preview {
+      color: $markdown-color-light;
+      background: $markdown-bg-light;
+    }
+    .ngx-markdown-editor-preview > .preview-wrapper {
+      border-left: 1px solid #0000002b;
+    }
+    .ngx-markdown-editor-preview::-webkit-scrollbar-thumb {
+      visibility: visible;
+    }
+    .CodeMirror-scroll {
+      color: $markdown-color-light;
+      background: $markdown-bg-light;
+    }
+    .Codemirror {
+      background: $markdown-bg-light;
+    }
+    .CodeMirror-cursor {
+      border-left: 1px solid $markdown-color-light;
+    }
   }
 }

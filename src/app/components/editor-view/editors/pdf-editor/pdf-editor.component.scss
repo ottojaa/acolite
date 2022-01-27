@@ -2,6 +2,16 @@
   border: none !important;
 }
 
+app-editor-top-bar {
+  height: 40px;
+}
+
+app-pdf-viewer {
+  height: calc(100% - 40px);
+  display: block;
+  overflow: hidden;
+}
+
 .loader-container {
   height: 100%;
   display: flex;

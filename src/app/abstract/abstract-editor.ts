@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
 import { Observable, Subject } from 'rxjs'
-import { takeUntil, debounceTime } from 'rxjs/operators'
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { UpdateFileContent } from '../../../app/shared/ipc-actions'
 import { SelectedTab } from '../../../app/shared/interfaces'
 import { AbstractComponent } from './abstract-component'
@@ -14,6 +14,7 @@ export class AbstractEditor extends AbstractComponent {
   public destroy$ = new Subject<boolean>()
   public autoSave$ = new Subject<{ filePath: string; content: string }>()
   public initialized$ = new Subject<boolean>()
+  lastModified: Date
 
   constructor(public electronService: ElectronService, public state: StateService) {
     super()
@@ -21,7 +22,8 @@ export class AbstractEditor extends AbstractComponent {
   }
 
   initAutoSave(): void {
-    this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe((payload) => {
+    this.autoSave$.pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged()).subscribe((payload) => {
+      this.lastModified = new Date()
       this.electronService.updateFileContent({ ...payload, state: this.state.value })
     })
   }

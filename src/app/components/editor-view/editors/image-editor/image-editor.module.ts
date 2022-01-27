@@ -17,8 +17,8 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { RoundedIconButtonModule } from 'app/components/common/rounded-icon-button/rounded-icon-button.module'
 import { MatIconModule } from '@angular/material/icon'
-import { FormatPathPipeModule } from 'app/components/pipes/format-path.module';
-import { EditorControlsComponent } from './editor-controls/editor-controls.component';
+import { FormatPathPipeModule } from 'app/components/pipes/format-path.module'
+import { EditorControlsComponent } from './editor-controls/editor-controls.component'
 import { ImageCropperComponent } from './image-cropper/image-cropper.component'
 
 @NgModule({
@@ -44,6 +44,7 @@ import { ImageCropperComponent } from './image-cropper/image-cropper.component'
     RoundedIconButtonModule,
     MatIconModule,
     FormatPathPipeModule,
+    EditorTopBarModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

@@ -12,7 +12,7 @@
   padding: 0.5rem 0.8rem;
   border-bottom: $editor-top-bar-border;
   border-top: $editor-top-bar-border;
-  background: var(--backgroundSecondary);
+  background: var(--backgroundPrimary);
   height: 100%;
   width: 100%;
   align-items: center;
@@ -27,12 +27,6 @@
     flex-direction: row;
   }
 
-  /*  &.light-theme {
-    p,
-    span {
-      color: #c0c0c0;
-    }
-  } */
   .last-saved {
     h4,
     h3 {

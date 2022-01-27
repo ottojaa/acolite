@@ -75,7 +75,7 @@ export const setDefaultDirectory = (event: IpcMainEvent, configPath: string, wor
       event.sender.send(FolderActionResponses.SetDefaultDirFailure, err)
       return
     }
-    event.sender.send(FolderActionResponses.SetDefaultDirSuccess, __dirname)
+    event.sender.send(FolderActionResponses.SetDefaultDirSuccess, { baseDir: workspacePath })
   })
 }
 

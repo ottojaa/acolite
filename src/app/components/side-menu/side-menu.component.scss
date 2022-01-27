@@ -13,10 +13,6 @@
   box-shadow: none;
 }
 
-:host ::ng-deep .p-tree-empty-message {
-  display: none; // Had to do this because tree's emptyMessage does not work.
-}
-
 ::ng-deep .mat-progress-bar-fill::after {
   background-color: var(--buttonColor);
 }

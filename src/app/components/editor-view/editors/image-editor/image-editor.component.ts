@@ -51,6 +51,7 @@ export class ImageEditorComponent extends AbstractEditor implements OnInit {
   }
 
   ngOnInit(): void {
+    this.lastModified = this.tab.modifiedAt
     this.initData()
     this.getImageBase64()
     this.themeListener().subscribe((data) => (this.isChecked = data === 'light'))

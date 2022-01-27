@@ -1,5 +1,5 @@
 import { trigger, transition, style, animate, keyframes } from '@angular/animations'
-import { ChangeDetectorRef, Component, Input, NgZone, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnInit } from '@angular/core'
 import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 import { ElectronService } from 'app/core/services'
 import { StateService } from 'app/services/state.service'
@@ -12,6 +12,7 @@ import { Doc } from '../../../../../../app/shared/interfaces'
   selector: 'app-editor-content-loader',
   templateUrl: './editor-content-loader.component.html',
   styleUrls: ['./editor-content-loader.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('componentLoaded', [
       transition(':enter', [

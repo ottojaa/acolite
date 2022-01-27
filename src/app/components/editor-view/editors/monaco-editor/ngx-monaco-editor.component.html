@@ -1,6 +1,6 @@
 <div class="editor-section">
   <ng-template #editor let-monacoReady="monacoReady">
-    <app-editor-top-bar [tab]="tab" [showMonacoThemeList]="true"></app-editor-top-bar>
+    <app-editor-top-bar [tab]="tab" [lastModified]="lastModified" [showMonacoThemeList]="true"></app-editor-top-bar>
     <mat-spinner [ngClass]="{ hide: monacoReady }"></mat-spinner>
     <ngx-monaco-editor
       [ngClass]="{ show: monacoReady }"

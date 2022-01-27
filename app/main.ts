@@ -230,10 +230,10 @@ const FolderActionReducer = (action: FolderActions) => {
         chooseDirectory(event, win, configPath)
         break
       }
-      case FolderActions.SetDefaultDir: {
+      /* case FolderActions.SetDefaultDir: {
         setDefaultDirectory(event, configPath, defaultDocumentPath)
         break
-      }
+      } */
       case FolderActions.ReadDir: {
         index = null
         index = getEmptyIndex()

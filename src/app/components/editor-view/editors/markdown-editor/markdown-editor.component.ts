@@ -36,6 +36,7 @@ export class MarkdownEditorViewComponent extends AbstractEditor implements OnIni
   }
 
   ngOnInit(): void {
+    this.lastModified = this.tab.modifiedAt
     this.initSelectedTabListener()
     this.initThemeListener()
     this.initMarkdownDefaultBehaviorOverride()
