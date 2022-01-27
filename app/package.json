@@ -1,6 +1,6 @@
 {
   "name": "acolite",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "main": "main.js",
   "private": true,
   "dependencies": {
