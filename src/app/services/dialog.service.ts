@@ -27,7 +27,7 @@ export class AppDialogService {
   ) {}
 
   openWorkspaceDirectoryDialog(): Observable<string | undefined> {
-    const ref = this.dialog.open(BaseDirectoryDialogComponent, { hasBackdrop: true })
+    const ref = this.dialog.open(BaseDirectoryDialogComponent, { hasBackdrop: true, width: '900px' })
     return ref.afterClosed().pipe(take(1))
   }
 

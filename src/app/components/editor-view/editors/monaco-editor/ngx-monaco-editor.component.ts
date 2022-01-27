@@ -8,6 +8,7 @@ import {
 import { AbstractEditor } from 'app/abstract/abstract-editor'
 import { ThemeService } from 'app/services/theme.service'
 import { get, isEqual } from 'lodash'
+import { Uri } from 'monaco-editor'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { filter, take } from 'rxjs/operators'
 import { Doc } from '../../../../../../app/shared/interfaces'
@@ -38,6 +39,10 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
 
   get filePath(): string {
     return this.tab.filePath
+  }
+
+  get uri(): Uri {
+    return monaco.Uri.file(this.filePath)
   }
 
   constructor(
@@ -86,7 +91,7 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
     this.editor = editorInstance
 
     const createModel = () => {
-      return monaco.editor.createModel(this.tab.fileContent, undefined, monaco.Uri.file(this.filePath))
+      return monaco.editor.createModel(this.tab.fileContent, undefined, this.uri)
     }
     const model = createModel()
 
@@ -105,9 +110,11 @@ export class NgxMonacoEditorComponent extends AbstractEditor implements OnInit {
       return
     }
 
-    const currentModel = editorInstance.getModels().find((model) => model.uri.path === this.filePath)
+    const currentModel = editorInstance.getModel(this.uri)
     if (currentModel) {
       currentModel.dispose()
+    } else {
+      console.error('Could not dispose current editor model, uri: ', this.uri)
     }
   }
 }
