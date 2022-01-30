@@ -1,8 +1,8 @@
 # Introduction
 
-Acolite is a local file management system and editor made with ElectronJS 13.1.7 and Angular 12 that helps you keep your important notes and files in a single centralized subset of your file system. Organize files easily by creating folders and subfolders dedicated to a certain purpose, and/or bookmark especially important files to find them quickly when you need them.
+Acolite is a local file management system and editor made with ElectronJS 13.1.7 and Angular 12 that helps you keep your important notes and files in a single centralized subset of your file system. Organize files easily by creating folders and subfolders dedicated to a certain purpose, and/or bookmark important files to find them quickly when you need them.
 
-Create new files and edit them in the app or drag and drop existing files from your file system. Text files are fully indexed and you can find them easily by searching for their text content, so not remembering a file's name is not an issue.
+Create new files and edit them in the app or drag and drop existing files from your file system. Text files are fully indexed and you can find them easily by searching for their text content, file path or name, so not remembering a file's name is not an issue.
 
 Download links for the latest release can be found [here](https://github.com/ottojaa/acolite/releases)
 
@@ -10,10 +10,9 @@ Download links for the latest release can be found [here](https://github.com/ott
 
 - Create and manage files conveniently
 - Dedicated file viewers / editors:
-  - **Text** editor
+  - **Text / Code** editor using [Monaco](https://github.com/microsoft/monaco-editor), supports ~1000 different languages
   - **Markdown** editor with full syntax highlighting and live preview
   - **Image** editor with basic cropping functionality
-  - **JSON** editor with syntax highlight and lint, coupled with object viewer
   - **PDF** viewer
 
 
@@ -27,11 +26,11 @@ Download links for the latest release can be found [here](https://github.com/ott
 - Persistent state and workspace settings
 
 ### Roadmap
-- File content previews in the dashboard
-- Backup service so you can access your files from any machine
-- Support and dedicated editors for more file types
-- Implement chokidar and decouple file indexing from the core logic of the application
-- More customisability in form of settings
+- [x] File content previews in the dashboard
+- [ ] Backup service so you can access your files from any machine
+- [x] Support and dedicated editors for more file types
+- [x] Implement chokidar and decouple file indexing from the core logic of the application
+- [ ] More customisability in form of settings
 
 
 ### Known issues
@@ -39,16 +38,13 @@ Download links for the latest release can be found [here](https://github.com/ott
   - **Windows**: `~/%APPDATA%/Roaming/acolite/acolite.config.json`
   - **Mac**: `~/Library/Application Support/acolite/acolite.config.json`
 
-- Creating / renaming files should not be as restrictive as it is right now in terms of extensions
-- Files are completely deleted from the system as opposed to moving them to trash / recycle bin
-
 
 
 # Examples
 
 ### Dashboard
 
-![Alt text](/samples/recently_modified.png?raw=true 'Dashboard')
+![Alt text](/samples/dashboard.png?raw=true 'Dashboard')
 
 ### Markdown Editor
 
@@ -58,9 +54,9 @@ Download links for the latest release can be found [here](https://github.com/ott
 
 ![Alt text](/samples/image_cropper_sample.png?raw=true 'Image cropper')
 
-### JSON Editor
+### Monaco editor + Intellisense
 
-![Alt text](/samples/json_sample.png?raw=true 'JSON Editor')
+![Alt text](/samples/monaco.png?raw=true 'Monaco editor')
 
 ### Content search
 
