@@ -58,7 +58,7 @@ export const initAppState = async (event: IpcMainEvent, configPath: string, inde
           return {}
         }
         const selectedWorkspaceData = validatedConfig.workspaces.find((workspace) => workspace.baseDir === baseDir)
-        const rootDirectory = getRootDirectory(baseDir)
+        const rootDirectory = await getRootDirectory(baseDir)
         const dashboardConfig = getDashboardConfig(index, selectedWorkspaceData.bookmarks)
         const state = { ...selectedWorkspaceData, rootDirectory, ...dashboardConfig }
 

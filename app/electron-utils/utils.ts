@@ -47,34 +47,45 @@ export const getDeletedFileMock = (filePath: string): TreeElement => {
 export const getTreeStructureFromBaseDirectory = (baseDir: string) => {
   const directoryPath = baseDir
 
-  const getDirectories = (fileEntity: TreeElement) =>
-    fs
-      .readdirSync(fileEntity.data.filePath, { withFileTypes: true })
-      .filter((dirent) => dirent.isDirectory())
-      .map((dirent) => join(fileEntity.data.filePath, dirent.name))
-      .filter((name) => !name.includes('_thumbnails'))
-      .map((dirPath) => getTreeElementFromPath(baseDir, dirPath, true))
+  const filterFn = (dirent: fs.Dirent, type: 'file' | 'directory') =>
+    type === 'file'
+      ? dirent.isFile() && !/(^|\/)\.[^\/\.]/g.test(dirent.name)
+      : dirent.isDirectory() && !dirent.name.includes('_thumbnails')
 
-  const getFiles = (fileEntity: TreeElement) =>
-    fs
-      .readdirSync(fileEntity.data.filePath, { withFileTypes: true })
-      .filter((dirent) => !dirent.isDirectory())
-      .map((dirent) => join(fileEntity.data.filePath, dirent.name))
-      .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item)) // Filter hidden files such as .DS_Store
-      .map((filePath) => getTreeElementFromPath(baseDir, filePath, false))
+  const getEntities = async (fileEntity: TreeElement, type: 'file' | 'directory') => {
+    const dirents = await fs.promises.readdir(fileEntity.data.filePath, { withFileTypes: true })
 
-  const getFilesRecursively = (file: TreeElement): TreeElement[] => {
-    let dirs = getDirectories(file)
-    let files: TreeElement[] = dirs.map((dir) => {
-      return {
-        ...dir,
-        children: getFilesRecursively(dir).reduce(
-          (directoryDescendants: TreeElement[], descendant: TreeElement) => directoryDescendants.concat(descendant),
-          []
-        ),
+    return dirents.reduce((acc: TreeElement[], curr: fs.Dirent) => {
+      const isValid = filterFn(curr, type)
+
+      if (isValid) {
+        const filePath = join(fileEntity.data.filePath, curr.name)
+        const treeElement = getTreeElementFromPath(baseDir, filePath, curr.isDirectory())
+        acc.push(treeElement)
       }
-    })
-    return files.concat(getFiles(file))
+      return acc
+    }, [])
+  }
+
+  const getFilesRecursively = async (file: TreeElement): Promise<TreeElement[]> => {
+    const dirs = await getEntities(file, 'directory')
+
+    const mapChildrenToDirectory = async (): Promise<TreeElement[]> =>
+      await Promise.all(
+        dirs.map(async (dir) => {
+          const dirFiles = await getFilesRecursively(dir)
+          return {
+            ...dir,
+            children: dirFiles.reduce(
+              (directoryDescendants: TreeElement[], descendant: TreeElement) => directoryDescendants.concat(descendant),
+              []
+            ),
+          }
+        })
+      )
+
+    let files = await mapChildrenToDirectory()
+    return files.concat(await getEntities(file, 'file'))
   }
 
   const rootFolder = getTreeElementFromPath(baseDir, directoryPath, true)
@@ -94,9 +105,9 @@ export const patchCollectionBy = <T, K extends keyof T>(collection: T[], newEl: 
   return copy
 }
 
-export const getRootDirectory = (baseDir: string): TreeElement => {
+export const getRootDirectory = async (baseDir: string): Promise<TreeElement> => {
   const rootTreeElement = getTreeElementFromPath(baseDir, baseDir, true)
-  const menuItems = getTreeStructureFromBaseDirectory(baseDir)
+  const menuItems = await getTreeStructureFromBaseDirectory(baseDir)
 
   return { ...rootTreeElement, children: menuItems }
 }

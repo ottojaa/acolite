@@ -276,8 +276,8 @@ export const copyFiles = (event: IpcMainEvent, payload: CopyFiles, index: Docume
   )
 
   Promise.all(promises).then(
-    () => {
-      const updatedTargetNodeChildren = getTreeStructureFromBaseDirectory(target.data.filePath)
+    async () => {
+      const updatedTargetNodeChildren = await getTreeStructureFromBaseDirectory(target.data.filePath)
       const node = { ...target, children: updatedTargetNodeChildren }
       const updatedRootDir = first(replaceTreeNodeRecursive([rootDirectory], node, baseDir))
 

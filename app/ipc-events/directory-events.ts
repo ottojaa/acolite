@@ -79,14 +79,10 @@ export const setDefaultDirectory = (event: IpcMainEvent, configPath: string, wor
   })
 }
 
-export const readAndSendMenuItemsFromBaseDirectory = async (
-  event: IpcMainEvent,
-  action: ReadDirectory,
-  index: Document<Doc, true>
-) => {
+export const readAndSendMenuItemsFromBaseDirectory = async (event: IpcMainEvent, action: ReadDirectory) => {
   try {
     const { baseDir } = action.state
-    const rootDirectory = getRootDirectory(baseDir)
+    const rootDirectory = await getRootDirectory(baseDir)
 
     event.sender.send(FolderActionResponses.ReadDirectorySuccess, { rootDirectory })
   } catch (err) {

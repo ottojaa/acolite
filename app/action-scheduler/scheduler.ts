@@ -1,20 +1,20 @@
 import { combineLatest, Observable, ReplaySubject, Subject } from 'rxjs'
-import { concatMap, debounceTime, distinctUntilChanged, map, startWith, tap } from 'rxjs/operators'
+import { distinctUntilChanged, map, mergeMap, startWith, tap } from 'rxjs/operators'
 
 /**
  * Queues promises and resolves them one by one in order. IsScheduling determines whether the queue is active
  */
 export class Scheduler {
   queue$ = new Subject()
-  results$: Observable<any>
+  results$: Observable<void>
   isScheduling$ = new ReplaySubject<boolean>(1)
 
   constructor() {
-    this.results$ = this.queue$.pipe(concatMap((action: Promise<any>) => action))
+    this.results$ = this.queue$.pipe(mergeMap((action: Promise<void>) => action, 10))
     this.isScheduling().subscribe((scheduling) => this.isScheduling$.next(scheduling))
   }
 
-  addToQueue(action: Promise<any>): void {
+  addToQueue(action: Promise<void>): void {
     this.queue$.next(action)
   }
 

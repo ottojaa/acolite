@@ -27,7 +27,6 @@ export type StateUpdate<T> = {
 interface TriggerMap {
   expandNodeParents: string[]
   updateStore: string[]
-  setMonacoTheme: string[]
 }
 
 @Injectable({
@@ -131,12 +130,11 @@ export class StateService extends AbstractComponent {
    *
    */
   handleCallbacks(state: State, triggerKeys: (keyof State)[]): void {
-    const { selectedTab, rootDirectory, monacoEditorTheme } = state
+    const { selectedTab, rootDirectory } = state
 
     const triggerMap: TriggerMap = {
       expandNodeParents: ['selectedTab'],
       updateStore: allowedConfigKeys,
-      setMonacoTheme: ['monacoEditorTheme'],
     }
 
     const shouldTrigger = (action: keyof TriggerMap) => triggerKeys.some((key) => triggerMap[action].includes(key))

@@ -14,7 +14,6 @@
     }
   ],
   "win": {
-    "icon": "dist/assets/icons/acolite-logo-ellipse.png",
     "target": ["nsis"],
     "publish": ["github"]
   },
@@ -28,9 +27,5 @@
     "entitlements": "./build/entitlements.mac.plist",
     "entitlementsInherit": "./build/entitlements.mac.plist",
     "hardenedRuntime": true
-  },
-  "linux": {
-    "icon": "dist/assets/icons/acolite-logo-ellipse.png",
-    "target": ["AppImage"]
   }
 }

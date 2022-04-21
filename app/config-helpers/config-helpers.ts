@@ -165,8 +165,9 @@ export const validateAndUpdateConfig = (workspaceConfig: WorkspaceConfig): Works
       }
     }
   }
-  const allowedKeys = allowedConfigKeys
-  const keys = Object.keys(workspaceConfig).filter((key: any) => allowedKeys.includes(key)) as (keyof WorkspaceConfig)[]
+  const keys = Object.keys(workspaceConfig).filter((key: string) =>
+    allowedConfigKeys.includes(key)
+  ) as (keyof WorkspaceConfig)[]
 
   return keys.reduce((acc, curr) => {
     acc[curr] = validatedConfigVal(curr)
